@@ -95,7 +95,7 @@
 
         /* ========== MAIN CONTAINER ========== */
         .main-container {
-            max-width: 960px;
+            max-width: 1200px;
             width: 100%;
             margin: 0 auto;
             padding: 28px 20px 40px;
@@ -120,30 +120,35 @@
             color: var(--gray);
         }
 
-        /* ========== SECTION TITLE ========== */
-        .section-title {
-            font-weight: 700;
-            padding: 8px 14px;
-            background: linear-gradient(90deg, var(--andreani-red) 0%, var(--andreani-red-dark) 100%);
-            color: white;
-            border-radius: 4px;
-            box-shadow: 0 0 12px var(--andreani-red-soft);
-            margin-bottom: 14px;
-            letter-spacing: 0.4px;
-            font-size: 15px;
-            display: inline-block;
+        /* ========== TWO COLUMN LAYOUT ========== */
+        .two-column-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .two-column-layout {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* ========== DROP ZONE ========== */
         .drop-zone {
             border: 3px dashed #b0c4de;
             border-radius: 20px;
-            padding: 60px 20px;
+            padding: 40px 20px;
             text-align: center;
             background: #fafcff;
             transition: 0.3s;
             cursor: pointer;
-            margin-bottom: 20px;
+            height: 100%;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .drop-zone.dragover {
@@ -168,6 +173,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+            justify-content: center;
         }
 
         #fileList li {
@@ -188,6 +194,106 @@
             padding: 2px 10px;
             font-size: 11px;
             font-weight: 600;
+        }
+
+        /* ========== MESSAGE CARD ========== */
+        .message-card {
+            background: var(--card-bg);
+            border-radius: var(--radio);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--sombra-card);
+            padding: 20px;
+            height: 100%;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--andreani-red);
+        }
+
+        .message-card-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .message-card-body {
+            flex: 1;
+            background: #f8f9fc;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            max-height: 300px;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            border: 1px solid var(--border-light);
+        }
+
+        .message-card-body:empty::before {
+            content: "💬 El mensaje se mostrará aquí después de procesar los archivos";
+            color: var(--gray-light);
+            font-style: italic;
+        }
+
+        .message-card-footer {
+            margin-top: 12px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-copiar {
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            color: white;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--andreani-red), var(--andreani-red-dark));
+            box-shadow: 0 2px 8px var(--andreani-red-soft);
+            transition: all var(--transicion);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-copiar:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--andreani-red-soft);
+        }
+
+        .btn-copiar:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-copiar.copiado {
+            background: #0a7a3a;
+        }
+
+        /* ========== SECTION TITLE ========== */
+        .section-title {
+            font-weight: 700;
+            padding: 8px 14px;
+            background: linear-gradient(90deg, var(--andreani-red) 0%, var(--andreani-red-dark) 100%);
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 0 12px var(--andreani-red-soft);
+            margin-bottom: 14px;
+            letter-spacing: 0.4px;
+            font-size: 15px;
+            display: inline-block;
         }
 
         /* ========== BOTONES ========== */
@@ -265,7 +371,7 @@
             background: #f0f4fa;
             border-radius: 12px;
             padding: 15px 20px;
-            max-height: 300px;
+            max-height: 250px;
             overflow-y: auto;
             font-family: 'Cascadia Code', 'Consolas', monospace;
             font-size: 13px;
@@ -329,7 +435,8 @@
             }
         }
 
-        .drop-zone {
+        .drop-zone,
+        .message-card {
             animation: fadeIn 300ms ease;
         }
 
@@ -366,7 +473,12 @@
             }
 
             .drop-zone {
-                padding: 40px 15px;
+                padding: 30px 15px;
+                min-height: 200px;
+            }
+
+            .message-card {
+                min-height: 200px;
             }
 
             .stats-bar {
@@ -381,16 +493,19 @@
         }
 
         /* Scroll personalizado */
-        .log-area::-webkit-scrollbar {
+        .log-area::-webkit-scrollbar,
+        .message-card-body::-webkit-scrollbar {
             width: 6px;
         }
 
-        .log-area::-webkit-scrollbar-track {
+        .log-area::-webkit-scrollbar-track,
+        .message-card-body::-webkit-scrollbar-track {
             background: #e0e4ea;
             border-radius: 10px;
         }
 
-        .log-area::-webkit-scrollbar-thumb {
+        .log-area::-webkit-scrollbar-thumb,
+        .message-card-body::-webkit-scrollbar-thumb {
             background: var(--andreani-red);
             border-radius: 10px;
         }
@@ -418,15 +533,34 @@
             <p class="subtitle">Subí archivos Excel para validar, convertir fórmulas a valores y generar el contrato normalizado</p>
         </div>
 
-        <!-- DROP ZONE -->
-        <div id="dropZone" class="drop-zone">
-            <p>📂 Arrastrá tus archivos <strong>.xlsx</strong> aquí</p>
-            <small>o hacé clic para seleccionarlos</small>
-            <input type="file" id="fileInput" multiple accept=".xlsx" style="display:none;" />
-        </div>
+        <!-- TWO COLUMN LAYOUT -->
+        <div class="two-column-layout">
+            <!-- LEFT: DROP ZONE -->
+            <div>
+                <div id="dropZone" class="drop-zone">
+                    <p>📂 Arrastrá tus archivos <strong>.xlsx</strong> aquí</p>
+                    <small>o hacé clic para seleccionarlos</small>
+                    <input type="file" id="fileInput" multiple accept=".xlsx" style="display:none;" />
+                    <div id="fileList"></div>
+                </div>
+            </div>
 
-        <!-- FILE LIST -->
-        <div id="fileList"></div>
+            <!-- RIGHT: MESSAGE CARD -->
+            <div>
+                <div class="message-card">
+                    <div class="message-card-header">
+                        <span style="font-size:20px;">💬</span>
+                        <h3>Mensaje para copiar</h3>
+                    </div>
+                    <div id="messageBody" class="message-card-body"></div>
+                    <div class="message-card-footer">
+                        <button id="copyBtn" class="btn-copiar" disabled>
+                            📋 Copiar mensaje
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- STATS -->
         <div id="statsBar" class="stats-bar" style="display:none;">
@@ -467,9 +601,12 @@
         const ERROR_COUNT = document.getElementById('errorCount');
         const PROCESS_BTN = document.getElementById('processBtn');
         const CLEAR_BTN = document.getElementById('clearBtn');
+        const MESSAGE_BODY = document.getElementById('messageBody');
+        const COPY_BTN = document.getElementById('copyBtn');
 
         let uploadedFiles = [];
         let processedResults = [];
+        let processedFileNames = [];
 
         // ============================================================
         //  DRAG & DROP + INPUT
@@ -515,6 +652,11 @@
             PROCESS_BTN.disabled = false;
             CLEAR_BTN.style.display = 'inline-flex';
             log(`✅ ${valid.length} archivo(s) agregado(s). Total: ${uploadedFiles.length}`, 'success');
+            // Limpiar mensaje anterior
+            MESSAGE_BODY.textContent = '';
+            COPY_BTN.disabled = true;
+            COPY_BTN.classList.remove('copiado');
+            COPY_BTN.textContent = '📋 Copiar mensaje';
         }
 
         function renderFileList() {
@@ -534,10 +676,15 @@
         CLEAR_BTN.addEventListener('click', () => {
             uploadedFiles = [];
             processedResults = [];
+            processedFileNames = [];
             renderFileList();
             STATS_BAR.style.display = 'none';
             PROCESS_BTN.disabled = true;
             CLEAR_BTN.style.display = 'none';
+            MESSAGE_BODY.textContent = '';
+            COPY_BTN.disabled = true;
+            COPY_BTN.classList.remove('copiado');
+            COPY_BTN.textContent = '📋 Copiar mensaje';
             LOG.textContent = '📋 Todo limpiado. Esperando archivos...';
         });
 
@@ -557,6 +704,38 @@
         }
 
         // ============================================================
+        //  COPIAR MENSAJE
+        // ============================================================
+        COPY_BTN.addEventListener('click', async () => {
+            const texto = MESSAGE_BODY.textContent;
+            if (!texto) return;
+
+            try {
+                await navigator.clipboard.writeText(texto);
+                COPY_BTN.textContent = '✅ ¡Copiado!';
+                COPY_BTN.classList.add('copiado');
+                setTimeout(() => {
+                    COPY_BTN.textContent = '📋 Copiar mensaje';
+                    COPY_BTN.classList.remove('copiado');
+                }, 3000);
+            } catch (err) {
+                // Fallback para navegadores sin clipboard API
+                const textarea = document.createElement('textarea');
+                textarea.value = texto;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                COPY_BTN.textContent = '✅ ¡Copiado!';
+                COPY_BTN.classList.add('copiado');
+                setTimeout(() => {
+                    COPY_BTN.textContent = '📋 Copiar mensaje';
+                    COPY_BTN.classList.remove('copiado');
+                }, 3000);
+            }
+        });
+
+        // ============================================================
         //  PROCESAMIENTO PRINCIPAL
         // ============================================================
         PROCESS_BTN.addEventListener('click', async () => {
@@ -567,6 +746,7 @@
             let validCount = 0;
             let errorCount = 0;
             processedResults = [];
+            processedFileNames = [];
 
             try {
                 for (const file of uploadedFiles) {
@@ -584,6 +764,16 @@
                         for (const err of validation.errors) {
                             log(`   → ${err}`, 'error');
                         }
+                        continue;
+                    }
+
+                    // ============================================
+                    // PASO 1.5: OBTENER DATOS PARA EL NOMBRE DEL ARCHIVO
+                    // ============================================
+                    const nombreData = getNombreArchivoData(workbook);
+                    if (nombreData.error) {
+                        errorCount++;
+                        log(`❌ ${file.name}: ${nombreData.error}`, 'error');
                         continue;
                     }
 
@@ -617,11 +807,23 @@
                     }
 
                     // ============================================
+                    // GENERAR NOMBRE DEL ARCHIVO DE SALIDA
+                    // ============================================
+                    let outputName = `Alta de contrato DMS ${nombreData.codigoERP} ${nombreData.codigoSolicitante}`;
+                    if (nombreData.clientName) {
+                        outputName += ` ${nombreData.clientName}`;
+                    }
+                    outputName += '.xlsx';
+
+                    // Guardar nombre para el mensaje
+                    processedFileNames.push(outputName);
+
+                    // ============================================
                     // GUARDAR RESULTADO
                     // ============================================
                     const wbout = XLSX.write(normalizedWB, { bookType: 'xlsx', type: 'array' });
                     processedResults.push({
-                        name: file.name.replace(/\.(xlsx)$/i, '') + '_normalizado.xlsx',
+                        name: outputName,
                         data: wbout
                     });
                 }
@@ -637,8 +839,15 @@
                         downloadFile(r.data, r.name);
                     }
                     log(`✅ ¡Completado! Se descargaron ${processedResults.length} archivos.`, 'success');
+
+                    // ============================================
+                    // GENERAR MENSAJE
+                    // ============================================
+                    generarMensaje(processedResults.length, processedFileNames);
                 } else {
                     log(`⚠️ No se generaron archivos para descargar.`, 'warning');
+                    MESSAGE_BODY.textContent = '';
+                    COPY_BTN.disabled = true;
                 }
 
             } catch (err) {
@@ -651,6 +860,55 @@
         });
 
         // ============================================================
+        //  FUNCIÓN: GENERAR MENSAJE
+        // ============================================================
+        function generarMensaje(cantidad, nombres) {
+            let mensaje = `Hola @Djirikian Damian Uriel, te paso ${cantidad} archivos para alta de contratos DMS\n\n`;
+            mensaje += nombres.join('\n');
+            
+            MESSAGE_BODY.textContent = mensaje;
+            COPY_BTN.disabled = false;
+            COPY_BTN.textContent = '📋 Copiar mensaje';
+            COPY_BTN.classList.remove('copiado');
+        }
+
+        // ============================================================
+        //  FUNCIÓN: OBTENER DATOS PARA NOMBRE DE ARCHIVO
+        // ============================================================
+        function getNombreArchivoData(workbook) {
+            const sheet = workbook.Sheets['Formulario'];
+            if (!sheet) {
+                return { error: 'No existe la hoja "Formulario"' };
+            }
+
+            const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+            // Buscar los valores en las filas correspondientes
+            // Fila 3 (index 2) = CodigoContratoERP
+            // Fila 5 (index 4) = CodigoSolicitanteERP
+            // Fila 14 (index 13) = ClientName
+
+            const codigoERP = String(data[2]?.[2] || '').trim();
+            const codigoSolicitante = String(data[4]?.[2] || '').trim();
+            const clientName = String(data[13]?.[2] || '').trim();
+
+            // Validar campos obligatorios
+            if (!codigoERP) {
+                return { error: 'Campo "CodigoContratoERP" (C3) está vacío. Es obligatorio.' };
+            }
+
+            if (!codigoSolicitante) {
+                return { error: 'Campo "CodigoSolicitanteERP" (C5) está vacío. Es obligatorio.' };
+            }
+
+            return {
+                codigoERP: codigoERP,
+                codigoSolicitante: codigoSolicitante,
+                clientName: clientName
+            };
+        }
+
+        // ============================================================
         //  FUNCIÓN: NORMALIZAR HasDeliveryNote
         // ============================================================
         function normalizarHasDeliveryNote(valor) {
@@ -658,22 +916,18 @@
             
             const valorStr = String(valor).toUpperCase().trim();
             
-            // Si ya es un valor válido, lo devolvemos
             if (['CON_REMITO', 'SIN_REMITO', 'DIGITALIZADO'].includes(valorStr)) {
                 return valorStr;
             }
             
-            // Si es true/1/si -> CON_REMITO
             if (['TRUE', '1', 'SI', 'SÍ'].includes(valorStr)) {
                 return 'CON_REMITO';
             }
             
-            // Si es false/0/no -> SIN_REMITO
             if (['FALSE', '0', 'NO'].includes(valorStr)) {
                 return 'SIN_REMITO';
             }
             
-            // Si no coincide con nada, devolvemos SIN_REMITO por defecto
             return 'SIN_REMITO';
         }
 
@@ -689,15 +943,12 @@
                 return { hasErrors: true, errors };
             }
 
-            // Convertir a array de arrays (para poder modificar valores)
             const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
 
-            // Filas a validar: 3-24 y 27-30 (index 2-23 y 26-29 en 0-based)
             const filasAValidar = [];
             for (let i = 2; i <= 23; i++) filasAValidar.push(i);
             for (let i = 26; i <= 29; i++) filasAValidar.push(i);
 
-            // Obtener referencias
             const refSheet = workbook.Sheets['Referencias'];
             const refData = refSheet ? XLSX.utils.sheet_to_json(refSheet, { header: 1, defval: '' }) : [];
             const referencias = extractReferences(refData);
@@ -716,23 +967,16 @@
 
                 if (!campo) continue;
 
-                // ============================================
-                // NORMALIZACIÓN: HasDeliveryNote
-                // ============================================
+                // Normalización: HasDeliveryNote
                 if (campo === 'HasDeliveryNote' && valor) {
                     const valorNormalizado = normalizarHasDeliveryNote(valor);
                     if (valorNormalizado !== valor) {
-                        // Actualizar el valor en la fila
                         row[2] = valorNormalizado;
                         huboNormalizacion = true;
                         log(`   → Campo "HasDeliveryNote" normalizado de "${valor}" a "${valorNormalizado}"`, 'info');
-                        valor = valorNormalizado; // Actualizar para las validaciones posteriores
+                        valor = valorNormalizado;
                     }
                 }
-
-                // ============================================
-                // VALIDACIONES
-                // ============================================
 
                 // Validar contra referencias
                 const camposReferencia = ['TipoDeEnvio', 'Logística Solicitada', 'Continente', 'SLA', 'Plazo', 'FormularioMobileB2B'];
@@ -743,7 +987,7 @@
                     }
                 }
 
-                // Validar HasDeliveryNote (ya normalizado)
+                // Validar HasDeliveryNote
                 if (campo === 'HasDeliveryNote' && valor) {
                     const valoresValidos = ['CON_REMITO', 'SIN_REMITO', 'DIGITALIZADO'];
                     if (!valoresValidos.includes(valor)) {
@@ -783,9 +1027,7 @@
                 }
             }
 
-            // Si hubo normalización, actualizar la hoja en el workbook
             if (huboNormalizacion) {
-                // Convertir de vuelta a hoja
                 const newSheet = XLSX.utils.aoa_to_sheet(data);
                 workbook.Sheets['Formulario'] = newSheet;
             }
@@ -797,7 +1039,6 @@
         //  FUNCIÓN: VALIDAR CONTRA REFERENCIAS
         // ============================================================
         function validarContraReferencias(campo, valor, referencias) {
-            // Caso especial: TipoDeEnvio
             if (campo === 'TipoDeEnvio') {
                 const tiposValidos = [
                     'Minorista', 'Mayorista', 'Cadena de frío',
@@ -807,7 +1048,6 @@
                 return tiposValidos.some(t => t.toLowerCase() === valor.toLowerCase());
             }
 
-            // Mapeo de campos a tablas de referencia
             const map = {
                 'Logística Solicitada': 'logistica',
                 'Continente': 'continente',
@@ -854,7 +1094,6 @@
                 const colO = String(row[14] || '').trim();
                 const colP = String(row[15] || '').trim();
 
-                // Detectar encabezados
                 if (colA === 'Logistica Solicitada') {
                     currentTable = 'logistica';
                     refs.logistica = [];
@@ -876,7 +1115,6 @@
                     continue;
                 }
 
-                // Agregar datos
                 if (currentTable === 'logistica' && colA && colB) {
                     refs.logistica.push({ key: colA, code: colB, desc: colC });
                 }
