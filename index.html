@@ -807,6 +807,11 @@
                     }
 
                     // ============================================
+                    // PASO 5: LIMPIAR DIRECCIONES VACÍAS
+                    // ============================================
+                    limpiarDireccionesVacias(normalizedWB);
+
+                    // ============================================
                     // GENERAR NOMBRE DEL ARCHIVO DE SALIDA
                     // ============================================
                     let outputName = `Alta de contrato DMS ${nombreData.codigoERP} ${nombreData.codigoSolicitante}`;
@@ -860,16 +865,91 @@
         });
 
         // ============================================================
+        //  FUNCIÓN: LIMPIAR DIRECCIONES VACÍAS
+        // ============================================================
+        function limpiarDireccionesVacias(workbook) {
+            const sheetName = 'Direcciones';
+            if (!workbook.Sheets[sheetName]) return;
+
+            const sheet = workbook.Sheets[sheetName];
+            const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+            if (data.length === 0) return;
+
+            // Mantener el header (fila 0)
+            const header = data[0];
+            const nuevasFilas = [header];
+
+            // Filtrar filas que tengan al menos un campo con valor
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                // Verificar si la fila tiene algún valor no vacío y no es "0"
+                const tieneDatos = row.some(cell => {
+                    const valor = String(cell).trim();
+                    return valor !== '' && valor !== '0';
+                });
+
+                if (tieneDatos) {
+                    nuevasFilas.push(row);
+                }
+            }
+
+            // Si no hay cambios, no hacemos nada
+            if (nuevasFilas.length === data.length) return;
+
+            // Reemplazar la hoja
+            const newSheet = XLSX.utils.aoa_to_sheet(nuevasFilas);
+            workbook.Sheets[sheetName] = newSheet;
+
+            log(`   → Se eliminaron ${data.length - nuevasFilas.length} filas vacías en la hoja "Direcciones"`, 'info');
+        }
+
+        // ============================================================
         //  FUNCIÓN: GENERAR MENSAJE
         // ============================================================
         function generarMensaje(cantidad, nombres) {
             let mensaje = `Hola @Djirikian Damian Uriel, te paso ${cantidad} archivos para alta de contratos DMS\n\n`;
             mensaje += nombres.join('\n');
-            
+
             MESSAGE_BODY.textContent = mensaje;
             COPY_BTN.disabled = false;
             COPY_BTN.textContent = '📋 Copiar mensaje';
             COPY_BTN.classList.remove('copiado');
+        }
+
+        // ============================================================
+        //  FUNCIÓN: NORMALIZAR CÓDIGO SOLICITANTE
+        // ============================================================
+        function normalizarCodigoSolicitante(valor) {
+            if (!valor) return null;
+
+            const strValor = String(valor).trim();
+
+            // Verificar que sea numérico
+            if (!/^\d+$/.test(strValor)) {
+                return { error: 'El código debe ser numérico' };
+            }
+
+            const longitud = strValor.length;
+
+            // Si tiene 6 dígitos, es válido
+            if (longitud === 6) {
+                return { valor: strValor };
+            }
+
+            // Si tiene 10 dígitos y comienza con 4 ceros, normalizar
+            if (longitud === 10 && strValor.startsWith('0000')) {
+                const normalizado = strValor.substring(4);
+                return { valor: normalizado };
+            }
+
+            // Si tiene 10 dígitos pero no comienza con 4 ceros
+            if (longitud === 10) {
+                return { error: 'El código tiene 10 dígitos pero no comienza con 4 ceros' };
+            }
+
+            // Otros casos: menos de 6 o más de 10
+            return { error: `El código tiene ${longitud} dígitos, debe tener 6 dígitos (o 10 dígitos comenzando con 4 ceros)` };
         }
 
         // ============================================================
@@ -889,7 +969,7 @@
             // Fila 14 (index 13) = ClientName
 
             const codigoERP = String(data[2]?.[2] || '').trim();
-            const codigoSolicitante = String(data[4]?.[2] || '').trim();
+            const codigoSolicitanteRaw = String(data[4]?.[2] || '').trim();
             const clientName = String(data[13]?.[2] || '').trim();
 
             // Validar campos obligatorios
@@ -897,9 +977,17 @@
                 return { error: 'Campo "CodigoContratoERP" (C3) está vacío. Es obligatorio.' };
             }
 
-            if (!codigoSolicitante) {
+            if (!codigoSolicitanteRaw) {
                 return { error: 'Campo "CodigoSolicitanteERP" (C5) está vacío. Es obligatorio.' };
             }
+
+            // Validar y normalizar CodigoSolicitanteERP
+            const resultadoNormalizacion = normalizarCodigoSolicitante(codigoSolicitanteRaw);
+            if (resultadoNormalizacion.error) {
+                return { error: `Campo "CodigoSolicitanteERP" = "${codigoSolicitanteRaw}" - ${resultadoNormalizacion.error}` };
+            }
+
+            const codigoSolicitante = resultadoNormalizacion.valor;
 
             return {
                 codigoERP: codigoERP,
@@ -913,21 +1001,21 @@
         // ============================================================
         function normalizarHasDeliveryNote(valor) {
             if (!valor) return 'SIN_REMITO';
-            
+
             const valorStr = String(valor).toUpperCase().trim();
-            
+
             if (['CON_REMITO', 'SIN_REMITO', 'DIGITALIZADO'].includes(valorStr)) {
                 return valorStr;
             }
-            
+
             if (['TRUE', '1', 'SI', 'SÍ'].includes(valorStr)) {
                 return 'CON_REMITO';
             }
-            
+
             if (['FALSE', '0', 'NO'].includes(valorStr)) {
                 return 'SIN_REMITO';
             }
-            
+
             return 'SIN_REMITO';
         }
 
