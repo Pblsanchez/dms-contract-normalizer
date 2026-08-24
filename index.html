@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Normalizador de Contratos DMS - Andreani</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        /* ============================================
+           SISTEMA DE DISEÑO ANDREANI
+           Inspirado en Dashboard Comercial v2.2
+           Paleta: Rojo corporativo
+           ============================================ */
+
+        :root {
+            --andreani-red: #c8102e;
+            --andreani-red-dark: #980b23;
+            --andreani-red-soft: rgba(200, 16, 46, 0.35);
+            --andreani-red-glow: rgba(200, 16, 46, 0.18);
+            --dark: #1a1a1a;
+            --gray: #666;
+            --gray-light: #8a939d;
+            --bg: #eef0f2;
+            --card-bg: #ffffff;
+            --border: #e0e0e0;
+            --border-light: rgba(0, 0, 0, 0.08);
+            --sombra-card: 0 6px 18px rgba(0, 0, 0, 0.08);
+            --sombra-hover: 0 10px 24px rgba(0, 0, 0, 0.12);
+            --radio: 10px;
+            --transicion: 220ms ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+            background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ========== HEADER ========== */
+        .andreani-header {
+            padding: 18px 28px;
+            background: #fff;
+            border-bottom: 3px solid var(--andreani-red);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .andreani-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            color: var(--dark);
+        }
+
+        .header-tag {
+            background: rgba(200, 16, 46, 0.08);
+            color: var(--andreani-red);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* ========== MAIN CONTAINER ========== */
+        .main-container {
+            max-width: 960px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 28px 20px 40px;
+            flex: 1;
+        }
+
+        .page-title-section {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .page-title-section h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* ========== SECTION TITLE ========== */
+        .section-title {
+            font-weight: 700;
+            padding: 8px 14px;
+            background: linear-gradient(90deg, var(--andreani-red) 0%, var(--andreani-red-dark) 100%);
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 0 12px var(--andreani-red-soft);
+            margin-bottom: 14px;
+            letter-spacing: 0.4px;
+            font-size: 15px;
+            display: inline-block;
+        }
+
+        /* ========== DROP ZONE ========== */
+        .drop-zone {
+            border: 3px dashed #b0c4de;
+            border-radius: 20px;
+            padding: 60px 20px;
+            text-align: center;
+            background: #fafcff;
+            transition: 0.3s;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone.dragover {
+            background: rgba(200, 16, 46, 0.05);
+            border-color: var(--andreani-red);
+        }
+
+        .drop-zone p {
+            margin: 0;
+            color: #2d4373;
+            font-size: 18px;
+        }
+
+        .drop-zone small {
+            color: #8a9bb5;
+        }
+
+        #fileList {
+            margin-top: 15px;
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        #fileList li {
+            background: #f0f4fa;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            color: #1e3a6b;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-badge {
+            background: var(--andreani-red);
+            color: white;
+            border-radius: 30px;
+            padding: 2px 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* ========== BOTONES ========== */
+        .form-actions {
+            text-align: center;
+            padding: 20px 0 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-descargar {
+            padding: 14px 40px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+            color: white;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--andreani-red), var(--andreani-red-dark));
+            box-shadow: 0 4px 12px var(--andreani-red-soft);
+            transition: all var(--transicion);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-descargar:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--andreani-red-soft);
+        }
+
+        .btn-descargar:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-descargar:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secundario {
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: 2px solid var(--andreani-red);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            color: var(--andreani-red);
+            background: transparent;
+            cursor: pointer;
+            transition: all var(--transicion);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secundario:hover {
+            background: var(--andreani-red);
+            color: white;
+        }
+
+        .action-hint {
+            font-size: 12px;
+            color: var(--gray-light);
+        }
+
+        /* ========== LOG AREA ========== */
+        .log-area {
+            margin-top: 20px;
+            background: #f0f4fa;
+            border-radius: 12px;
+            padding: 15px 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Cascadia Code', 'Consolas', monospace;
+            font-size: 13px;
+            color: #1d2b44;
+            white-space: pre-wrap;
+            border: 1px solid var(--border);
+            line-height: 1.6;
+        }
+
+        .log-area .log-success {
+            color: #0a7a3a;
+        }
+
+        .log-area .log-warning {
+            color: #b45a0a;
+        }
+
+        .log-area .log-error {
+            color: var(--andreani-red);
+        }
+
+        .log-area .log-info {
+            color: #1a5a8a;
+        }
+
+        /* ========== STATS ========== */
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .stat-item {
+            background: var(--card-bg);
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--sombra-card);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-item strong {
+            color: var(--andreani-red);
+            font-size: 18px;
+        }
+
+        /* ========== ANIMACIONES ========== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .drop-zone {
+            animation: fadeIn 300ms ease;
+        }
+
+        /* ========== FOOTER ========== */
+        .andreani-footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 12px;
+            color: var(--gray-light);
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
+            letter-spacing: 0.2px;
+            margin-top: auto;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 640px) {
+            .andreani-header {
+                padding: 12px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-left {
+                width: 100%;
+            }
+
+            .main-container {
+                padding: 16px 12px 30px;
+            }
+
+            .page-title-section h1 {
+                font-size: 20px;
+            }
+
+            .drop-zone {
+                padding: 40px 15px;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .stat-item {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Scroll personalizado */
+        .log-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .log-area::-webkit-scrollbar-track {
+            background: #e0e4ea;
+            border-radius: 10px;
+        }
+
+        .log-area::-webkit-scrollbar-thumb {
+            background: var(--andreani-red);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="andreani-header">
+        <div class="header-left">
+            <div class="andreani-logo">
+                <span class="logo-icon">📦</span>
+                <span class="logo-text">Andreani</span>
+            </div>
+            <span class="header-tag">DMS · Normalizador</span>
+        </div>
+        <div style="font-size:13px; color: var(--gray);">
+            <span>v2.0</span>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main-container">
+        <div class="page-title-section">
+            <h1>🔄 Normalizador de Contratos DMS</h1>
+            <p class="subtitle">Subí archivos Excel para validar, convertir fórmulas a valores y generar el contrato normalizado</p>
+        </div>
+
+        <!-- DROP ZONE -->
+        <div id="dropZone" class="drop-zone">
+            <p>📂 Arrastrá tus archivos <strong>.xlsx</strong> aquí</p>
+            <small>o hacé clic para seleccionarlos</small>
+            <input type="file" id="fileInput" multiple accept=".xlsx" style="display:none;" />
+        </div>
+
+        <!-- FILE LIST -->
+        <div id="fileList"></div>
+
+        <!-- STATS -->
+        <div id="statsBar" class="stats-bar" style="display:none;">
+            <div class="stat-item">📄 Archivos: <strong id="fileCount">0</strong></div>
+            <div class="stat-item">✅ Válidos: <strong id="validCount">0</strong></div>
+            <div class="stat-item">⚠️ Con errores: <strong id="errorCount">0</strong></div>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="form-actions">
+            <button id="processBtn" class="btn-descargar" disabled>
+                ⚡ Procesar y Normalizar
+            </button>
+            <button id="clearBtn" class="btn-secundario" style="display:none;">
+                🗑️ Limpiar todo
+            </button>
+            <span class="action-hint">Los archivos procesados se descargarán automáticamente</span>
+        </div>
+
+        <!-- LOG -->
+        <div id="logArea" class="log-area">📋 Esperando archivos...</div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="andreani-footer">
+        Andreani · Sistema de Normalización de Contratos DMS
+    </footer>
+
+    <script>
+        // ============================================================
+        //  CONFIGURACIÓN
+        // ============================================================
+        const LOG = document.getElementById('logArea');
+        const FILE_LIST = document.getElementById('fileList');
+        const STATS_BAR = document.getElementById('statsBar');
+        const FILE_COUNT = document.getElementById('fileCount');
+        const VALID_COUNT = document.getElementById('validCount');
+        const ERROR_COUNT = document.getElementById('errorCount');
+        const PROCESS_BTN = document.getElementById('processBtn');
+        const CLEAR_BTN = document.getElementById('clearBtn');
+
+        let uploadedFiles = [];
+        let processedResults = [];
+
+        // ============================================================
+        //  DRAG & DROP + INPUT
+        // ============================================================
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+            fileInput.value = '';
+        });
+
+        function handleFiles(fileList) {
+            const valid = [];
+            for (const f of fileList) {
+                const ext = f.name.split('.').pop().toLowerCase();
+                if (['xlsx'].includes(ext)) {
+                    valid.push(f);
+                } else {
+                    log(`⚠️ Archivo ignorado (no es .xlsx): ${f.name}`, 'warning');
+                }
+            }
+            if (valid.length === 0) return;
+            uploadedFiles = uploadedFiles.concat(valid);
+            renderFileList();
+            updateStats();
+            PROCESS_BTN.disabled = false;
+            CLEAR_BTN.style.display = 'inline-flex';
+            log(`✅ ${valid.length} archivo(s) agregado(s). Total: ${uploadedFiles.length}`, 'success');
+        }
+
+        function renderFileList() {
+            FILE_LIST.innerHTML = uploadedFiles.map((f, i) =>
+                `<li>📄 ${f.name} <span class="file-badge">${(f.size/1024).toFixed(1)} KB</span></li>`
+            ).join('');
+        }
+
+        function updateStats() {
+            STATS_BAR.style.display = 'flex';
+            FILE_COUNT.textContent = uploadedFiles.length;
+            // Los contadores de válidos/errores se actualizan después del procesamiento
+        }
+
+        // ============================================================
+        //  LIMPIAR
+        // ============================================================
+        CLEAR_BTN.addEventListener('click', () => {
+            uploadedFiles = [];
+            processedResults = [];
+            renderFileList();
+            STATS_BAR.style.display = 'none';
+            PROCESS_BTN.disabled = true;
+            CLEAR_BTN.style.display = 'none';
+            LOG.textContent = '📋 Todo limpiado. Esperando archivos...';
+        });
+
+        // ============================================================
+        //  LOG
+        // ============================================================
+        function log(msg, type = 'info') {
+            const types = {
+                success: 'log-success',
+                warning: 'log-warning',
+                error: 'log-error',
+                info: 'log-info'
+            };
+            const cls = types[type] || 'log-info';
+            LOG.innerHTML += `<span class="${cls}">${msg}</span>\n`;
+            LOG.scrollTop = LOG.scrollHeight;
+        }
+
+        // ============================================================
+        //  PROCESAMIENTO PRINCIPAL
+        // ============================================================
+        PROCESS_BTN.addEventListener('click', async () => {
+            if (uploadedFiles.length === 0) return;
+            PROCESS_BTN.disabled = true;
+            PROCESS_BTN.textContent = '⏳ Procesando...';
+
+            let validCount = 0;
+            let errorCount = 0;
+            processedResults = [];
+
+            try {
+                for (const file of uploadedFiles) {
+                    const buffer = await file.arrayBuffer();
+                    const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
+
+                    // ============================================
+                    // PASO 1: VALIDAR FORMULARIO
+                    // ============================================
+                    const validation = validateFormulario(workbook, file.name);
+
+                    if (validation.hasErrors) {
+                        errorCount++;
+                        log(`❌ ${file.name}: ${validation.errors.length} error(es) de validación`, 'error');
+                        for (const err of validation.errors) {
+                            log(`   → ${err}`, 'error');
+                        }
+                        continue;
+                    }
+
+                    validCount++;
+                    log(`✅ ${file.name}: Validación correcta`, 'success');
+
+                    // ============================================
+                    // PASO 2: CONVERTIR FÓRMULAS A VALORES
+                    // ============================================
+                    const normalizedWB = normalizeWorkbook(workbook);
+
+                    // ============================================
+                    // PASO 3: ELIMINAR hoja "Formulario"
+                    // ============================================
+                    const sheetNames = normalizedWB.SheetNames;
+                    const formularioIndex = sheetNames.indexOf('Formulario');
+                    if (formularioIndex !== -1) {
+                        normalizedWB.SheetNames.splice(formularioIndex, 1);
+                        delete normalizedWB.Sheets['Formulario'];
+                        log(`   → Hoja "Formulario" eliminada`, 'info');
+                    }
+
+                    // ============================================
+                    // PASO 4: OCULTAR hoja "Referencias"
+                    // ============================================
+                    // xlsx no soporta ocultar hojas directamente, pero podemos
+                    // renombrarla con un prefijo o simplemente mantenerla.
+                    // En la práctica, el usuario puede ocultarla manualmente.
+                    // Como alternativa, la dejamos pero la movemos al final.
+                    const refIndex = normalizedWB.SheetNames.indexOf('Referencias');
+                    if (refIndex !== -1) {
+                        // La movemos al final
+                        const refName = normalizedWB.SheetNames.splice(refIndex, 1)[0];
+                        normalizedWB.SheetNames.push(refName);
+                        log(`   → Hoja "Referencias" movida al final`, 'info');
+                    }
+
+                    // ============================================
+                    // GUARDAR RESULTADO
+                    // ============================================
+                    const wbout = XLSX.write(normalizedWB, { bookType: 'xlsx', type: 'array' });
+                    processedResults.push({
+                        name: file.name.replace(/\.(xlsx)$/i, '') + '_normalizado.xlsx',
+                        data: wbout
+                    });
+                }
+
+                // Actualizar estadísticas
+                VALID_COUNT.textContent = validCount;
+                ERROR_COUNT.textContent = errorCount;
+
+                // Descargar resultados
+                if (processedResults.length > 0) {
+                    log(`📦 Descargando ${processedResults.length} archivo(s) normalizado(s)...`, 'success');
+                    for (const r of processedResults) {
+                        downloadFile(r.data, r.name);
+                    }
+                    log(`✅ ¡Completado! Se descargaron ${processedResults.length} archivos.`, 'success');
+                } else {
+                    log(`⚠️ No se generaron archivos para descargar.`, 'warning');
+                }
+
+            } catch (err) {
+                log(`❌ ERROR: ${err.message}`, 'error');
+                console.error(err);
+            }
+
+            PROCESS_BTN.disabled = false;
+            PROCESS_BTN.textContent = '⚡ Procesar y Normalizar';
+        });
+
+        // ============================================================
+        //  FUNCIÓN: VALIDAR FORMULARIO
+        // ============================================================
+        function validateFormulario(workbook, fileName) {
+            const errors = [];
+            const sheet = workbook.Sheets['Formulario'];
+
+            if (!sheet) {
+                errors.push(`No existe la hoja "Formulario"`);
+                return { hasErrors: true, errors };
+            }
+
+            // Convertir a array de arrays
+            const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+            // Buscar los campos en la columna A y sus valores en la columna C
+            // Estructura: [A: campo, B: vacío, C: valor, D: comentario]
+            // Filas 3-24 y 27-30 (index 2-23 y 26-29 en 0-based)
+            const filasAValidar = [];
+            for (let i = 2; i <= 23; i++) filasAValidar.push(i); // 3-24
+            for (let i = 26; i <= 29; i++) filasAValidar.push(i); // 27-30
+
+            // También necesitamos la hoja Referencias para validar contra las listas
+            const refSheet = workbook.Sheets['Referencias'];
+            const refData = refSheet ? XLSX.utils.sheet_to_json(refSheet, { header: 1, defval: '' }) : [];
+
+            // Extraer las listas de referencia
+            const referencias = extractReferences(refData);
+
+            for (const rowIdx of filasAValidar) {
+                if (rowIdx >= data.length) {
+                    errors.push(`Fila ${rowIdx+1} no existe en el archivo`);
+                    continue;
+                }
+
+                const row = data[rowIdx];
+                const campo = String(row[0] || '').trim();
+                const valor = String(row[2] || '').trim();
+
+                // Si el campo está vacío, lo ignoramos
+                if (!campo) continue;
+
+                // Verificar si es un campo que debe validarse contra referencias
+                const camposReferencia = ['TipoDeEnvio', 'TipoEntrega', 'SLA', 'Logística Solicitada', 'Continente', 'Plazo', 'FormularioMobileB2B'];
+                if (camposReferencia.includes(campo)) {
+                    // Validar que el valor exista en las referencias
+                    const esValido = validarContraReferencias(campo, valor, referencias);
+                    if (!esValido) {
+                        errors.push(`Campo "${campo}" = "${valor}" no es válido según la hoja Referencias`);
+                    }
+                }
+
+                // Validar que el campo no esté vacío (excepto algunos opcionales)
+                const opcionales = ['CondicionDeEntrega', 'DescripcionContratoERP'];
+                if (!opcionales.includes(campo) && !valor) {
+                    errors.push(`Campo "${campo}" está vacío (fila ${rowIdx+1})`);
+                }
+
+                // Validaciones específicas
+                if (campo === 'CodigoContratoERP' && valor && !/^\d{9}$/.test(valor)) {
+                    errors.push(`Campo "CodigoContratoERP" = "${valor}" debe tener 9 dígitos`);
+                }
+
+                if (campo === 'IDSociedadSAP' && valor && valor !== '1100') {
+                    errors.push(`Campo "IDSociedadSAP" = "${valor}" debe ser "1100" para B2B`);
+                }
+
+                if (campo === 'Habilitado' && valor && valor !== '1' && valor !== '0') {
+                    errors.push(`Campo "Habilitado" = "${valor}" debe ser 1 o 0`);
+                }
+
+                // Booleanos: AllowRescue, AllowWithdrawPartialValues, etc.
+                const booleanFields = ['AllowRescue', 'AllowWithdrawPartialValues', 'ObligatoryGauge',
+                    'AllowPartialDelivery', 'IsCentralizedReturn', 'HasCollectionManagement',
+                    'HasDeliveryNote', 'AllowPrintDocumentationReturn', '¿Es recambio?'
+                ];
+                if (booleanFields.includes(campo) && valor && !['true', 'false', 'TRUE', 'FALSE', 'True', 'False', '1', '0', 'si', 'no'].includes(valor.toLowerCase())) {
+                    errors.push(`Campo "${campo}" = "${valor}" debe ser true/false o si/no`);
+                }
+            }
+
+            return { hasErrors: errors.length > 0, errors };
+        }
+
+        // ============================================================
+        //  FUNCIÓN: EXTRAER REFERENCIAS
+        // ============================================================
+        function extractReferences(refData) {
+            const refs = {};
+
+            // Buscar las tablas en la hoja Referencias
+            // Estructura: cada tabla tiene encabezados y datos
+            // Logística Solicitada: columna A-C
+            // Continente: columna E-G
+            // SLAs: columna I-K
+            // Formulario Mobile: columna M-P
+
+            let currentTable = null;
+            for (const row of refData) {
+                const colA = String(row[0] || '').trim();
+                const colB = String(row[1] || '').trim();
+                const colC = String(row[2] || '').trim();
+                const colE = String(row[4] || '').trim();
+                const colF = String(row[5] || '').trim();
+                const colG = String(row[6] || '').trim();
+                const colI = String(row[8] || '').trim();
+                const colJ = String(row[9] || '').trim();
+                const colK = String(row[10] || '').trim();
+                const colM = String(row[12] || '').trim();
+                const colN = String(row[13] || '').trim();
+                const colO = String(row[14] || '').trim();
+                const colP = String(row[15] || '').trim();
+
+                // Detectar encabezados
+                if (colA === 'Logistica Solicitada') {
+                    currentTable = 'logistica';
+                    refs.logistica = [];
+                    continue;
+                }
+                if (colE === 'Continente') {
+                    currentTable = 'continente';
+                    refs.continente = [];
+                    continue;
+                }
+                if (colI === 'SLAs') {
+                    currentTable = 'sla';
+                    refs.sla = [];
+                    continue;
+                }
+                if (colM === 'Formulario Mobile B2B') {
+                    currentTable = 'formulario';
+                    refs.formulario = [];
+                    continue;
+                }
+
+                // Agregar datos según la tabla actual
+                if (currentTable === 'logistica' && colA && colB) {
+                    refs.logistica.push({ key: colA, code: colB, desc: colC });
+                }
+                if (currentTable === 'continente' && colE && colF) {
+                    refs.continente.push({ key: colE, code: colF, desc: colG });
+                }
+                if (currentTable === 'sla' && colI && colJ) {
+                    refs.sla.push({ key: colI, code: colJ, desc: colK });
+                }
+                if (currentTable === 'formulario' && colM && colN) {
+                    refs.formulario.push({ key: colM, code: colN, desc: colO, aplica: colP });
+                }
+            }
+
+            return refs;
+        }
+
+        // ============================================================
+        //  FUNCIÓN: VALIDAR CONTRA REFERENCIAS
+        // ============================================================
+        function validarContraReferencias(campo, valor, referencias) {
+            // Mapeo de campos a sus tablas de referencia
+            const map = {
+                'TipoDeEnvio': 'logistica',
+                'Logística Solicitada': 'logistica',
+                'Continente': 'continente',
+                'SLA': 'sla',
+                'Plazo': 'sla',
+                'FormularioMobileB2B': 'formulario'
+            };
+
+            const tableName = map[campo];
+            if (!tableName) return true; // Si no está en el mapa, no validamos
+
+            const table = referencias[tableName];
+            if (!table || table.length === 0) return true; // Si no hay referencias, no validamos
+
+            // Buscar el valor en las claves o códigos de la tabla
+            return table.some(item => {
+                return item.key === valor ||
+                    item.code === valor ||
+                    item.desc === valor ||
+                    item.key.toLowerCase() === valor.toLowerCase() ||
+                    item.code.toLowerCase() === valor.toLowerCase();
+            });
+        }
+
+        // ============================================================
+        //  FUNCIÓN: NORMALIZAR WORKBOOK (convertir fórmulas a valores)
+        // ============================================================
+        function normalizeWorkbook(workbook) {
+            const newWB = XLSX.utils.book_new();
+
+            // Procesar cada hoja
+            for (const sheetName of workbook.SheetNames) {
+                const originalSheet = workbook.Sheets[sheetName];
+
+                // Convertir a array de arrays con valores ya evaluados
+                const data = XLSX.utils.sheet_to_json(originalSheet, { header: 1, defval: '', raw: false });
+
+                // Crear nueva hoja con los valores
+                const newSheet = XLSX.utils.aoa_to_sheet(data);
+
+                // Copiar estilos? xlsx no soporta estilos fácilmente, así que solo copiamos valores
+                XLSX.utils.book_append_sheet(newWB, newSheet, sheetName);
+            }
+
+            return newWB;
+        }
+
+        // ============================================================
+        //  UTILIDADES
+        // ============================================================
+
+        function downloadFile(data, filename) {
+            const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        }
+
+        // ============================================================
+        //  INICIO
+        // ============================================================
+        log('📌 Sistema listo. Arrastrá archivos .xlsx o hacé clic para subir.', 'info');
+        log('📋 Los archivos serán validados, normalizados y descargados automáticamente.', 'info');
+    </script>
+</body>
+</html>
