@@ -651,6 +651,33 @@
         });
 
         // ============================================================
+        //  FUNCIÓN: NORMALIZAR HasDeliveryNote
+        // ============================================================
+        function normalizarHasDeliveryNote(valor) {
+            if (!valor) return 'SIN_REMITO';
+            
+            const valorStr = String(valor).toUpperCase().trim();
+            
+            // Si ya es un valor válido, lo devolvemos
+            if (['CON_REMITO', 'SIN_REMITO', 'DIGITALIZADO'].includes(valorStr)) {
+                return valorStr;
+            }
+            
+            // Si es true/1/si -> CON_REMITO
+            if (['TRUE', '1', 'SI', 'SÍ'].includes(valorStr)) {
+                return 'CON_REMITO';
+            }
+            
+            // Si es false/0/no -> SIN_REMITO
+            if (['FALSE', '0', 'NO'].includes(valorStr)) {
+                return 'SIN_REMITO';
+            }
+            
+            // Si no coincide con nada, devolvemos SIN_REMITO por defecto
+            return 'SIN_REMITO';
+        }
+
+        // ============================================================
         //  FUNCIÓN: VALIDAR FORMULARIO
         // ============================================================
         function validateFormulario(workbook, fileName) {
@@ -662,7 +689,7 @@
                 return { hasErrors: true, errors };
             }
 
-            // Convertir a array de arrays
+            // Convertir a array de arrays (para poder modificar valores)
             const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
 
             // Filas a validar: 3-24 y 27-30 (index 2-23 y 26-29 en 0-based)
@@ -675,6 +702,8 @@
             const refData = refSheet ? XLSX.utils.sheet_to_json(refSheet, { header: 1, defval: '' }) : [];
             const referencias = extractReferences(refData);
 
+            let huboNormalizacion = false;
+
             for (const rowIdx of filasAValidar) {
                 if (rowIdx >= data.length) {
                     errors.push(`Fila ${rowIdx+1} no existe en el archivo`);
@@ -683,9 +712,27 @@
 
                 const row = data[rowIdx];
                 const campo = String(row[0] || '').trim();
-                const valor = String(row[2] || '').trim();
+                let valor = String(row[2] || '').trim();
 
                 if (!campo) continue;
+
+                // ============================================
+                // NORMALIZACIÓN: HasDeliveryNote
+                // ============================================
+                if (campo === 'HasDeliveryNote' && valor) {
+                    const valorNormalizado = normalizarHasDeliveryNote(valor);
+                    if (valorNormalizado !== valor) {
+                        // Actualizar el valor en la fila
+                        row[2] = valorNormalizado;
+                        huboNormalizacion = true;
+                        log(`   → Campo "HasDeliveryNote" normalizado de "${valor}" a "${valorNormalizado}"`, 'info');
+                        valor = valorNormalizado; // Actualizar para las validaciones posteriores
+                    }
+                }
+
+                // ============================================
+                // VALIDACIONES
+                // ============================================
 
                 // Validar contra referencias
                 const camposReferencia = ['TipoDeEnvio', 'Logística Solicitada', 'Continente', 'SLA', 'Plazo', 'FormularioMobileB2B'];
@@ -696,12 +743,11 @@
                     }
                 }
 
-                // Validar HasDeliveryNote (3 valores posibles)
+                // Validar HasDeliveryNote (ya normalizado)
                 if (campo === 'HasDeliveryNote' && valor) {
                     const valoresValidos = ['CON_REMITO', 'SIN_REMITO', 'DIGITALIZADO'];
-                    const valorNormalizado = valor.toUpperCase().trim();
-                    if (!valoresValidos.includes(valorNormalizado)) {
-                        errors.push(`Campo "${campo}" = "${valor}" debe ser CON_REMITO, SIN_REMITO o DIGITALIZADO`);
+                    if (!valoresValidos.includes(valor)) {
+                        errors.push(`Campo "${campo}" = "${valor}" no es válido después de la normalización`);
                     }
                 }
 
@@ -735,6 +781,13 @@
                         errors.push(`Campo "${campo}" = "${valor}" debe ser true/false o si/no`);
                     }
                 }
+            }
+
+            // Si hubo normalización, actualizar la hoja en el workbook
+            if (huboNormalizacion) {
+                // Convertir de vuelta a hoja
+                const newSheet = XLSX.utils.aoa_to_sheet(data);
+                workbook.Sheets['Formulario'] = newSheet;
             }
 
             return { hasErrors: errors.length > 0, errors };
