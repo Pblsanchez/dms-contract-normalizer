@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guía de Usuario - Normalizador de Contratos DMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+            background: #f6f7fb;
+            color: #1a1a1a;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 50px 60px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .header .badge {
+            display: inline-block;
+            background: #c8102e;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-top: 8px;
+        }
+
+        .section {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+
+        .section-title .icon {
+            font-size: 28px;
+        }
+
+        .section-title .step {
+            background: #c8102e;
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .section p {
+            color: #444;
+            margin-bottom: 12px;
+        }
+
+        .section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .section ul li {
+            padding: 8px 0 8px 28px;
+            position: relative;
+            color: #444;
+        }
+
+        .section ul li::before {
+            content: "•";
+            color: #c8102e;
+            font-weight: 700;
+            font-size: 20px;
+            position: absolute;
+            left: 4px;
+            top: 6px;
+        }
+
+        .highlight-box {
+            background: #f8f9fc;
+            border-left: 4px solid #c8102e;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0;
+        }
+
+        .highlight-box strong {
+            color: #c8102e;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-family: "Cascadia Code", "Consolas", monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 12px 0;
+            white-space: pre-wrap;
+        }
+
+        .code-block .highlight {
+            color: #f0a030;
+        }
+
+        .code-block .success {
+            color: #4caf50;
+        }
+
+        .code-block .error {
+            color: #f44336;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 12px 0;
+        }
+
+        .grid-2 .card {
+            background: #f8f9fc;
+            padding: 16px 20px;
+            border-radius: 8px;
+            border: 1px solid #e8eaed;
+        }
+
+        .grid-2 .card .label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .grid-2 .card .value {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .grid-2 .card .value.valid {
+            color: #0a7a3a;
+        }
+
+        .grid-2 .card .value.invalid {
+            color: #c8102e;
+        }
+
+        .grid-2 .card .value.normalized {
+            color: #1a5a8a;
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: #f8f9fc;
+            border-radius: 12px;
+            margin: 16px 0;
+        }
+
+        .flow-step {
+            background: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: 2px solid #e8eaed;
+            font-weight: 600;
+            font-size: 13px;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .flow-step.active {
+            border-color: #c8102e;
+            background: rgba(200, 16, 46, 0.05);
+        }
+
+        .flow-arrow {
+            font-size: 20px;
+            color: #aaa;
+        }
+
+        .btn-demo {
+            display: inline-block;
+            background: #c8102e;
+            color: white;
+            padding: 10px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-demo:hover {
+            background: #980b23;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 24px 16px;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-diagram {
+                flex-direction: column;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="logo">📦</div>
+            <h1>Normalizador de Contratos DMS</h1>
+            <span class="badge">Andreani · Guía de Usuario</span>
+            <p class="subtitle">Una herramienta simple para validar y normalizar contratos DMS</p>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECCIÓN 1: ¿QUÉ HACE ESTA HERRAMIENTA? -->
+        <!-- ============================================================ -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">🤔</span>
+                <span>¿Qué hace esta herramienta?</span>
+            </div>
+            <p>
+                Esta herramienta está diseñada para <strong>automatizar y simplificar</strong> el proceso de
+                preparación de contratos DMS para la plataforma Andreani.
+            </p>
+            <p>
+                <strong>¿Qué problema resuelve?</strong> El archivo Excel que recibes tiene información
+                desordenada, fórmulas que deben convertirse a valores estáticos, y datos que necesitan
+                ser validados y normalizados antes de ser procesados por el sistema.
+            </p>
+            <p>
+                <strong>¿Qué hace exactamente?</strong>
+            </p>
+            <ul>
+                <li>✅ <strong>Valida</strong> que los campos del formulario sean correctos</li>
+                <li>🔄 <strong>Convierte</strong> todas las fórmulas a valores estáticos</li>
+                <li>🗑️ <strong>Elimina</strong> la hoja <code>Formulario</code> (solo se usa para la carga)</li>
+                <li>📑 <strong>Organiza</strong> la hoja <code>Referencias</code> al final</li>
+                <li>🏢 <strong>Limpia</strong> las direcciones vacías</li>
+                <li>📝 <strong>Renombra</strong> el archivo con los datos del contrato</li>
+                <li>💬 <strong>Genera</strong> un mensaje listo para copiar</li>
+            </ul>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECCIÓN 2: FLUJO DE TRABAJO -->
+        <!-- ============================================================ -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">🔄</span>
+                <span>Flujo de trabajo</span>
+            </div>
+
+            <div class="flow-diagram">
+                <div class="flow-step active">📂 Subir<br /><small>archivos .xlsx</small></div>
+                <span class="flow-arrow">➜</span>
+                <div class="flow-step">✅ Validar<br /><small>campos</small></div>
+                <span class="flow-arrow">➜</span>
+                <div class="flow-step">🔄 Normalizar<br /><small>datos</small></div>
+                <span class="flow-arrow">➜</span>
+                <div class="flow-step">📥 Descargar<br /><small>archivos</small></div>
+                <span class="flow-arrow">➜</span>
+                <div class="flow-step">💬 Copiar<br /><small>mensaje</small></div>
+            </div>
+
+            <p style="text-align:center; font-size:14px; color:#888;">
+                Solo 5 pasos: <strong>Subir → Validar → Normalizar → Descargar → Copiar mensaje</strong>
+            </p>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECCIÓN 3: REGLAS DE VALIDACIÓN -->
+        <!-- ============================================================ -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">📋</span>
+                <span>Reglas de validación</span>
+            </div>
+
+            <p>
+                La herramienta verifica automáticamente que los datos ingresados sean correctos.
+                Estas son las reglas que aplica:
+            </p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="label">📌 CodigoContratoERP (C3)</div>
+                    <div class="value valid">✅ 9 dígitos</div>
+                    <div style="font-size:13px; color:#666; margin-top:4px;">Ej: <code>351005959</code></div>
+                </div>
+                <div class="card">
+                    <div class="label">📌 IDSociedadSAP (C7)</div>
+                    <div class="value valid">✅ Debe ser "1100"</div>
+                    <div style="font-size:13px; color:#666; margin-top:4px;">Para B2B siempre es <code>1100</code></div>
+                </div>
+                <div class="card">
+                    <div class="label">📌 Habilitado (C8)</div>
+                    <div class="value valid">✅ 1 o 0</div>
+                    <div style="font-size:13px; color:#666; margin-top:4px;">1 = Activo, 0 = Inactivo</div>
+                </div>
+                <div class="card">
+                    <div class="label">📌 Campos booleanos</div>
+                    <div class="value valid">✅ true/false, 1/0, si/no</div>
+                    <div style="font-size:13px; color:#666; margin-top:4px;">AllowRescue, ObligatoryGauge, etc.</div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <strong>📌 HasDeliveryNote</strong> — Normalización automática:<br />
+                <code>true / 1 / si</code> → <strong>CON_REMITO</strong><br />
+                <code>false / 0 / no</code> → <strong>SIN_REMITO</strong><br />
+                <code>CON_REMITO / SIN_REMITO / DIGITALIZADO</code> → se mantienen
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECCIÓN 4: NORMALIZACIÓN DE SOLICITANTE -->
+        <!-- ============================================================ -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">🔢</span>
+                <span>Normalización de CodigoSolicitanteERP</span>
+            </div>
+
+            <p>
+                El campo <strong>CodigoSolicitanteERP</strong> (C5) puede llegar en diferentes formatos.
+                La herramienta lo normaliza automáticamente:
+            </p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="label">✅ Válido</div>
+                    <div class="value valid">6 dígitos</div>
+                    <div style="font-size:13px; color:#666; margin-top:4px;">Ej: <code>123456</code></div>
+                </div>
+                <div class="card">
+                    <div class="label">🔄 Normalizado</div>
+                    <div class="value normalized">10 dígitos con 4 ceros</div>
+                    <div style="font-size:13px; color:#666; margin-top:4px;">
+                        <code>0000120761</code> → <strong>120761</strong>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="label">❌ Inválido</div>
+                    <div class="value invalid">10 dígitos sin 4 ceros</div>
+                    <div style="font-size:13px; color:#666; margin-top:4px;">
+                        <code>1234567890</code> → ❌ Error
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="label">❌ Inválido</div>
+                    <div class="value invalid">Menos de 6 o más de 10</div>
+                    <div style="font-size:13px; color:#666; margin-top:4px;">
+                        <code>12345</code> o <code>12345678901</code> → ❌ Error
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECCIÓN 5: LIMPIEZA DE DIRECCIONES -->
+        <!-- ============================================================ -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">🏢</span>
+                <span>Limpieza de direcciones</span>
+            </div>
+
+            <p>
+                Si el ejecutivo solo completó algunas direcciones, la herramienta <strong>elimina automáticamente</strong>
+                las filas vacías de la hoja <code>Direcciones</code>.
+            </p>
+
+            <div style="background:#f8f9fc; border-radius:8px; padding:16px; margin:12px 0;">
+                <div style="font-weight:600; color:#666; font-size:13px; margin-bottom:8px;">📋 Ejemplo:</div>
+                <div class="code-block" style="background:#f0f2f5; color:#333;">
+                    <span style="color:#c8102e; font-weight:600;">ANTES</span>
+                    Street         | City      | AddressType
+                    Amado Aufranc  | ESPERANZA | 1
+                    0              | 0         | 2     ← vacía
+                    0              | 0         | 3     ← vacía
+                    Amado Aufranc  | ESPERANZA | 7
+                    0              | 0         | 8     ← vacía
+                </div>
+                <div style="text-align:center; font-size:24px; margin:8px 0;">⬇️</div>
+                <div class="code-block" style="background:#e8f5e9; color:#333;">
+                    <span style="color:#0a7a3a; font-weight:600;">DESPUÉS</span>
+                    Street         | City      | AddressType
+                    Amado Aufranc  | ESPERANZA | 1     ← se conserva
+                    Amado Aufranc  | ESPERANZA | 7     ← se conserva
+                </div>
+                <div style="font-size:13px; color:#666; margin-top:8px;">
+                    ✅ Solo se conservan las filas que tienen al menos un campo con información real
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECCIÓN 6: NOMBRE DE ARCHIVO -->
+        <!-- ============================================================ -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">📝</span>
+                <span>Nombre de archivo personalizado</span>
+            </div>
+
+            <p>
+                La herramienta renombra automáticamente el archivo de salida con los datos del contrato:
+            </p>
+
+            <div class="code-block">
+                <span style="color:#f0a030;">Alta de contrato DMS</span> <span style="color:#4caf50;">351005959</span> <span style="color:#4fc3f7;">120761</span> <span style="color:#ffb74d;">NOISACO SA</span><span style="color:#888;">.xlsx</span>
+            </div>
+
+            <ul>
+                <li><strong>Alta de contrato DMS</strong> → Texto fijo</li>
+                <li><strong>351005959</strong> → CodigoContratoERP (C3) — <span style="color:#c8102e;">Obligatorio</span></li>
+                <li><strong>120761</strong> → CodigoSolicitanteERP (C5) — <span style="color:#c8102e;">Obligatorio</span></li>
+                <li><strong>NOISACO SA</strong> → ClientName (C14) — <span style="color:#888;">Opcional</span></li>
+            </ul>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECCIÓN 7: MENSAJE PARA COPIAR -->
+        <!-- ============================================================ -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">💬</span>
+                <span>Mensaje para copiar</span>
+            </div>
+
+            <p>
+                Después de procesar los archivos, la herramienta genera un mensaje listo para copiar
+                al portapapeles con un solo clic.
+            </p>
+
+            <div class="highlight-box">
+                <strong>📋 Formato del mensaje:</strong>
+                <div class="code-block" style="background:#1a1a1a; color:#e0e0e0; margin-top:8px;">
+                    Hola @Djirikian Damian Uriel, te paso 2 archivos para alta de contratos DMS
+
+                    Alta de contrato DMS 351005959 120761 NOISACO SA.xlsx
+                    Alta de contrato DMS 351005994 987654 EL CRISTORANTE S.A.xlsx
+                </div>
+            </div>
+
+            <ul>
+                <li>✅ El destinatario es <strong>@Djirikian Damian Uriel</strong> (fijo)</li>
+                <li>✅ Muestra la <strong>cantidad</strong> de archivos procesados</li>
+                <li>✅ Lista <strong>todos los nombres</strong> de los archivos</li>
+                <li>✅ Botón <strong>"📋 Copiar mensaje"</strong> para copiar al portapapeles</li>
+            </ul>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECCIÓN 8: RESUMEN RÁPIDO -->
+        <!-- ============================================================ -->
+        <div class="section" style="border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
+            <div class="section-title">
+                <span class="icon">⚡</span>
+                <span>Resumen rápido</span>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-top:12px;">
+                <div style="background:#f8f9fc; padding:16px; border-radius:8px; text-align:center;">
+                    <div style="font-size:32px;">📂</div>
+                    <div style="font-weight:600;">Subí</div>
+                    <div style="font-size:13px; color:#666;">Arrastrá tus archivos .xlsx</div>
+                </div>
+                <div style="background:#f8f9fc; padding:16px; border-radius:8px; text-align:center;">
+                    <div style="font-size:32px;">⚡</div>
+                    <div style="font-weight:600;">Procesá</div>
+                    <div style="font-size:13px; color:#666;">Validación y normalización automática</div>
+                </div>
+                <div style="background:#f8f9fc; padding:16px; border-radius:8px; text-align:center;">
+                    <div style="font-size:32px;">📥</div>
+                    <div style="font-weight:600;">Descargá</div>
+                    <div style="font-size:13px; color:#666;">Archivos listos para usar</div>
+                </div>
+            </div>
+
+            <div style="text-align:center; margin-top:24px;">
+                <a href="index.html" class="btn-demo">🚀 Ir a la herramienta</a>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
