@@ -8,8 +8,6 @@
     <style>
         /* ============================================
            SISTEMA DE DISEÑO ANDREANI
-           Inspirado en Dashboard Comercial v2.2
-           Paleta: Rojo corporativo
            ============================================ */
 
         :root {
@@ -528,7 +526,6 @@
         function updateStats() {
             STATS_BAR.style.display = 'flex';
             FILE_COUNT.textContent = uploadedFiles.length;
-            // Los contadores de válidos/errores se actualizan después del procesamiento
         }
 
         // ============================================================
@@ -610,15 +607,10 @@
                     }
 
                     // ============================================
-                    // PASO 4: OCULTAR hoja "Referencias"
+                    // PASO 4: MOVER hoja "Referencias" al final
                     // ============================================
-                    // xlsx no soporta ocultar hojas directamente, pero podemos
-                    // renombrarla con un prefijo o simplemente mantenerla.
-                    // En la práctica, el usuario puede ocultarla manualmente.
-                    // Como alternativa, la dejamos pero la movemos al final.
                     const refIndex = normalizedWB.SheetNames.indexOf('Referencias');
                     if (refIndex !== -1) {
-                        // La movemos al final
                         const refName = normalizedWB.SheetNames.splice(refIndex, 1)[0];
                         normalizedWB.SheetNames.push(refName);
                         log(`   → Hoja "Referencias" movida al final`, 'info');
@@ -673,18 +665,14 @@
             // Convertir a array de arrays
             const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
 
-            // Buscar los campos en la columna A y sus valores en la columna C
-            // Estructura: [A: campo, B: vacío, C: valor, D: comentario]
-            // Filas 3-24 y 27-30 (index 2-23 y 26-29 en 0-based)
+            // Filas a validar: 3-24 y 27-30 (index 2-23 y 26-29 en 0-based)
             const filasAValidar = [];
-            for (let i = 2; i <= 23; i++) filasAValidar.push(i); // 3-24
-            for (let i = 26; i <= 29; i++) filasAValidar.push(i); // 27-30
+            for (let i = 2; i <= 23; i++) filasAValidar.push(i);
+            for (let i = 26; i <= 29; i++) filasAValidar.push(i);
 
-            // También necesitamos la hoja Referencias para validar contra las listas
+            // Obtener referencias
             const refSheet = workbook.Sheets['Referencias'];
             const refData = refSheet ? XLSX.utils.sheet_to_json(refSheet, { header: 1, defval: '' }) : [];
-
-            // Extraer las listas de referencia
             const referencias = extractReferences(refData);
 
             for (const rowIdx of filasAValidar) {
@@ -697,20 +685,27 @@
                 const campo = String(row[0] || '').trim();
                 const valor = String(row[2] || '').trim();
 
-                // Si el campo está vacío, lo ignoramos
                 if (!campo) continue;
 
-                // Verificar si es un campo que debe validarse contra referencias
-                const camposReferencia = ['TipoDeEnvio', 'TipoEntrega', 'SLA', 'Logística Solicitada', 'Continente', 'Plazo', 'FormularioMobileB2B'];
+                // Validar contra referencias
+                const camposReferencia = ['TipoDeEnvio', 'Logística Solicitada', 'Continente', 'SLA', 'Plazo', 'FormularioMobileB2B'];
                 if (camposReferencia.includes(campo)) {
-                    // Validar que el valor exista en las referencias
                     const esValido = validarContraReferencias(campo, valor, referencias);
                     if (!esValido) {
                         errors.push(`Campo "${campo}" = "${valor}" no es válido según la hoja Referencias`);
                     }
                 }
 
-                // Validar que el campo no esté vacío (excepto algunos opcionales)
+                // Validar HasDeliveryNote (3 valores posibles)
+                if (campo === 'HasDeliveryNote' && valor) {
+                    const valoresValidos = ['CON_REMITO', 'SIN_REMITO', 'DIGITALIZADO'];
+                    const valorNormalizado = valor.toUpperCase().trim();
+                    if (!valoresValidos.includes(valorNormalizado)) {
+                        errors.push(`Campo "${campo}" = "${valor}" debe ser CON_REMITO, SIN_REMITO o DIGITALIZADO`);
+                    }
+                }
+
+                // Campos opcionales
                 const opcionales = ['CondicionDeEntrega', 'DescripcionContratoERP'];
                 if (!opcionales.includes(campo) && !valor) {
                     errors.push(`Campo "${campo}" está vacío (fila ${rowIdx+1})`);
@@ -729,13 +724,16 @@
                     errors.push(`Campo "Habilitado" = "${valor}" debe ser 1 o 0`);
                 }
 
-                // Booleanos: AllowRescue, AllowWithdrawPartialValues, etc.
+                // Booleanos
                 const booleanFields = ['AllowRescue', 'AllowWithdrawPartialValues', 'ObligatoryGauge',
                     'AllowPartialDelivery', 'IsCentralizedReturn', 'HasCollectionManagement',
-                    'HasDeliveryNote', 'AllowPrintDocumentationReturn', '¿Es recambio?'
+                    'AllowPrintDocumentationReturn', '¿Es recambio?'
                 ];
-                if (booleanFields.includes(campo) && valor && !['true', 'false', 'TRUE', 'FALSE', 'True', 'False', '1', '0', 'si', 'no'].includes(valor.toLowerCase())) {
-                    errors.push(`Campo "${campo}" = "${valor}" debe ser true/false o si/no`);
+                if (booleanFields.includes(campo) && valor) {
+                    const valoresValidos = ['true', 'false', 'TRUE', 'FALSE', 'True', 'False', '1', '0', 'si', 'no'];
+                    if (!valoresValidos.some(v => v.toLowerCase() === valor.toLowerCase())) {
+                        errors.push(`Campo "${campo}" = "${valor}" debe ser true/false o si/no`);
+                    }
                 }
             }
 
@@ -743,17 +741,49 @@
         }
 
         // ============================================================
+        //  FUNCIÓN: VALIDAR CONTRA REFERENCIAS
+        // ============================================================
+        function validarContraReferencias(campo, valor, referencias) {
+            // Caso especial: TipoDeEnvio
+            if (campo === 'TipoDeEnvio') {
+                const tiposValidos = [
+                    'Minorista', 'Mayorista', 'Cadena de frío',
+                    'Cargas completas', 'Congelado', 'Logística inversa',
+                    'Paquetería', 'Retira depósito', 'Logística Asegurada'
+                ];
+                return tiposValidos.some(t => t.toLowerCase() === valor.toLowerCase());
+            }
+
+            // Mapeo de campos a tablas de referencia
+            const map = {
+                'Logística Solicitada': 'logistica',
+                'Continente': 'continente',
+                'SLA': 'sla',
+                'Plazo': 'sla',
+                'FormularioMobileB2B': 'formulario'
+            };
+
+            const tableName = map[campo];
+            if (!tableName) return true;
+
+            const table = referencias[tableName];
+            if (!table || table.length === 0) return true;
+
+            return table.some(item => {
+                return item.key === valor ||
+                    item.code === valor ||
+                    item.desc === valor ||
+                    item.key.toLowerCase() === valor.toLowerCase() ||
+                    item.code.toLowerCase() === valor.toLowerCase() ||
+                    (item.desc && item.desc.toLowerCase() === valor.toLowerCase());
+            });
+        }
+
+        // ============================================================
         //  FUNCIÓN: EXTRAER REFERENCIAS
         // ============================================================
         function extractReferences(refData) {
             const refs = {};
-
-            // Buscar las tablas en la hoja Referencias
-            // Estructura: cada tabla tiene encabezados y datos
-            // Logística Solicitada: columna A-C
-            // Continente: columna E-G
-            // SLAs: columna I-K
-            // Formulario Mobile: columna M-P
 
             let currentTable = null;
             for (const row of refData) {
@@ -793,7 +823,7 @@
                     continue;
                 }
 
-                // Agregar datos según la tabla actual
+                // Agregar datos
                 if (currentTable === 'logistica' && colA && colB) {
                     refs.logistica.push({ key: colA, code: colB, desc: colC });
                 }
@@ -812,52 +842,15 @@
         }
 
         // ============================================================
-        //  FUNCIÓN: VALIDAR CONTRA REFERENCIAS
-        // ============================================================
-        function validarContraReferencias(campo, valor, referencias) {
-            // Mapeo de campos a sus tablas de referencia
-            const map = {
-                'TipoDeEnvio': 'logistica',
-                'Logística Solicitada': 'logistica',
-                'Continente': 'continente',
-                'SLA': 'sla',
-                'Plazo': 'sla',
-                'FormularioMobileB2B': 'formulario'
-            };
-
-            const tableName = map[campo];
-            if (!tableName) return true; // Si no está en el mapa, no validamos
-
-            const table = referencias[tableName];
-            if (!table || table.length === 0) return true; // Si no hay referencias, no validamos
-
-            // Buscar el valor en las claves o códigos de la tabla
-            return table.some(item => {
-                return item.key === valor ||
-                    item.code === valor ||
-                    item.desc === valor ||
-                    item.key.toLowerCase() === valor.toLowerCase() ||
-                    item.code.toLowerCase() === valor.toLowerCase();
-            });
-        }
-
-        // ============================================================
-        //  FUNCIÓN: NORMALIZAR WORKBOOK (convertir fórmulas a valores)
+        //  FUNCIÓN: NORMALIZAR WORKBOOK
         // ============================================================
         function normalizeWorkbook(workbook) {
             const newWB = XLSX.utils.book_new();
 
-            // Procesar cada hoja
             for (const sheetName of workbook.SheetNames) {
                 const originalSheet = workbook.Sheets[sheetName];
-
-                // Convertir a array de arrays con valores ya evaluados
                 const data = XLSX.utils.sheet_to_json(originalSheet, { header: 1, defval: '', raw: false });
-
-                // Crear nueva hoja con los valores
                 const newSheet = XLSX.utils.aoa_to_sheet(data);
-
-                // Copiar estilos? xlsx no soporta estilos fácilmente, así que solo copiamos valores
                 XLSX.utils.book_append_sheet(newWB, newSheet, sheetName);
             }
 
