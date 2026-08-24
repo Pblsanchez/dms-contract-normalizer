@@ -93,6 +93,24 @@
             letter-spacing: 0.3px;
         }
 
+        .header-link {
+            color: var(--andreani-red);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all var(--transicion);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .header-link:hover {
+            background: rgba(200, 16, 46, 0.08);
+            transform: translateY(-1px);
+        }
+
         /* ========== MAIN CONTAINER ========== */
         .main-container {
             max-width: 1200px;
@@ -521,7 +539,11 @@
             </div>
             <span class="header-tag">DMS · Normalizador</span>
         </div>
-        <div style="font-size:13px; color: var(--gray);">
+        <div style="display:flex; align-items:center; gap:16px; font-size:13px; color: var(--gray);">
+            <a href="guia-usuario.html" target="_blank" style="color: var(--andreani-red); text-decoration: none; font-weight:600; display:flex; align-items:center; gap:4px; transition: all var(--transicion);">
+                <span style="font-size:16px;">📖</span> Guía
+            </a>
+            <span>|</span>
             <span>v2.0</span>
         </div>
     </header>
@@ -1229,6 +1251,24 @@
             for (const sheetName of workbook.SheetNames) {
                 const originalSheet = workbook.Sheets[sheetName];
                 const data = XLSX.utils.sheet_to_json(originalSheet, { header: 1, defval: '', raw: false });
+                
+                // ============================================
+                // REGLA ESPECIAL: AllowsStorage = FALSE en hoja Contrato
+                // ============================================
+                if (sheetName === 'Contrato') {
+                    // Buscar la fila donde está "AllowsStorage" (fila 2, columna Y = index 24)
+                    // Y forzar su valor a "false"
+                    if (data.length > 1) {
+                        // La fila 2 (index 1) contiene los valores
+                        const rowIndex = 1; // Fila 2 en 0-based
+                        if (data[rowIndex] && data[rowIndex].length > 24) {
+                            // Columna Y = índice 24
+                            data[rowIndex][24] = 'false';
+                            log(`   → AllowsStorage forzado a "false" en hoja "Contrato"`, 'info');
+                        }
+                    }
+                }
+                
                 const newSheet = XLSX.utils.aoa_to_sheet(data);
                 XLSX.utils.book_append_sheet(newWB, newSheet, sheetName);
             }
