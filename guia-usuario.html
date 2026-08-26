@@ -4,47 +4,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Guía de Usuario - Normalizador de Contratos DMS</title>
+    <link rel="stylesheet" href="css/styles.css" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
-            background: #f6f7fb;
-            color: #1a1a1a;
-            line-height: 1.6;
-            padding: 40px 20px;
-        }
-
-        .container {
-            max-width: 900px;
+        /* ========== ESTILOS EXCLUSIVOS DE LA GUÍA ========== */
+        .guide-container {
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 16px;
-            padding: 50px 60px;
+            padding: 40px 50px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
         }
 
-        .header {
+        .guide-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
-        .header .logo {
+        .guide-header .logo {
             font-size: 48px;
             margin-bottom: 10px;
         }
 
-        .header h1 {
+        .guide-header h1 {
             font-size: 32px;
             font-weight: 700;
             color: #1a1a1a;
         }
 
-        .header .badge {
+        .guide-header .badge {
             display: inline-block;
             background: #c8102e;
             color: white;
@@ -55,12 +43,80 @@
             margin-top: 8px;
         }
 
-        .header .subtitle {
+        .guide-header .subtitle {
             color: #666;
             font-size: 16px;
             margin-top: 8px;
         }
 
+        /* ========== TABS ========== */
+        .tabs-wrapper {
+            position: sticky;
+            top: 80px;
+            z-index: 50;
+            background: white;
+            padding: 10px 0 0 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            padding: 0 0 8px 0;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray);
+            border-radius: 8px 8px 0 0;
+            transition: all var(--transicion);
+            font-family: inherit;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            background: rgba(200, 16, 46, 0.05);
+            color: var(--andreani-red);
+        }
+
+        .tab-btn.active {
+            color: var(--andreani-red);
+            background: rgba(200, 16, 46, 0.08);
+        }
+
+        .tab-btn.active::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--andreani-red);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-btn .icon {
+            margin-right: 6px;
+        }
+
+        /* ========== TAB CONTENT ========== */
+        .tab-content {
+            display: none;
+            animation: fadeIn 300ms ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ========== SECTION STYLES ========== */
         .section {
             margin-bottom: 32px;
             padding-bottom: 32px;
@@ -137,6 +193,14 @@
 
         .highlight-box strong {
             color: #c8102e;
+        }
+
+        .highlight-box ul {
+            margin-top: 8px;
+        }
+
+        .highlight-box ul li {
+            padding: 4px 0 4px 24px;
         }
 
         .code-block {
@@ -253,9 +317,96 @@
             transform: translateY(-2px);
         }
 
-        @media (max-width: 640px) {
-            .container {
-                padding: 24px 16px;
+        .btn-volver {
+            display: inline-block;
+            background: transparent;
+            color: #c8102e;
+            padding: 10px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 2px solid #c8102e;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-volver:hover {
+            background: #c8102e;
+            color: white;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .summary-grid .item {
+            background: #f8f9fc;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .summary-grid .item .emoji {
+            font-size: 32px;
+        }
+
+        .summary-grid .item .title {
+            font-weight: 600;
+        }
+
+        .summary-grid .item .desc {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* ========== RESPONSIVE: Accordion en móvil ========== */
+        @media (max-width: 768px) {
+            .guide-container {
+                padding: 20px 16px;
+            }
+
+            .tabs-wrapper {
+                top: 120px;
+            }
+
+            .tabs {
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .tab-btn {
+                text-align: left;
+                padding: 12px 16px;
+                border-radius: 8px;
+                border-bottom: 1px solid var(--border-light);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+            }
+
+            .tab-btn.active {
+                background: rgba(200, 16, 46, 0.08);
+            }
+
+            .tab-btn.active::after {
+                display: none;
+            }
+
+            .tab-btn .arrow {
+                transition: transform 0.3s ease;
+                font-size: 12px;
+            }
+
+            .tab-btn.active .arrow {
+                transform: rotate(180deg);
+            }
+
+            .tab-content {
+                padding-top: 12px;
             }
 
             .grid-2 {
@@ -270,357 +421,513 @@
                 transform: rotate(90deg);
             }
 
-            .header h1 {
+            .guide-header h1 {
                 font-size: 24px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .guide-container {
+                padding: 16px 12px;
+            }
+
+            .tabs-wrapper {
+                top: 140px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- HEADER -->
-        <div class="header">
-            <div class="logo">📦</div>
-            <h1>Normalizador de Contratos DMS</h1>
-            <span class="badge">Andreani · Guía de Usuario</span>
-            <p class="subtitle">Una herramienta simple para validar y normalizar contratos DMS</p>
+    <!-- HEADER -->
+    <header class="andreani-header">
+        <div class="header-left">
+            <div class="andreani-logo">
+                <span class="logo-icon">📦</span>
+                <span class="logo-text">Andreani</span>
+            </div>
+            <span class="header-tag">DMS · Normalizador</span>
         </div>
-
-        <!-- ============================================================ -->
-        <!-- SECCIÓN 1: ¿QUÉ HACE ESTA HERRAMIENTA? -->
-        <!-- ============================================================ -->
-        <div class="section">
-            <div class="section-title">
-                <span class="icon">🤔</span>
-                <span>¿Qué hace esta herramienta?</span>
-            </div>
-            <p>
-                Esta herramienta está diseñada para <strong>automatizar y simplificar</strong> el proceso de
-                preparación de contratos DMS para la plataforma Andreani.
-            </p>
-            <p>
-                <strong>¿Qué problema resuelve?</strong> El archivo Excel que recibes tiene información
-                desordenada, fórmulas que deben convertirse a valores estáticos, y datos que necesitan
-                ser validados y normalizados antes de ser procesados por el sistema.
-            </p>
-            <p>
-                <strong>¿Qué hace exactamente?</strong>
-            </p>
-            <ul>
-                <li>✅ <strong>Valida</strong> que los campos del formulario sean correctos</li>
-                <li>🔄 <strong>Convierte</strong> todas las fórmulas a valores estáticos</li>
-                <li>🗑️ <strong>Elimina</strong> la hoja <code>Formulario</code> (solo se usa para la carga)</li>
-                <li>📑 <strong>Organiza</strong> la hoja <code>Referencias</code> al final</li>
-                <li>🏢 <strong>Limpia</strong> las direcciones vacías</li>
-                <li>📝 <strong>Renombra</strong> el archivo con los datos del contrato</li>
-                <li>💬 <strong>Genera</strong> un mensaje listo para copiar</li>
-            </ul>
+        <div style="display:flex; align-items:center; gap:16px; font-size:13px; color: var(--gray);">
+            <a href="index.html" class="header-link">
+                <span style="font-size:16px;">🏠</span> Inicio
+            </a>
+            <span>|</span>
+            <span>v2.0</span>
         </div>
+    </header>
 
-        <!-- ============================================================ -->
-        <!-- SECCIÓN 2: FLUJO DE TRABAJO -->
-        <!-- ============================================================ -->
-        <div class="section">
-            <div class="section-title">
-                <span class="icon">🔄</span>
-                <span>Flujo de trabajo</span>
+    <!-- MAIN -->
+    <main class="main-container" style="max-width:1000px;">
+        <div class="guide-container">
+            <!-- HEADER -->
+            <div class="guide-header">
+                <div class="logo">📦</div>
+                <h1>Normalizador de Contratos DMS</h1>
+                <span class="badge">Andreani · Guía de Usuario</span>
+                <p class="subtitle">Una herramienta simple para validar y normalizar contratos DMS</p>
             </div>
 
-            <div class="flow-diagram">
-                <div class="flow-step active">📂 Subir<br /><small>archivos .xlsx</small></div>
-                <span class="flow-arrow">➜</span>
-                <div class="flow-step">✅ Validar<br /><small>campos</small></div>
-                <span class="flow-arrow">➜</span>
-                <div class="flow-step">🔄 Normalizar<br /><small>datos</small></div>
-                <span class="flow-arrow">➜</span>
-                <div class="flow-step">📥 Descargar<br /><small>archivos</small></div>
-                <span class="flow-arrow">➜</span>
-                <div class="flow-step">💬 Copiar<br /><small>mensaje</small></div>
-            </div>
-
-            <p style="text-align:center; font-size:14px; color:#888;">
-                Solo 5 pasos: <strong>Subir → Validar → Normalizar → Descargar → Copiar mensaje</strong>
-            </p>
-        </div>
-
-        <!-- ============================================================ -->
-        <!-- SECCIÓN 3: REGLAS DE VALIDACIÓN Y NORMALIZACIÓN -->
-        <!-- ============================================================ -->
-        <div class="section">
-            <div class="section-title">
-                <span class="icon">📋</span>
-                <span>Reglas de validación y normalización</span>
-            </div>
-
-            <p>
-                La herramienta verifica automáticamente que los datos ingresados sean correctos y <strong>normaliza</strong>
-                aquellos valores que tengan errores comunes de tipeo, acentuación o mayúsculas/minúsculas.
-            </p>
-
-            <div class="grid-2">
-                <div class="card">
-                    <div class="label">📌 CodigoContratoERP (C3)</div>
-                    <div class="value valid">✅ 9 dígitos</div>
-                    <div style="font-size:13px; color:#666; margin-top:4px;">Ej: <code>351005959</code></div>
-                </div>
-                <div class="card">
-                    <div class="label">📌 IDSociedadSAP (C7)</div>
-                    <div class="value valid">✅ Debe ser "1100"</div>
-                    <div style="font-size:13px; color:#666; margin-top:4px;">Para B2B siempre es <code>1100</code></div>
-                </div>
-                <div class="card">
-                    <div class="label">📌 Habilitado (C8)</div>
-                    <div class="value valid">✅ 1 o 0</div>
-                    <div style="font-size:13px; color:#666; margin-top:4px;">1 = Activo, 0 = Inactivo</div>
-                </div>
-                <div class="card">
-                    <div class="label">📌 Campos booleanos</div>
-                    <div class="value valid">✅ true/false, 1/0, si/no</div>
-                    <div style="font-size:13px; color:#666; margin-top:4px;">AllowRescue, ObligatoryGauge, etc.</div>
+            <!-- TABS -->
+            <div class="tabs-wrapper">
+                <div class="tabs" id="tabsContainer">
+                    <button class="tab-btn active" data-tab="tab1">
+                        <span class="icon">🤔</span> ¿Qué hace?
+                    </button>
+                    <button class="tab-btn" data-tab="tab2">
+                        <span class="icon">🔄</span> Flujo
+                    </button>
+                    <button class="tab-btn" data-tab="tab3">
+                        <span class="icon">📋</span> Reglas
+                    </button>
+                    <button class="tab-btn" data-tab="tab4">
+                        <span class="icon">🔢</span> Solicitante
+                    </button>
+                    <button class="tab-btn" data-tab="tab5">
+                        <span class="icon">🏢</span> Direcciones
+                    </button>
+                    <button class="tab-btn" data-tab="tab6">
+                        <span class="icon">📝</span> Nombres
+                    </button>
+                    <button class="tab-btn" data-tab="tab7">
+                        <span class="icon">💬</span> Mensaje
+                    </button>
+                    <button class="tab-btn" data-tab="tab8">
+                        <span class="icon">📖</span> Sinónimos
+                    </button>
+                    <button class="tab-btn" data-tab="tab9">
+                        <span class="icon">⚡</span> Resumen
+                    </button>
                 </div>
             </div>
 
-            <div class="highlight-box">
-                <strong>📌 Normalización automática por diccionario de sinónimos</strong><br />
-                La herramienta corrige automáticamente errores comunes de tipeo en los siguientes campos:
-                <ul style="margin-top:8px;">
-                    <li><strong>TipoDeEnvio:</strong> <code>"paqueteria"</code> → <strong>"Paquetería"</strong></li>
-                    <li><strong>TipoDeEnvio:</strong> <code>"logistica inversa"</code> → <strong>"Logística inversa"</strong></li>
-                    <li><strong>HasDeliveryNote:</strong> <code>"con remito"</code> → <strong>"CON_REMITO"</strong></li>
-                    <li><strong>HasDeliveryNote:</strong> <code>"sin remito"</code> → <strong>"SIN_REMITO"</strong></li>
-                    <li><strong>Logística Solicitada, Continente, SLA, FormularioMobileB2B:</strong> normaliza mayúsculas, minúsculas y acentos</li>
-                </ul>
-            </div>
-
-            <div class="highlight-box" style="border-left-color: #0a7a3a;">
-                <strong>📌 HasDeliveryNote</strong> — Normalización automática:<br />
-                <code>true / 1 / si</code> → <strong>CON_REMITO</strong><br />
-                <code>false / 0 / no</code> → <strong>SIN_REMITO</strong><br />
-                <code>con remito / CON_REMITO / ConRemito</code> → <strong>CON_REMITO</strong><br />
-                <code>sin remito / SIN_REMITO / SinRemito</code> → <strong>SIN_REMITO</strong><br />
-                <code>digitalizado / DIGITALIZADO / Digitalizado</code> → <strong>DIGITALIZADO</strong>
-            </div>
-        </div>
-
-        <!-- ============================================================ -->
-        <!-- SECCIÓN 4: NORMALIZACIÓN DE SOLICITANTE -->
-        <!-- ============================================================ -->
-        <div class="section">
-            <div class="section-title">
-                <span class="icon">🔢</span>
-                <span>Normalización de CodigoSolicitanteERP</span>
-            </div>
-
-            <p>
-                El campo <strong>CodigoSolicitanteERP</strong> (C5) puede llegar en diferentes formatos.
-                La herramienta lo normaliza automáticamente:
-            </p>
-
-            <div class="grid-2">
-                <div class="card">
-                    <div class="label">✅ Válido</div>
-                    <div class="value valid">6 dígitos</div>
-                    <div style="font-size:13px; color:#666; margin-top:4px;">Ej: <code>123456</code></div>
+            <!-- ============================================================ -->
+            <!-- TAB 1: ¿QUÉ HACE? -->
+            <!-- ============================================================ -->
+            <div id="tab1" class="tab-content active">
+                <div class="section">
+                    <div class="section-title">
+                        <span class="icon">🤔</span>
+                        <span>¿Qué hace esta herramienta?</span>
+                    </div>
+                    <p>
+                        Esta herramienta está diseñada para <strong>automatizar y simplificar</strong> el proceso de
+                        preparación de contratos DMS para la plataforma Andreani.
+                    </p>
+                    <p>
+                        <strong>¿Qué problema resuelve?</strong> El archivo Excel que recibes tiene información
+                        desordenada, fórmulas que deben convertirse a valores estáticos, y datos que necesitan
+                        ser validados y normalizados antes de ser procesados por el sistema.
+                    </p>
+                    <p>
+                        <strong>¿Qué hace exactamente?</strong>
+                    </p>
+                    <ul>
+                        <li>✅ <strong>Valida</strong> que los campos del formulario sean correctos</li>
+                        <li>🔄 <strong>Convierte</strong> todas las fórmulas a valores estáticos</li>
+                        <li>🗑️ <strong>Elimina</strong> la hoja <code>Formulario</code> (solo se usa para la carga)</li>
+                        <li>📑 <strong>Organiza</strong> la hoja <code>Referencias</code> al final</li>
+                        <li>🏢 <strong>Limpia</strong> las direcciones vacías</li>
+                        <li>📝 <strong>Renombra</strong> el archivo con los datos del contrato</li>
+                        <li>💬 <strong>Genera</strong> un mensaje listo para copiar</li>
+                    </ul>
                 </div>
-                <div class="card">
-                    <div class="label">🔄 Normalizado</div>
-                    <div class="value normalized">10 dígitos con 4 ceros</div>
-                    <div style="font-size:13px; color:#666; margin-top:4px;">
-                        <code>0000120761</code> → <strong>120761</strong>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TAB 2: FLUJO DE TRABAJO -->
+            <!-- ============================================================ -->
+            <div id="tab2" class="tab-content">
+                <div class="section">
+                    <div class="section-title">
+                        <span class="icon">🔄</span>
+                        <span>Flujo de trabajo</span>
+                    </div>
+
+                    <div class="flow-diagram">
+                        <div class="flow-step active">📂 Subir<br /><small>archivos .xlsx</small></div>
+                        <span class="flow-arrow">➜</span>
+                        <div class="flow-step">✅ Validar<br /><small>campos</small></div>
+                        <span class="flow-arrow">➜</span>
+                        <div class="flow-step">🔄 Normalizar<br /><small>datos</small></div>
+                        <span class="flow-arrow">➜</span>
+                        <div class="flow-step">📥 Descargar<br /><small>archivos</small></div>
+                        <span class="flow-arrow">➜</span>
+                        <div class="flow-step">💬 Copiar<br /><small>mensaje</small></div>
+                    </div>
+
+                    <p style="text-align:center; font-size:14px; color:#888;">
+                        Solo 5 pasos: <strong>Subir → Validar → Normalizar → Descargar → Copiar mensaje</strong>
+                    </p>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TAB 3: REGLAS DE VALIDACIÓN -->
+            <!-- ============================================================ -->
+            <div id="tab3" class="tab-content">
+                <div class="section">
+                    <div class="section-title">
+                        <span class="icon">📋</span>
+                        <span>Reglas de validación y normalización</span>
+                    </div>
+
+                    <p>
+                        La herramienta verifica automáticamente que los datos ingresados sean correctos y <strong>normaliza</strong>
+                        aquellos valores que tengan errores comunes de tipeo, acentuación o mayúsculas/minúsculas.
+                    </p>
+
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="label">📌 CodigoContratoERP (C3)</div>
+                            <div class="value valid">✅ 9 dígitos</div>
+                            <div style="font-size:13px; color:#666; margin-top:4px;">Ej: <code>351005959</code></div>
+                        </div>
+                        <div class="card">
+                            <div class="label">📌 IDSociedadSAP (C7)</div>
+                            <div class="value valid">✅ Debe ser "1100"</div>
+                            <div style="font-size:13px; color:#666; margin-top:4px;">Para B2B siempre es <code>1100</code></div>
+                        </div>
+                        <div class="card">
+                            <div class="label">📌 Habilitado (C8)</div>
+                            <div class="value valid">✅ 1 o 0</div>
+                            <div style="font-size:13px; color:#666; margin-top:4px;">1 = Activo, 0 = Inactivo</div>
+                        </div>
+                        <div class="card">
+                            <div class="label">📌 Campos booleanos</div>
+                            <div class="value valid">✅ true/false, 1/0, si/no</div>
+                            <div style="font-size:13px; color:#666; margin-top:4px;">AllowRescue, ObligatoryGauge, etc.</div>
+                        </div>
+                    </div>
+
+                    <div class="highlight-box">
+                        <strong>📌 Normalización automática por diccionario de sinónimos</strong><br />
+                        La herramienta corrige automáticamente errores comunes de tipeo en los siguientes campos:
+                        <ul>
+                            <li><strong>TipoDeEnvio:</strong> <code>"paqueteria"</code> → <strong>"Paquetería"</strong></li>
+                            <li><strong>TipoDeEnvio:</strong> <code>"logistica inversa"</code> → <strong>"Logística inversa"</strong></li>
+                            <li><strong>HasDeliveryNote:</strong> <code>"con remito"</code> → <strong>"CON_REMITO"</strong></li>
+                            <li><strong>HasDeliveryNote:</strong> <code>"sin remito"</code> → <strong>"SIN_REMITO"</strong></li>
+                            <li><strong>Logística Solicitada, Continente, SLA, FormularioMobileB2B:</strong> normaliza mayúsculas, minúsculas y acentos</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box" style="border-left-color: #0a7a3a;">
+                        <strong>📌 HasDeliveryNote</strong> — Normalización automática:<br />
+                        <code>true / 1 / si</code> → <strong>CON_REMITO</strong><br />
+                        <code>false / 0 / no</code> → <strong>SIN_REMITO</strong><br />
+                        <code>con remito / CON_REMITO / ConRemito</code> → <strong>CON_REMITO</strong><br />
+                        <code>sin remito / SIN_REMITO / SinRemito</code> → <strong>SIN_REMITO</strong><br />
+                        <code>digitalizado / DIGITALIZADO / Digitalizado</code> → <strong>DIGITALIZADO</strong>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="label">❌ Inválido</div>
-                    <div class="value invalid">10 dígitos sin 4 ceros</div>
-                    <div style="font-size:13px; color:#666; margin-top:4px;">
-                        <code>1234567890</code> → ❌ Error
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TAB 4: NORMALIZACIÓN DE SOLICITANTE -->
+            <!-- ============================================================ -->
+            <div id="tab4" class="tab-content">
+                <div class="section">
+                    <div class="section-title">
+                        <span class="icon">🔢</span>
+                        <span>Normalización de CodigoSolicitanteERP</span>
+                    </div>
+
+                    <p>
+                        El campo <strong>CodigoSolicitanteERP</strong> (C5) puede llegar en diferentes formatos.
+                        La herramienta lo normaliza automáticamente:
+                    </p>
+
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="label">✅ Válido</div>
+                            <div class="value valid">6 dígitos</div>
+                            <div style="font-size:13px; color:#666; margin-top:4px;">Ej: <code>123456</code></div>
+                        </div>
+                        <div class="card">
+                            <div class="label">🔄 Normalizado</div>
+                            <div class="value normalized">10 dígitos con 4 ceros</div>
+                            <div style="font-size:13px; color:#666; margin-top:4px;">
+                                <code>0000120761</code> → <strong>120761</strong>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="label">❌ Inválido</div>
+                            <div class="value invalid">10 dígitos sin 4 ceros</div>
+                            <div style="font-size:13px; color:#666; margin-top:4px;">
+                                <code>1234567890</code> → ❌ Error
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="label">❌ Inválido</div>
+                            <div class="value invalid">Menos de 6 o más de 10</div>
+                            <div style="font-size:13px; color:#666; margin-top:4px;">
+                                <code>12345</code> o <code>12345678901</code> → ❌ Error
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="label">❌ Inválido</div>
-                    <div class="value invalid">Menos de 6 o más de 10</div>
-                    <div style="font-size:13px; color:#666; margin-top:4px;">
-                        <code>12345</code> o <code>12345678901</code> → ❌ Error
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TAB 5: LIMPIEZA DE DIRECCIONES -->
+            <!-- ============================================================ -->
+            <div id="tab5" class="tab-content">
+                <div class="section">
+                    <div class="section-title">
+                        <span class="icon">🏢</span>
+                        <span>Limpieza de direcciones</span>
+                    </div>
+
+                    <p>
+                        Si el ejecutivo solo completó algunas direcciones, la herramienta <strong>elimina automáticamente</strong>
+                        las filas vacías de la hoja <code>Direcciones</code>.
+                    </p>
+
+                    <div style="background:#f8f9fc; border-radius:8px; padding:16px; margin:12px 0;">
+                        <div style="font-weight:600; color:#666; font-size:13px; margin-bottom:8px;">📋 Ejemplo:</div>
+                        <div class="code-block" style="background:#f0f2f5; color:#333;">
+                            <span style="color:#c8102e; font-weight:600;">ANTES</span>
+                            Street         | City      | AddressType
+                            Amado Aufranc  | ESPERANZA | 1
+                            0              | 0         | 2     ← vacía
+                            0              | 0         | 3     ← vacía
+                            Amado Aufranc  | ESPERANZA | 7
+                            0              | 0         | 8     ← vacía
+                        </div>
+                        <div style="text-align:center; font-size:24px; margin:8px 0;">⬇️</div>
+                        <div class="code-block" style="background:#e8f5e9; color:#333;">
+                            <span style="color:#0a7a3a; font-weight:600;">DESPUÉS</span>
+                            Street         | City      | AddressType
+                            Amado Aufranc  | ESPERANZA | 1     ← se conserva
+                            Amado Aufranc  | ESPERANZA | 7     ← se conserva
+                        </div>
+                        <div style="font-size:13px; color:#666; margin-top:8px;">
+                            ✅ Solo se conservan las filas que tienen al menos un campo con información real
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TAB 6: NOMBRE DE ARCHIVO -->
+            <!-- ============================================================ -->
+            <div id="tab6" class="tab-content">
+                <div class="section">
+                    <div class="section-title">
+                        <span class="icon">📝</span>
+                        <span>Nombre de archivo personalizado</span>
+                    </div>
+
+                    <p>
+                        La herramienta renombra automáticamente el archivo de salida con los datos del contrato:
+                    </p>
+
+                    <div class="code-block">
+                        <span style="color:#f0a030;">Alta de contrato DMS</span> <span style="color:#4caf50;">351005959</span> <span style="color:#4fc3f7;">120761</span> <span style="color:#ffb74d;">NOISACO SA</span><span style="color:#888;">.xlsx</span>
+                    </div>
+
+                    <ul>
+                        <li><strong>Alta de contrato DMS</strong> → Texto fijo</li>
+                        <li><strong>351005959</strong> → CodigoContratoERP (C3) — <span style="color:#c8102e;">Obligatorio</span></li>
+                        <li><strong>120761</strong> → CodigoSolicitanteERP (C5) — <span style="color:#c8102e;">Obligatorio</span></li>
+                        <li><strong>NOISACO SA</strong> → ClientName (C14) — <span style="color:#888;">Opcional</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TAB 7: MENSAJE PARA COPIAR -->
+            <!-- ============================================================ -->
+            <div id="tab7" class="tab-content">
+                <div class="section">
+                    <div class="section-title">
+                        <span class="icon">💬</span>
+                        <span>Mensaje para copiar</span>
+                    </div>
+
+                    <p>
+                        Después de procesar los archivos, la herramienta genera un mensaje listo para copiar
+                        al portapapeles con un solo clic.
+                    </p>
+
+                    <div class="highlight-box">
+                        <strong>📋 Formato del mensaje:</strong>
+                        <div class="code-block" style="background:#1a1a1a; color:#e0e0e0; margin-top:8px;">
+                            Hola @Djirikian Damian Uriel, te paso 2 archivos para alta de contratos DMS
+
+                            Alta de contrato DMS 351005959 120761 NOISACO SA.xlsx
+                            Alta de contrato DMS 351005994 987654 EL CRISTORANTE S.A.xlsx
+                        </div>
+                    </div>
+
+                    <ul>
+                        <li>✅ El destinatario es <strong>@Djirikian Damian Uriel</strong> (fijo)</li>
+                        <li>✅ Muestra la <strong>cantidad</strong> de archivos procesados</li>
+                        <li>✅ Lista <strong>todos los nombres</strong> de los archivos</li>
+                        <li>✅ Botón <strong>"📋 Copiar mensaje"</strong> para copiar al portapapeles</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TAB 8: NORMALIZACIÓN POR DICCIONARIO -->
+            <!-- ============================================================ -->
+            <div id="tab8" class="tab-content">
+                <div class="section">
+                    <div class="section-title">
+                        <span class="icon">📖</span>
+                        <span>Normalización por diccionario de sinónimos</span>
+                    </div>
+
+                    <p>
+                        La herramienta incluye un <strong>diccionario de sinónimos</strong> que permite corregir automáticamente
+                        errores comunes de tipeo en los campos con valores predefinidos.
+                    </p>
+
+                    <p><strong>¿Cómo funciona?</strong></p>
+                    <ul>
+                        <li>🔍 <strong>Detección:</strong> Identifica valores que no coinciden exactamente con los valores válidos</li>
+                        <li>🔄 <strong>Corrección:</strong> Busca en el diccionario de sinónimos y aplica la corrección automática</li>
+                        <li>📝 <strong>Registro:</strong> Todas las correcciones se registran en el log para trazabilidad</li>
+                        <li>❌ <strong>Error:</strong> Si el valor no se reconoce, muestra un error con la lista de valores válidos</li>
+                    </ul>
+
+                    <div style="background:#f8f9fc; border-radius:8px; padding:16px; margin:12px 0;">
+                        <div style="font-weight:600; color:#666; font-size:13px; margin-bottom:8px;">📋 Ejemplos de normalización:</div>
+                        <div class="code-block" style="background:#f0f2f5; color:#333; font-size:12px;">
+                            <span style="color:#c8102e; font-weight:600;">Campo: TipoDeEnvio</span>
+                            ❌ "paqueteria"    → ✅ <strong>"Paquetería"</strong>
+                            ❌ "logistica inversa" → ✅ <strong>"Logística inversa"</strong>
+                            ❌ "cadena de frio"    → ✅ <strong>"Cadena de frío"</strong>
+                            ❌ "retira deposito"   → ✅ <strong>"Retira depósito"</strong>
+
+                            <span style="color:#c8102e; font-weight:600; display:block; margin-top:8px;">Campo: HasDeliveryNote</span>
+                            ❌ "con remito"    → ✅ <strong>"CON_REMITO"</strong>
+                            ❌ "sin remito"    → ✅ <strong>"SIN_REMITO"</strong>
+                            ❌ "CONREMITO"     → ✅ <strong>"CON_REMITO"</strong>
+                            ❌ "digitalizado"  → ✅ <strong>"DIGITALIZADO"</strong>
+                        </div>
+                    </div>
+
+                    <div class="highlight-box" style="border-left-color: #1a5a8a;">
+                        <strong>💡 Beneficios:</strong><br />
+                        ✅ Reduce errores por tipeo manual<br />
+                        ✅ Acepta valores sin acentos o con mayúsculas/minúsculas incorrectas<br />
+                        ✅ Mejora la experiencia del usuario<br />
+                        ✅ Mantiene la trazabilidad con logs de normalización
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TAB 9: RESUMEN RÁPIDO -->
+            <!-- ============================================================ -->
+            <div id="tab9" class="tab-content">
+                <div class="section" style="border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
+                    <div class="section-title">
+                        <span class="icon">⚡</span>
+                        <span>Resumen rápido</span>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="item">
+                            <div class="emoji">📂</div>
+                            <div class="title">Subí</div>
+                            <div class="desc">Arrastrá tus archivos .xlsx</div>
+                        </div>
+                        <div class="item">
+                            <div class="emoji">⚡</div>
+                            <div class="title">Procesá</div>
+                            <div class="desc">Validación y normalización automática</div>
+                        </div>
+                        <div class="item">
+                            <div class="emoji">📥</div>
+                            <div class="title">Descargá</div>
+                            <div class="desc">Archivos listos para usar</div>
+                        </div>
+                    </div>
+
+                    <div style="text-align:center; margin-top:24px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                        <a href="index.html" class="btn-demo">🚀 Ir a la herramienta</a>
+                        <a href="index.html" class="btn-volver">⬅️ Volver</a>
                     </div>
                 </div>
             </div>
         </div>
+    </main>
 
-        <!-- ============================================================ -->
-        <!-- SECCIÓN 5: LIMPIEZA DE DIRECCIONES -->
-        <!-- ============================================================ -->
-        <div class="section">
-            <div class="section-title">
-                <span class="icon">🏢</span>
-                <span>Limpieza de direcciones</span>
-            </div>
+    <!-- FOOTER -->
+    <footer class="andreani-footer">
+        Andreani · Sistema de Normalización de Contratos DMS
+    </footer>
 
-            <p>
-                Si el ejecutivo solo completó algunas direcciones, la herramienta <strong>elimina automáticamente</strong>
-                las filas vacías de la hoja <code>Direcciones</code>.
-            </p>
+    <script>
+        // ============================================================
+        //  TABS + ACCORDION EN MÓVIL
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
 
-            <div style="background:#f8f9fc; border-radius:8px; padding:16px; margin:12px 0;">
-                <div style="font-weight:600; color:#666; font-size:13px; margin-bottom:8px;">📋 Ejemplo:</div>
-                <div class="code-block" style="background:#f0f2f5; color:#333;">
-                    <span style="color:#c8102e; font-weight:600;">ANTES</span>
-                    Street         | City      | AddressType
-                    Amado Aufranc  | ESPERANZA | 1
-                    0              | 0         | 2     ← vacía
-                    0              | 0         | 3     ← vacía
-                    Amado Aufranc  | ESPERANZA | 7
-                    0              | 0         | 8     ← vacía
-                </div>
-                <div style="text-align:center; font-size:24px; margin:8px 0;">⬇️</div>
-                <div class="code-block" style="background:#e8f5e9; color:#333;">
-                    <span style="color:#0a7a3a; font-weight:600;">DESPUÉS</span>
-                    Street         | City      | AddressType
-                    Amado Aufranc  | ESPERANZA | 1     ← se conserva
-                    Amado Aufranc  | ESPERANZA | 7     ← se conserva
-                </div>
-                <div style="font-size:13px; color:#666; margin-top:8px;">
-                    ✅ Solo se conservan las filas que tienen al menos un campo con información real
-                </div>
-            </div>
-        </div>
+            // Función para activar un tab
+            function activateTab(tabId) {
+                // Desactivar todos
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
 
-        <!-- ============================================================ -->
-        <!-- SECCIÓN 6: NOMBRE DE ARCHIVO -->
-        <!-- ============================================================ -->
-        <div class="section">
-            <div class="section-title">
-                <span class="icon">📝</span>
-                <span>Nombre de archivo personalizado</span>
-            </div>
+                // Activar el seleccionado
+                const activeTab = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+                const activeContent = document.getElementById(tabId);
 
-            <p>
-                La herramienta renombra automáticamente el archivo de salida con los datos del contrato:
-            </p>
+                if (activeTab) activeTab.classList.add('active');
+                if (activeContent) activeContent.classList.add('active');
+            }
 
-            <div class="code-block">
-                <span style="color:#f0a030;">Alta de contrato DMS</span> <span style="color:#4caf50;">351005959</span> <span style="color:#4fc3f7;">120761</span> <span style="color:#ffb74d;">NOISACO SA</span><span style="color:#888;">.xlsx</span>
-            </div>
+            // Click en tabs (escritorio y móvil)
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    const tabId = this.getAttribute('data-tab');
+                    activateTab(tabId);
 
-            <ul>
-                <li><strong>Alta de contrato DMS</strong> → Texto fijo</li>
-                <li><strong>351005959</strong> → CodigoContratoERP (C3) — <span style="color:#c8102e;">Obligatorio</span></li>
-                <li><strong>120761</strong> → CodigoSolicitanteERP (C5) — <span style="color:#c8102e;">Obligatorio</span></li>
-                <li><strong>NOISACO SA</strong> → ClientName (C14) — <span style="color:#888;">Opcional</span></li>
-            </ul>
-        </div>
+                    // En móvil, cerrar otros tabs (accordion)
+                    if (window.innerWidth <= 768) {
+                        const isActive = this.classList.contains('active');
+                        tabs.forEach(t => {
+                            if (t !== this) {
+                                t.classList.remove('active');
+                            }
+                        });
+                        // Si está activo, mantenerlo abierto
+                        if (isActive) {
+                            this.classList.add('active');
+                        }
+                    }
+                });
+            });
 
-        <!-- ============================================================ -->
-        <!-- SECCIÓN 7: MENSAJE PARA COPIAR -->
-        <!-- ============================================================ -->
-        <div class="section">
-            <div class="section-title">
-                <span class="icon">💬</span>
-                <span>Mensaje para copiar</span>
-            </div>
+            // En móvil, permitir que el tab activo se cierre al hacer click nuevamente
+            if (window.innerWidth <= 768) {
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function(e) {
+                        const tabId = this.getAttribute('data-tab');
+                        const content = document.getElementById(tabId);
 
-            <p>
-                Después de procesar los archivos, la herramienta genera un mensaje listo para copiar
-                al portapapeles con un solo clic.
-            </p>
+                        // Si el tab ya está activo, cerrarlo (accordion)
+                        if (this.classList.contains('active') && content.classList.contains('active')) {
+                            this.classList.remove('active');
+                            content.classList.remove('active');
+                        }
+                    });
+                });
+            }
 
-            <div class="highlight-box">
-                <strong>📋 Formato del mensaje:</strong>
-                <div class="code-block" style="background:#1a1a1a; color:#e0e0e0; margin-top:8px;">
-                    Hola @Djirikian Damian Uriel, te paso 2 archivos para alta de contratos DMS
-
-                    Alta de contrato DMS 351005959 120761 NOISACO SA.xlsx
-                    Alta de contrato DMS 351005994 987654 EL CRISTORANTE S.A.xlsx
-                </div>
-            </div>
-
-            <ul>
-                <li>✅ El destinatario es <strong>@Djirikian Damian Uriel</strong> (fijo)</li>
-                <li>✅ Muestra la <strong>cantidad</strong> de archivos procesados</li>
-                <li>✅ Lista <strong>todos los nombres</strong> de los archivos</li>
-                <li>✅ Botón <strong>"📋 Copiar mensaje"</strong> para copiar al portapapeles</li>
-            </ul>
-        </div>
-
-        <!-- ============================================================ -->
-        <!-- SECCIÓN 8: NORMALIZACIÓN POR DICCIONARIO -->
-        <!-- ============================================================ -->
-        <div class="section">
-            <div class="section-title">
-                <span class="icon">📖</span>
-                <span>Normalización por diccionario de sinónimos</span>
-            </div>
-
-            <p>
-                La herramienta incluye un <strong>diccionario de sinónimos</strong> que permite corregir automáticamente
-                errores comunes de tipeo en los campos con valores predefinidos.
-            </p>
-
-            <p><strong>¿Cómo funciona?</strong></p>
-            <ul>
-                <li>🔍 <strong>Detección:</strong> Identifica valores que no coinciden exactamente con los valores válidos</li>
-                <li>🔄 <strong>Corrección:</strong> Busca en el diccionario de sinónimos y aplica la corrección automática</li>
-                <li>📝 <strong>Registro:</strong> Todas las correcciones se registran en el log para trazabilidad</li>
-                <li>❌ <strong>Error:</strong> Si el valor no se reconoce, muestra un error con la lista de valores válidos</li>
-            </ul>
-
-            <div style="background:#f8f9fc; border-radius:8px; padding:16px; margin:12px 0;">
-                <div style="font-weight:600; color:#666; font-size:13px; margin-bottom:8px;">📋 Ejemplos de normalización:</div>
-                <div class="code-block" style="background:#f0f2f5; color:#333; font-size:12px;">
-                    <span style="color:#c8102e; font-weight:600;">Campo: TipoDeEnvio</span>
-                    ❌ "paqueteria"    → ✅ <strong>"Paquetería"</strong>
-                    ❌ "logistica inversa" → ✅ <strong>"Logística inversa"</strong>
-                    ❌ "cadena de frio"    → ✅ <strong>"Cadena de frío"</strong>
-                    ❌ "retira deposito"   → ✅ <strong>"Retira depósito"</strong>
-
-                    <span style="color:#c8102e; font-weight:600; display:block; margin-top:8px;">Campo: HasDeliveryNote</span>
-                    ❌ "con remito"    → ✅ <strong>"CON_REMITO"</strong>
-                    ❌ "sin remito"    → ✅ <strong>"SIN_REMITO"</strong>
-                    ❌ "CONREMITO"     → ✅ <strong>"CON_REMITO"</strong>
-                    ❌ "digitalizado"  → ✅ <strong>"DIGITALIZADO"</strong>
-                </div>
-            </div>
-
-            <div class="highlight-box" style="border-left-color: #1a5a8a;">
-                <strong>💡 Beneficios:</strong><br />
-                ✅ Reduce errores por tipeo manual<br />
-                ✅ Acepta valores sin acentos o con mayúsculas/minúsculas incorrectas<br />
-                ✅ Mejora la experiencia del usuario<br />
-                ✅ Mantiene la trazabilidad con logs de normalización
-            </div>
-        </div>
-
-        <!-- ============================================================ -->
-        <!-- SECCIÓN 9: RESUMEN RÁPIDO -->
-        <!-- ============================================================ -->
-        <div class="section" style="border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
-            <div class="section-title">
-                <span class="icon">⚡</span>
-                <span>Resumen rápido</span>
-            </div>
-
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-top:12px;">
-                <div style="background:#f8f9fc; padding:16px; border-radius:8px; text-align:center;">
-                    <div style="font-size:32px;">📂</div>
-                    <div style="font-weight:600;">Subí</div>
-                    <div style="font-size:13px; color:#666;">Arrastrá tus archivos .xlsx</div>
-                </div>
-                <div style="background:#f8f9fc; padding:16px; border-radius:8px; text-align:center;">
-                    <div style="font-size:32px;">⚡</div>
-                    <div style="font-weight:600;">Procesá</div>
-                    <div style="font-size:13px; color:#666;">Validación y normalización automática</div>
-                </div>
-                <div style="background:#f8f9fc; padding:16px; border-radius:8px; text-align:center;">
-                    <div style="font-size:32px;">📥</div>
-                    <div style="font-weight:600;">Descargá</div>
-                    <div style="font-size:13px; color:#666;">Archivos listos para usar</div>
-                </div>
-            </div>
-
-            <div style="text-align:center; margin-top:24px;">
-                <a href="index.html" class="btn-demo">🚀 Ir a la herramienta</a>
-            </div>
-        </div>
-
-    </div>
+            // Activar el primer tab por defecto
+            activateTab('tab1');
+        });
+    </script>
 </body>
 </html>
