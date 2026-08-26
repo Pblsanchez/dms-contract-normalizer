@@ -1088,20 +1088,61 @@
                     }
                 }
 
-                // Validar contra referencias
+                // Validar contra referencias con normalización
                 const camposReferencia = ['TipoDeEnvio', 'Logística Solicitada', 'Continente', 'SLA', 'Plazo', 'FormularioMobileB2B'];
                 if (camposReferencia.includes(campo)) {
-                    const esValido = validarContraReferencias(campo, valor, referencias);
-                    if (!esValido) {
-                        errors.push(`Campo "${campo}" = "${valor}" no es válido según la hoja Referencias`);
+                    const resultado = validarContraReferencias(campo, valor, referencias);
+                    
+                    if (resultado.normalizado) {
+                        // Actualizar el valor en la fila
+                        row[2] = resultado.valor;
+                        huboNormalizacion = true;
+                        log(`   → Campo "${campo}" normalizado de "${valor}" a "${resultado.valor}"`, 'info');
+                        valor = resultado.valor;
+                    }
+                    
+                    if (!resultado.valido) {
+                        // Obtener lista de valores válidos para el mensaje de error
+                        let valoresValidos = [];
+                        if (campo === 'TipoDeEnvio') {
+                            valoresValidos = [
+                                'Minorista', 'Mayorista', 'Cadena de frío',
+                                'Cargas completas', 'Congelado', 'Logística inversa',
+                                'Paquetería', 'Retira depósito', 'Logística Asegurada'
+                            ];
+                        } else {
+                            const map = {
+                                'Logística Solicitada': 'logistica',
+                                'Continente': 'continente',
+                                'SLA': 'sla',
+                                'Plazo': 'sla',
+                                'FormularioMobileB2B': 'formulario'
+                            };
+                            const tableName = map[campo];
+                            if (tableName && referencias[tableName]) {
+                                valoresValidos = referencias[tableName].map(item => item.key);
+                            }
+                        }
+                        
+                        const listaValores = valoresValidos.join(', ');
+                        errors.push(`Campo "${campo}" = "${valor}" no es válido. Valores válidos: ${listaValores}`);
                     }
                 }
 
-                // Validar HasDeliveryNote
+                // Validar HasDeliveryNote (con normalización incluida en validarContraReferencias)
                 if (campo === 'HasDeliveryNote' && valor) {
-                    const valoresValidos = ['CON_REMITO', 'SIN_REMITO', 'DIGITALIZADO'];
-                    if (!valoresValidos.includes(valor)) {
-                        errors.push(`Campo "${campo}" = "${valor}" no es válido después de la normalización`);
+                    const resultado = validarContraReferencias(campo, valor, referencias);
+                    
+                    if (resultado.normalizado) {
+                        // Actualizar el valor en la fila
+                        row[2] = resultado.valor;
+                        huboNormalizacion = true;
+                        log(`   → Campo "HasDeliveryNote" normalizado de "${valor}" a "${resultado.valor}"`, 'info');
+                        valor = resultado.valor;
+                    }
+                    
+                    if (!resultado.valido) {
+                        errors.push(`Campo "${campo}" = "${valor}" no es válido. Valores válidos: CON_REMITO, SIN_REMITO, DIGITALIZADO`);
                     }
                 }
 
@@ -1146,16 +1187,106 @@
         }
 
         // ============================================================
+        //  FUNCIÓN: NORMALIZAR VALOR CON DICCIONARIO
+        // ============================================================
+        function normalizarValorConDiccionario(campo, valor, referencias) {
+            if (!valor) return { valor: valor, normalizado: false };
+            
+            const valorLimpio = String(valor).trim();
+            
+            // Diccionario de sinónimos por campo
+            const diccionarios = {
+                'TipoDeEnvio': {
+                    'minorista': 'Minorista',
+                    'mayorista': 'Mayorista',
+                    'cadena de frio': 'Cadena de frío',
+                    'cadena de frío': 'Cadena de frío',
+                    'carga completa': 'Cargas completas',
+                    'cargas completa': 'Cargas completas',
+                    'cargas completas': 'Cargas completas',
+                    'logistica inversa': 'Logística inversa',
+                    'logística inversa': 'Logística inversa',
+                    'retira deposito': 'Retira depósito',
+                    'retira depósito': 'Retira depósito',
+                    'logistica asegurada': 'Logística Asegurada',
+                    'logística asegurada': 'Logística Asegurada',
+                    'paqueteria': 'Paquetería',
+                    'paquetería': 'Paquetería',
+                    'congelado': 'Congelado'
+                },
+                'HasDeliveryNote': {
+                    'con remito': 'CON_REMITO',
+                    'conremito': 'CON_REMITO',
+                    'sin remito': 'SIN_REMITO',
+                    'sinremito': 'SIN_REMITO',
+                    'digitalizado': 'DIGITALIZADO'
+                }
+            };
+
+            // Buscar en el diccionario del campo específico
+            const diccionario = diccionarios[campo];
+            if (diccionario) {
+                const valorLower = valorLimpio.toLowerCase();
+                for (const [key, value] of Object.entries(diccionario)) {
+                    if (valorLower === key.toLowerCase()) {
+                        return { valor: value, normalizado: true };
+                    }
+                }
+            }
+
+            // Para campos que vienen de Referencias (Logística Solicitada, Continente, SLA, FormularioMobileB2B)
+            const map = {
+                'Logística Solicitada': 'logistica',
+                'Continente': 'continente',
+                'SLA': 'sla',
+                'Plazo': 'sla',
+                'FormularioMobileB2B': 'formulario'
+            };
+
+            const tableName = map[campo];
+            if (tableName && referencias[tableName]) {
+                const table = referencias[tableName];
+                const valorLower = valorLimpio.toLowerCase();
+                
+                // Buscar coincidencia exacta (case-insensitive)
+                for (const item of table) {
+                    const itemKey = String(item.key || '').toLowerCase();
+                    const itemCode = String(item.code || '').toLowerCase();
+                    const itemDesc = String(item.desc || '').toLowerCase();
+                    
+                    if (valorLower === itemKey || 
+                        valorLower === itemCode || 
+                        (itemDesc && valorLower === itemDesc)) {
+                        return { valor: item.key, normalizado: true };
+                    }
+                }
+            }
+
+            return { valor: valorLimpio, normalizado: false };
+        }
+
+        // ============================================================
         //  FUNCIÓN: VALIDAR CONTRA REFERENCIAS
         // ============================================================
         function validarContraReferencias(campo, valor, referencias) {
+            // Primero intentar normalizar
+            const resultado = normalizarValorConDiccionario(campo, valor, referencias);
+            
+            // Si se normalizó, usar el valor normalizado
+            const valorNormalizado = resultado.valor;
+            
             if (campo === 'TipoDeEnvio') {
                 const tiposValidos = [
                     'Minorista', 'Mayorista', 'Cadena de frío',
                     'Cargas completas', 'Congelado', 'Logística inversa',
                     'Paquetería', 'Retira depósito', 'Logística Asegurada'
                 ];
-                return tiposValidos.some(t => t.toLowerCase() === valor.toLowerCase());
+                const esValido = tiposValidos.some(t => t === valorNormalizado);
+                return { 
+                    valido: esValido, 
+                    valor: esValido ? valorNormalizado : valor,
+                    normalizado: resultado.normalizado
+                };
             }
 
             const map = {
@@ -1167,19 +1298,22 @@
             };
 
             const tableName = map[campo];
-            if (!tableName) return true;
+            if (!tableName) return { valido: true, valor: valor, normalizado: false };
 
             const table = referencias[tableName];
-            if (!table || table.length === 0) return true;
+            if (!table || table.length === 0) return { valido: true, valor: valor, normalizado: false };
 
-            return table.some(item => {
-                return item.key === valor ||
-                    item.code === valor ||
-                    item.desc === valor ||
-                    item.key.toLowerCase() === valor.toLowerCase() ||
-                    item.code.toLowerCase() === valor.toLowerCase() ||
-                    (item.desc && item.desc.toLowerCase() === valor.toLowerCase());
+            const esValido = table.some(item => {
+                return item.key === valorNormalizado ||
+                    item.code === valorNormalizado ||
+                    item.desc === valorNormalizado;
             });
+
+            return { 
+                valido: esValido, 
+                valor: esValido ? valorNormalizado : valor,
+                normalizado: resultado.normalizado
+            };
         }
 
         // ============================================================
