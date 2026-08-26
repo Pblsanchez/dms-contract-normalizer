@@ -344,17 +344,17 @@
         </div>
 
         <!-- ============================================================ -->
-        <!-- SECCIÓN 3: REGLAS DE VALIDACIÓN -->
+        <!-- SECCIÓN 3: REGLAS DE VALIDACIÓN Y NORMALIZACIÓN -->
         <!-- ============================================================ -->
         <div class="section">
             <div class="section-title">
                 <span class="icon">📋</span>
-                <span>Reglas de validación</span>
+                <span>Reglas de validación y normalización</span>
             </div>
 
             <p>
-                La herramienta verifica automáticamente que los datos ingresados sean correctos.
-                Estas son las reglas que aplica:
+                La herramienta verifica automáticamente que los datos ingresados sean correctos y <strong>normaliza</strong>
+                aquellos valores que tengan errores comunes de tipeo, acentuación o mayúsculas/minúsculas.
             </p>
 
             <div class="grid-2">
@@ -381,10 +381,24 @@
             </div>
 
             <div class="highlight-box">
+                <strong>📌 Normalización automática por diccionario de sinónimos</strong><br />
+                La herramienta corrige automáticamente errores comunes de tipeo en los siguientes campos:
+                <ul style="margin-top:8px;">
+                    <li><strong>TipoDeEnvio:</strong> <code>"paqueteria"</code> → <strong>"Paquetería"</strong></li>
+                    <li><strong>TipoDeEnvio:</strong> <code>"logistica inversa"</code> → <strong>"Logística inversa"</strong></li>
+                    <li><strong>HasDeliveryNote:</strong> <code>"con remito"</code> → <strong>"CON_REMITO"</strong></li>
+                    <li><strong>HasDeliveryNote:</strong> <code>"sin remito"</code> → <strong>"SIN_REMITO"</strong></li>
+                    <li><strong>Logística Solicitada, Continente, SLA, FormularioMobileB2B:</strong> normaliza mayúsculas, minúsculas y acentos</li>
+                </ul>
+            </div>
+
+            <div class="highlight-box" style="border-left-color: #0a7a3a;">
                 <strong>📌 HasDeliveryNote</strong> — Normalización automática:<br />
                 <code>true / 1 / si</code> → <strong>CON_REMITO</strong><br />
                 <code>false / 0 / no</code> → <strong>SIN_REMITO</strong><br />
-                <code>CON_REMITO / SIN_REMITO / DIGITALIZADO</code> → se mantienen
+                <code>con remito / CON_REMITO / ConRemito</code> → <strong>CON_REMITO</strong><br />
+                <code>sin remito / SIN_REMITO / SinRemito</code> → <strong>SIN_REMITO</strong><br />
+                <code>digitalizado / DIGITALIZADO / Digitalizado</code> → <strong>DIGITALIZADO</strong>
             </div>
         </div>
 
@@ -528,7 +542,55 @@
         </div>
 
         <!-- ============================================================ -->
-        <!-- SECCIÓN 8: RESUMEN RÁPIDO -->
+        <!-- SECCIÓN 8: NORMALIZACIÓN POR DICCIONARIO -->
+        <!-- ============================================================ -->
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">📖</span>
+                <span>Normalización por diccionario de sinónimos</span>
+            </div>
+
+            <p>
+                La herramienta incluye un <strong>diccionario de sinónimos</strong> que permite corregir automáticamente
+                errores comunes de tipeo en los campos con valores predefinidos.
+            </p>
+
+            <p><strong>¿Cómo funciona?</strong></p>
+            <ul>
+                <li>🔍 <strong>Detección:</strong> Identifica valores que no coinciden exactamente con los valores válidos</li>
+                <li>🔄 <strong>Corrección:</strong> Busca en el diccionario de sinónimos y aplica la corrección automática</li>
+                <li>📝 <strong>Registro:</strong> Todas las correcciones se registran en el log para trazabilidad</li>
+                <li>❌ <strong>Error:</strong> Si el valor no se reconoce, muestra un error con la lista de valores válidos</li>
+            </ul>
+
+            <div style="background:#f8f9fc; border-radius:8px; padding:16px; margin:12px 0;">
+                <div style="font-weight:600; color:#666; font-size:13px; margin-bottom:8px;">📋 Ejemplos de normalización:</div>
+                <div class="code-block" style="background:#f0f2f5; color:#333; font-size:12px;">
+                    <span style="color:#c8102e; font-weight:600;">Campo: TipoDeEnvio</span>
+                    ❌ "paqueteria"    → ✅ <strong>"Paquetería"</strong>
+                    ❌ "logistica inversa" → ✅ <strong>"Logística inversa"</strong>
+                    ❌ "cadena de frio"    → ✅ <strong>"Cadena de frío"</strong>
+                    ❌ "retira deposito"   → ✅ <strong>"Retira depósito"</strong>
+
+                    <span style="color:#c8102e; font-weight:600; display:block; margin-top:8px;">Campo: HasDeliveryNote</span>
+                    ❌ "con remito"    → ✅ <strong>"CON_REMITO"</strong>
+                    ❌ "sin remito"    → ✅ <strong>"SIN_REMITO"</strong>
+                    ❌ "CONREMITO"     → ✅ <strong>"CON_REMITO"</strong>
+                    ❌ "digitalizado"  → ✅ <strong>"DIGITALIZADO"</strong>
+                </div>
+            </div>
+
+            <div class="highlight-box" style="border-left-color: #1a5a8a;">
+                <strong>💡 Beneficios:</strong><br />
+                ✅ Reduce errores por tipeo manual<br />
+                ✅ Acepta valores sin acentos o con mayúsculas/minúsculas incorrectas<br />
+                ✅ Mejora la experiencia del usuario<br />
+                ✅ Mantiene la trazabilidad con logs de normalización
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECCIÓN 9: RESUMEN RÁPIDO -->
         <!-- ============================================================ -->
         <div class="section" style="border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
             <div class="section-title">
