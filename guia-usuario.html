@@ -501,6 +501,9 @@
                     <button class="tab-btn" data-tab="tab9">
                         <span class="icon">⚡</span> Resumen
                     </button>
+                    <button class="tab-btn" data-tab="tab10">
+                        <span class="icon">📥</span> Plantilla
+                    </button>
                 </div>
             </div>
 
@@ -533,6 +536,7 @@
                         <li>🏢 <strong>Limpia</strong> las direcciones vacías</li>
                         <li>📝 <strong>Renombra</strong> el archivo con los datos del contrato</li>
                         <li>💬 <strong>Genera</strong> un mensaje listo para copiar</li>
+                        <li>📥 <strong>Descarga</strong> una plantilla simplificada para completar los datos</li>
                     </ul>
                 </div>
             </div>
@@ -548,7 +552,9 @@
                     </div>
 
                     <div class="flow-diagram">
-                        <div class="flow-step active">📂 Subir<br /><small>archivos .xlsx</small></div>
+                        <div class="flow-step active">📥 Plantilla<br /><small>descargar</small></div>
+                        <span class="flow-arrow">➜</span>
+                        <div class="flow-step">📂 Subir<br /><small>archivos .xlsx</small></div>
                         <span class="flow-arrow">➜</span>
                         <div class="flow-step">✅ Validar<br /><small>campos</small></div>
                         <span class="flow-arrow">➜</span>
@@ -560,7 +566,7 @@
                     </div>
 
                     <p style="text-align:center; font-size:14px; color:#888;">
-                        Solo 5 pasos: <strong>Subir → Validar → Normalizar → Descargar → Copiar mensaje</strong>
+                        Solo 6 pasos: <strong>Plantilla → Subir → Validar → Normalizar → Descargar → Copiar mensaje</strong>
                     </p>
                 </div>
             </div>
@@ -582,12 +588,12 @@
 
                     <div class="grid-2">
                         <div class="card">
-                            <div class="label">📌 CodigoContratoERP (C3)</div>
+                            <div class="label">📌 Código de Contrato (C3)</div>
                             <div class="value valid">✅ 9 dígitos</div>
                             <div style="font-size:13px; color:#666; margin-top:4px;">Ej: <code>351005959</code></div>
                         </div>
                         <div class="card">
-                            <div class="label">📌 IDSociedadSAP (C7)</div>
+                            <div class="label">📌 Sociedad SAP (C7)</div>
                             <div class="value valid">✅ Debe ser "1100"</div>
                             <div style="font-size:13px; color:#666; margin-top:4px;">Para B2B siempre es <code>1100</code></div>
                         </div>
@@ -607,16 +613,16 @@
                         <strong>📌 Normalización automática por diccionario de sinónimos</strong><br />
                         La herramienta corrige automáticamente errores comunes de tipeo en los siguientes campos:
                         <ul>
-                            <li><strong>TipoDeEnvio:</strong> <code>"paqueteria"</code> → <strong>"Paquetería"</strong></li>
-                            <li><strong>TipoDeEnvio:</strong> <code>"logistica inversa"</code> → <strong>"Logística inversa"</strong></li>
-                            <li><strong>HasDeliveryNote:</strong> <code>"con remito"</code> → <strong>"CON_REMITO"</strong></li>
-                            <li><strong>HasDeliveryNote:</strong> <code>"sin remito"</code> → <strong>"SIN_REMITO"</strong></li>
-                            <li><strong>Logística Solicitada, Continente, SLA, FormularioMobileB2B:</strong> normaliza mayúsculas, minúsculas y acentos</li>
+                            <li><strong>Tipo de Envío:</strong> <code>"paqueteria"</code> → <strong>"Paquetería"</strong></li>
+                            <li><strong>Tipo de Envío:</strong> <code>"logistica inversa"</code> → <strong>"Logística inversa"</strong></li>
+                            <li><strong>¿Usa remito?:</strong> <code>"con remito"</code> → <strong>"CON_REMITO"</strong></li>
+                            <li><strong>¿Usa remito?:</strong> <code>"sin remito"</code> → <strong>"SIN_REMITO"</strong></li>
+                            <li><strong>Logística Solicitada, Continente, SLA, Formulario Mobile:</strong> normaliza mayúsculas, minúsculas y acentos</li>
                         </ul>
                     </div>
 
                     <div class="highlight-box" style="border-left-color: #0a7a3a;">
-                        <strong>📌 HasDeliveryNote</strong> — Normalización automática:<br />
+                        <strong>📌 ¿Usa remito? (HasDeliveryNote)</strong> — Normalización automática:<br />
                         <code>true / 1 / si</code> → <strong>CON_REMITO</strong><br />
                         <code>false / 0 / no</code> → <strong>SIN_REMITO</strong><br />
                         <code>con remito / CON_REMITO / ConRemito</code> → <strong>CON_REMITO</strong><br />
@@ -633,11 +639,11 @@
                 <div class="section">
                     <div class="section-title">
                         <span class="icon">🔢</span>
-                        <span>Normalización de CodigoSolicitanteERP</span>
+                        <span>Normalización de Código del Cliente</span>
                     </div>
 
                     <p>
-                        El campo <strong>CodigoSolicitanteERP</strong> (C5) puede llegar en diferentes formatos.
+                        El campo <strong>Código del Cliente (CodigoSolicitanteERP)</strong> (C5) puede llegar en diferentes formatos.
                         La herramienta lo normaliza automáticamente:
                     </p>
 
@@ -732,9 +738,9 @@
 
                     <ul>
                         <li><strong>Alta de contrato DMS</strong> → Texto fijo</li>
-                        <li><strong>351005959</strong> → CodigoContratoERP (C3) — <span style="color:#c8102e;">Obligatorio</span></li>
-                        <li><strong>120761</strong> → CodigoSolicitanteERP (C5) — <span style="color:#c8102e;">Obligatorio</span></li>
-                        <li><strong>NOISACO SA</strong> → ClientName (C14) — <span style="color:#888;">Opcional</span></li>
+                        <li><strong>351005959</strong> → Código de Contrato (C3) — <span style="color:#c8102e;">Obligatorio</span></li>
+                        <li><strong>120761</strong> → Código del Cliente (C5) — <span style="color:#c8102e;">Obligatorio</span></li>
+                        <li><strong>NOISACO SA</strong> → Razón Social (C14) — <span style="color:#888;">Opcional</span></li>
                     </ul>
                 </div>
             </div>
@@ -799,13 +805,13 @@
                     <div style="background:#f8f9fc; border-radius:8px; padding:16px; margin:12px 0;">
                         <div style="font-weight:600; color:#666; font-size:13px; margin-bottom:8px;">📋 Ejemplos de normalización:</div>
                         <div class="code-block" style="background:#f0f2f5; color:#333; font-size:12px;">
-                            <span style="color:#c8102e; font-weight:600;">Campo: TipoDeEnvio</span>
+                            <span style="color:#c8102e; font-weight:600;">Campo: Tipo de Envío</span>
                             ❌ "paqueteria"    → ✅ <strong>"Paquetería"</strong>
                             ❌ "logistica inversa" → ✅ <strong>"Logística inversa"</strong>
                             ❌ "cadena de frio"    → ✅ <strong>"Cadena de frío"</strong>
                             ❌ "retira deposito"   → ✅ <strong>"Retira depósito"</strong>
 
-                            <span style="color:#c8102e; font-weight:600; display:block; margin-top:8px;">Campo: HasDeliveryNote</span>
+                            <span style="color:#c8102e; font-weight:600; display:block; margin-top:8px;">Campo: ¿Usa remito?</span>
                             ❌ "con remito"    → ✅ <strong>"CON_REMITO"</strong>
                             ❌ "sin remito"    → ✅ <strong>"SIN_REMITO"</strong>
                             ❌ "CONREMITO"     → ✅ <strong>"CON_REMITO"</strong>
@@ -835,25 +841,113 @@
 
                     <div class="summary-grid">
                         <div class="item">
+                            <div class="emoji">📥</div>
+                            <div class="title">Descargá</div>
+                            <div class="desc">La plantilla para completar</div>
+                        </div>
+                        <div class="item">
                             <div class="emoji">📂</div>
                             <div class="title">Subí</div>
-                            <div class="desc">Arrastrá tus archivos .xlsx</div>
+                            <div class="desc">El archivo con los datos</div>
                         </div>
                         <div class="item">
                             <div class="emoji">⚡</div>
                             <div class="title">Procesá</div>
-                            <div class="desc">Validación y normalización automática</div>
+                            <div class="desc">Validación y normalización</div>
                         </div>
                         <div class="item">
                             <div class="emoji">📥</div>
                             <div class="title">Descargá</div>
-                            <div class="desc">Archivos listos para usar</div>
+                            <div class="desc">Archivo normalizado</div>
+                        </div>
+                        <div class="item">
+                            <div class="emoji">💬</div>
+                            <div class="title">Copiá</div>
+                            <div class="desc">El mensaje para enviar</div>
                         </div>
                     </div>
 
                     <div style="text-align:center; margin-top:24px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
                         <a href="index.html" class="btn-demo">🚀 Ir a la herramienta</a>
                         <a href="index.html" class="btn-volver">⬅️ Volver</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- TAB 10: PLANTILLA -->
+            <!-- ============================================================ -->
+            <div id="tab10" class="tab-content">
+                <div class="section">
+                    <div class="section-title">
+                        <span class="icon">📥</span>
+                        <span>Plantilla de Contrato</span>
+                    </div>
+
+                    <p>
+                        La herramienta incluye una <strong>plantilla simplificada</strong> para que completes los datos de tu contrato.
+                        <strong>¿Para qué sirve?</strong> Si no tenés un archivo Excel preparado, podés descargar esta plantilla,
+                        completarla y luego arrastrarla a la herramienta.
+                    </p>
+
+                    <div class="highlight-box" style="border-left-color: #1a5a8a;">
+                        <strong>📋 Características de la plantilla:</strong>
+                        <ul>
+                            <li>✅ <strong>Etiquetas amigables:</strong> Los campos tienen nombres comerciales fáciles de entender</li>
+                            <li>✅ <strong>Ayuda integrada:</strong> Cada campo incluye una descripción y ejemplos</li>
+                            <li>✅ <strong>Celdas bloqueadas:</strong> Los campos que no deben modificarse están en color gris</li>
+                            <li>✅ <strong>Valores por defecto:</strong> Campos como "Sociedad SAP" y "Habilitado" ya vienen precargados</li>
+                            <li>✅ <strong>Instrucciones claras:</strong> Al descargar, un modal te guía paso a paso</li>
+                        </ul>
+                    </div>
+
+                    <p><strong>¿Cómo obtenerla?</strong></p>
+                    <div style="background:#f8f9fc; border-radius:8px; padding:16px; margin:12px 0;">
+                        <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center; justify-content:center;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:24px;">1️⃣</span>
+                                <span>Hacé clic en <strong>"📥 Descargar plantilla"</strong> en la pantalla principal</span>
+                            </div>
+                            <span style="font-size:20px; color:#aaa;">→</span>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:24px;">2️⃣</span>
+                                <span>Completá los datos en el Excel</span>
+                            </div>
+                            <span style="font-size:20px; color:#aaa;">→</span>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:24px;">3️⃣</span>
+                                <span>Arrastrá el archivo a la herramienta</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="highlight-box" style="border-left-color: #0a7a3a;">
+                        <strong>📌 Estructura de la plantilla:</strong><br />
+                        <div class="code-block" style="background:#f0f2f5; color:#333; margin-top:8px; font-size:12px;">
+                            <span style="color:#c8102e; font-weight:600;">📋 Hoja: Formulario</span>
+                            🔑 DATOS DEL CONTRATO
+                            • Código de Contrato: 9 dígitos, ej: 351005959
+                            • Código del Cliente: 6 dígitos, ej: 125383
+
+                            📦 DATOS DEL ENVÍO
+                            • Tipo de Envío: Minorista, Mayorista, etc.
+                            • Condición de Entrega: Texto libre
+                            • Modalidad de Entrega: Domicilio, Sucursal, etc.
+
+                            🏢 DATOS DEL CLIENTE
+                            • Razón Social: Nombre completo del cliente
+
+                            ⚙️ CONFIGURACIÓN
+                            • Nivel de Servicio (SLA): SLA 1, SLA 2, SLA 3
+                            • ¿Usa remito?: CON_REMITO, SIN_REMITO, DIGITALIZADO
+                            • Campos booleanos: true / false
+
+                            📍 DIRECCIONES (obligatorias: Devolución y Devolución de Remitos)
+                        </div>
+                    </div>
+
+                    <div style="text-align:center; margin-top:16px;">
+                        <a href="index.html" class="btn-demo">🚀 Ir a la herramienta para descargar la plantilla</a>
                     </div>
                 </div>
             </div>
@@ -873,13 +967,10 @@
             const tabs = document.querySelectorAll('.tab-btn');
             const contents = document.querySelectorAll('.tab-content');
 
-            // Función para activar un tab
             function activateTab(tabId) {
-                // Desactivar todos
                 tabs.forEach(t => t.classList.remove('active'));
                 contents.forEach(c => c.classList.remove('active'));
 
-                // Activar el seleccionado
                 const activeTab = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
                 const activeContent = document.getElementById(tabId);
 
@@ -887,13 +978,11 @@
                 if (activeContent) activeContent.classList.add('active');
             }
 
-            // Click en tabs (escritorio y móvil)
             tabs.forEach(tab => {
                 tab.addEventListener('click', function(e) {
                     const tabId = this.getAttribute('data-tab');
                     activateTab(tabId);
 
-                    // En móvil, cerrar otros tabs (accordion)
                     if (window.innerWidth <= 768) {
                         const isActive = this.classList.contains('active');
                         tabs.forEach(t => {
@@ -901,7 +990,6 @@
                                 t.classList.remove('active');
                             }
                         });
-                        // Si está activo, mantenerlo abierto
                         if (isActive) {
                             this.classList.add('active');
                         }
@@ -909,14 +997,12 @@
                 });
             });
 
-            // En móvil, permitir que el tab activo se cierre al hacer click nuevamente
             if (window.innerWidth <= 768) {
                 tabs.forEach(tab => {
                     tab.addEventListener('click', function(e) {
                         const tabId = this.getAttribute('data-tab');
                         const content = document.getElementById(tabId);
 
-                        // Si el tab ya está activo, cerrarlo (accordion)
                         if (this.classList.contains('active') && content.classList.contains('active')) {
                             this.classList.remove('active');
                             content.classList.remove('active');
@@ -925,7 +1011,6 @@
                 });
             }
 
-            // Activar el primer tab por defecto
             activateTab('tab1');
         });
     </script>
