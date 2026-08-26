@@ -33,9 +33,30 @@
             <p class="subtitle">Subí archivos Excel para validar, convertir fórmulas a valores y generar el contrato normalizado</p>
         </div>
 
-        <!-- TWO COLUMN LAYOUT -->
-        <div class="two-column-layout">
-            <!-- LEFT: DROP ZONE -->
+        <!-- THREE COLUMN LAYOUT -->
+        <div class="three-column-layout">
+            <!-- LEFT: PLANTILLA CARD -->
+            <div>
+                <div class="plantilla-card">
+                    <div class="plantilla-card-header">
+                        <span style="font-size:20px;">📥</span>
+                        <h3>¿No tenés el archivo?</h3>
+                    </div>
+                    <div class="plantilla-card-body">
+                        <p class="desc">Descargá la plantilla para completar los datos del contrato.</p>
+                        <ol class="steps">
+                            <li>📥 Descargá la plantilla</li>
+                            <li>✏️ Completá los datos</li>
+                            <li>📂 Arrastrá el archivo</li>
+                        </ol>
+                        <button id="btnPlantilla" class="btn-plantilla">
+                            📥 Descargar plantilla
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CENTER: DROP ZONE -->
             <div>
                 <div id="dropZone" class="drop-zone">
                     <p>📂 Arrastrá tus archivos <strong>.xlsx</strong> aquí</p>
@@ -89,6 +110,58 @@
         Andreani · Sistema de Normalización de Contratos DMS
     </footer>
 
+    <!-- ============================================================ -->
+    <!-- MODAL DE DESCARGA DE PLANTILLA -->
+    <!-- ============================================================ -->
+    <div id="modalPlantilla" class="modal-overlay">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-icon">📥</div>
+            <h2>Descargar plantilla</h2>
+            <p class="sub">Completá los datos y cargá el archivo para obtener tu contrato normalizado</p>
+
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <div class="title">📥 Descargá la plantilla</div>
+                    <div class="desc">Obtené el archivo Excel con los campos necesarios para el contrato.</div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <div class="title">✏️ Completá los datos</div>
+                    <div class="desc">Completá solo los campos en color <strong>blanco</strong>. Los campos en <strong>gris</strong> son de solo lectura.</div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <div class="title">📂 Arrastrá el archivo</div>
+                    <div class="desc">Arrastrá el archivo en la zona de carga. La herramienta validará y normalizará automáticamente los datos.</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <div class="title">⚠️ Recordá</div>
+                <ul>
+                    <li>El código de contrato debe tener 9 dígitos</li>
+                    <li>El código de cliente debe tener 6 dígitos</li>
+                    <li>No modifiques las celdas bloqueadas (color gris)</li>
+                </ul>
+            </div>
+
+            <button id="btnDescargarModal" class="btn-descargar-modal">
+                📥 Descargar plantilla
+            </button>
+            <button id="btnCerrarModal" class="btn-cerrar-modal">
+                🔒 Cerrar
+            </button>
+        </div>
+    </div>
+
     <script>
         // ============================================================
         //  CONFIGURACIÓN
@@ -107,6 +180,132 @@
         let uploadedFiles = [];
         let processedResults = [];
         let processedFileNames = [];
+
+        // ============================================================
+        //  MODAL DE DESCARGA DE PLANTILLA
+        // ============================================================
+        const modalPlantilla = document.getElementById('modalPlantilla');
+        const btnPlantilla = document.getElementById('btnPlantilla');
+        const btnDescargarModal = document.getElementById('btnDescargarModal');
+        const btnCerrarModal = document.getElementById('btnCerrarModal');
+        const modalClose = document.getElementById('modalClose');
+
+        function abrirModal() {
+            modalPlantilla.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModal() {
+            modalPlantilla.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        btnPlantilla.addEventListener('click', abrirModal);
+        btnDescargarModal.addEventListener('click', function() {
+            generarPlantilla();
+            cerrarModal();
+        });
+        btnCerrarModal.addEventListener('click', cerrarModal);
+        modalClose.addEventListener('click', cerrarModal);
+        modalPlantilla.addEventListener('click', function(e) {
+            if (e.target === this) cerrarModal();
+        });
+
+        // ============================================================
+        //  FUNCIÓN: GENERAR PLANTILLA
+        // ============================================================
+        function generarPlantilla() {
+            const wb = XLSX.utils.book_new();
+
+            // ============================================
+            // HOJA: Formulario (simplificada con referencias amigables)
+            // ============================================
+            const formularioData = [
+                ['Campo', 'Descripción / Ayuda', 'Valor', 'Comentario'],
+                ['', '🔑 DATOS DEL CONTRATO', '', ''],
+                ['Código de Contrato', '9 dígitos, ej: 351005959', '', ''],
+                ['Descripción del Contrato', 'Texto libre', '', ''],
+                ['Código del Cliente', '6 dígitos, ej: 125383', '', ''],
+                ['Sociedad SAP', 'Siempre 1100', '1100', 'No modificar'],
+                ['', '📦 DATOS DEL ENVÍO', '', ''],
+                ['Tipo de Envío', 'Minorista, Mayorista, Cadena de frío, Cargas completas, Congelado, Logística inversa, Paquetería, Retira depósito, Logística Asegurada', '', 'Seleccionar de la lista'],
+                ['Condición de Entrega', 'Ej: Mayor de 18 + DNI', '', ''],
+                ['Habilitado', '1 = Activo, 0 = Inactivo', '1', 'Dejar como 1'],
+                ['Modalidad de Entrega', 'Domicilio, Sucursal, Punto de retiro', '', 'Seleccionar de la lista'],
+                ['Fecha Habilitación', 'Fecha actual', '=TODAY()', 'No modificar'],
+                ['Válido Desde', 'Fecha inicio contrato', '2025-01-01', 'No modificar'],
+                ['Válido Hasta', 'Fecha fin contrato (si no tiene, dejar 9999-12-08)', '9999-12-08', 'No modificar'],
+                ['', '🏢 DATOS DEL CLIENTE', '', ''],
+                ['Razón Social', 'Nombre completo del cliente', '', ''],
+                ['', '⚙️ CONFIGURACIÓN', '', ''],
+                ['Nivel de Servicio (SLA)', 'SLA 1 - Estándar B2B, SLA 2 - Acordado con cliente, SLA 3 - Urgente', '', 'Seleccionar de la lista'],
+                ['¿Permite Rescate?', 'true / false', '', ''],
+                ['¿Permite retiro parcial de valores?', 'true / false', '', ''],
+                ['¿Aforo Obligatorio?', 'true / false', '', ''],
+                ['¿Permite Entrega Parcial?', 'true / false', '', ''],
+                ['¿Devolución Centralizada?', 'true / false', '', ''],
+                ['¿Tiene gestión de cobranza?', 'true / false', '', ''],
+                ['¿Usa remito?', 'CON_REMITO, SIN_REMITO, DIGITALIZADO', '', 'Seleccionar de la lista'],
+                ['¿Permite imprimir comprobante de entrega?', 'true / false', '', ''],
+                ['¿Es recambio?', 'true / false', '', ''],
+                ['', '', '', ''],
+                ['', '📋 NIVELES DE ESFUERZO', '', ''],
+                ['Logística Solicitada', 'Entrega, Logística inversa, Punto a punto, Retiro, Cambio', '', 'Seleccionar de la lista'],
+                ['Continente', 'Contenedor, Bulto, Pallet, Sobre, Bodega, etc.', '', 'Seleccionar de la lista'],
+                ['Plazo', 'SLA 1 - Estándar B2B, SLA 2 - Acordado con cliente, SLA 3 - Urgente', '', 'Seleccionar de la lista'],
+                ['Formulario Mobile B2B', 'Formulario B2B 1 al 13', '', 'Seleccionar de la lista'],
+                ['', '', '', ''],
+                ['', '📍 DIRECCIONES (obligatorias: Devolución y Devolución de Remitos)', '', ''],
+                ['Clase de Dirección', 'Calle', 'Número', 'Piso'],
+                ['DEVOLUCIÓN *', '', '', ''],
+                ['RESCATE', '', '', ''],
+                ['REENVIO', '', '', ''],
+                ['DESTRUCCION', '', '', ''],
+                ['SINIESTRO', '', '', ''],
+                ['DEVOLUCION_CENTRALIZADA', '', '', ''],
+                ['DEVOLUCION_REMITOS *', '', '', ''],
+                ['DEVOLUCION_COBROS', '', '', '']
+            ];
+
+            const wsFormulario = XLSX.utils.aoa_to_sheet(formularioData);
+            XLSX.utils.book_append_sheet(wb, wsFormulario, 'Formulario');
+
+            // ============================================
+            // HOJA: Contrato
+            // ============================================
+            const contratoData = [
+                ['NombreContratoDMS', 'CodigoContratoERP', 'DescripcionContratoERP', 'CodigoSolicitanteERP', 'IDSociedadSAP', 'TipoDeEnvio', 'CondicionDeEntrega', 'Habilitado', 'TipoEntrega', 'FechaHabilitado', 'ValidoDesde', 'ValidoHasta', 'ClientName', 'SLA', 'AllowRescue', 'AllowWithdrawPartialValues', 'ObligatoryGauge', 'AllowPartialDelivery', 'IsCentralizedReturn', 'HasCollectionManagement', 'DeliveryNote', 'AllowPrintDocumentationReturn', 'MotiveStateMap', 'AutomaticAdmission', 'AllowsStorage', 'HasChange'],
+                ['', '', '', '', '1100', '', '', '1', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'ALERTRAN ESTANDAR MOTIVES V4', 'false', 'false', '']
+            ];
+
+            const wsContrato = XLSX.utils.aoa_to_sheet(contratoData);
+            XLSX.utils.book_append_sheet(wb, wsContrato, 'Contrato');
+
+            // ============================================
+            // HOJA: Direcciones
+            // ============================================
+            const direccionesData = [
+                ['Street', 'Number', 'Floor', 'Department', 'City', 'PostalCode', 'State', 'Country', 'Phone', 'MailBox', 'AddressType'],
+                ['', '', '', '', '', '', '', '', '', '', '1'],
+                ['', '', '', '', '', '', '', '', '', '', '2'],
+                ['', '', '', '', '', '', '', '', '', '', '3'],
+                ['', '', '', '', '', '', '', '', '', '', '4'],
+                ['', '', '', '', '', '', '', '', '', '', '5'],
+                ['', '', '', '', '', '', '', '', '', '', '6'],
+                ['', '', '', '', '', '', '', '', '', '', '7'],
+                ['', '', '', '', '', '', '', '', '', '', '8']
+            ];
+
+            const wsDirecciones = XLSX.utils.aoa_to_sheet(direccionesData);
+            XLSX.utils.book_append_sheet(wb, wsDirecciones, 'Direcciones');
+
+            // ============================================
+            // ESCRIBIR Y DESCARGAR
+            // ============================================
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            downloadFile(wbout, 'Modelo de alta de contrato DMS.xlsx');
+            log('📥 Plantilla descargada correctamente', 'success');
+        }
 
         // ============================================================
         //  DRAG & DROP + INPUT
@@ -152,7 +351,6 @@
             PROCESS_BTN.disabled = false;
             CLEAR_BTN.style.display = 'inline-flex';
             log(`✅ ${valid.length} archivo(s) agregado(s). Total: ${uploadedFiles.length}`, 'success');
-            // Limpiar mensaje anterior
             MESSAGE_BODY.textContent = '';
             COPY_BTN.disabled = true;
             COPY_BTN.classList.remove('copiado');
@@ -219,7 +417,6 @@
                     COPY_BTN.classList.remove('copiado');
                 }, 3000);
             } catch (err) {
-                // Fallback para navegadores sin clipboard API
                 const textarea = document.createElement('textarea');
                 textarea.value = texto;
                 document.body.appendChild(textarea);
@@ -253,9 +450,6 @@
                     const buffer = await file.arrayBuffer();
                     const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
 
-                    // ============================================
-                    // PASO 1: VALIDAR FORMULARIO
-                    // ============================================
                     const validation = validateFormulario(workbook, file.name);
 
                     if (validation.hasErrors) {
@@ -267,9 +461,6 @@
                         continue;
                     }
 
-                    // ============================================
-                    // PASO 1.5: OBTENER DATOS PARA EL NOMBRE DEL ARCHIVO
-                    // ============================================
                     const nombreData = getNombreArchivoData(workbook);
                     if (nombreData.error) {
                         errorCount++;
@@ -280,14 +471,8 @@
                     validCount++;
                     log(`✅ ${file.name}: Validación correcta`, 'success');
 
-                    // ============================================
-                    // PASO 2: CONVERTIR FÓRMULAS A VALORES
-                    // ============================================
                     const normalizedWB = normalizeWorkbook(workbook);
 
-                    // ============================================
-                    // PASO 3: ELIMINAR hoja "Formulario"
-                    // ============================================
                     const sheetNames = normalizedWB.SheetNames;
                     const formularioIndex = sheetNames.indexOf('Formulario');
                     if (formularioIndex !== -1) {
@@ -296,9 +481,6 @@
                         log(`   → Hoja "Formulario" eliminada`, 'info');
                     }
 
-                    // ============================================
-                    // PASO 4: MOVER hoja "Referencias" al final
-                    // ============================================
                     const refIndex = normalizedWB.SheetNames.indexOf('Referencias');
                     if (refIndex !== -1) {
                         const refName = normalizedWB.SheetNames.splice(refIndex, 1)[0];
@@ -306,26 +488,16 @@
                         log(`   → Hoja "Referencias" movida al final`, 'info');
                     }
 
-                    // ============================================
-                    // PASO 5: LIMPIAR DIRECCIONES VACÍAS
-                    // ============================================
                     limpiarDireccionesVacias(normalizedWB);
 
-                    // ============================================
-                    // GENERAR NOMBRE DEL ARCHIVO DE SALIDA
-                    // ============================================
                     let outputName = `Alta de contrato DMS ${nombreData.codigoERP} ${nombreData.codigoSolicitante}`;
                     if (nombreData.clientName) {
                         outputName += ` ${nombreData.clientName}`;
                     }
                     outputName += '.xlsx';
 
-                    // Guardar nombre para el mensaje
                     processedFileNames.push(outputName);
 
-                    // ============================================
-                    // GUARDAR RESULTADO
-                    // ============================================
                     const wbout = XLSX.write(normalizedWB, { bookType: 'xlsx', type: 'array' });
                     processedResults.push({
                         name: outputName,
@@ -333,21 +505,15 @@
                     });
                 }
 
-                // Actualizar estadísticas
                 VALID_COUNT.textContent = validCount;
                 ERROR_COUNT.textContent = errorCount;
 
-                // Descargar resultados
                 if (processedResults.length > 0) {
                     log(`📦 Descargando ${processedResults.length} archivo(s) normalizado(s)...`, 'success');
                     for (const r of processedResults) {
                         downloadFile(r.data, r.name);
                     }
                     log(`✅ ¡Completado! Se descargaron ${processedResults.length} archivos.`, 'success');
-
-                    // ============================================
-                    // GENERAR MENSAJE
-                    // ============================================
                     generarMensaje(processedResults.length, processedFileNames);
                 } else {
                     log(`⚠️ No se generaron archivos para descargar.`, 'warning');
@@ -365,8 +531,9 @@
         });
 
         // ============================================================
-        //  FUNCIÓN: LIMPIAR DIRECCIONES VACÍAS
+        //  FUNCIONES AUXILIARES
         // ============================================================
+
         function limpiarDireccionesVacias(workbook) {
             const sheetName = 'Direcciones';
             if (!workbook.Sheets[sheetName]) return;
@@ -376,14 +543,11 @@
 
             if (data.length === 0) return;
 
-            // Mantener el header (fila 0)
             const header = data[0];
             const nuevasFilas = [header];
 
-            // Filtrar filas que tengan al menos un campo con valor
             for (let i = 1; i < data.length; i++) {
                 const row = data[i];
-                // Verificar si la fila tiene algún valor no vacío y no es "0"
                 const tieneDatos = row.some(cell => {
                     const valor = String(cell).trim();
                     return valor !== '' && valor !== '0';
@@ -394,19 +558,14 @@
                 }
             }
 
-            // Si no hay cambios, no hacemos nada
             if (nuevasFilas.length === data.length) return;
 
-            // Reemplazar la hoja
             const newSheet = XLSX.utils.aoa_to_sheet(nuevasFilas);
             workbook.Sheets[sheetName] = newSheet;
 
             log(`   → Se eliminaron ${data.length - nuevasFilas.length} filas vacías en la hoja "Direcciones"`, 'info');
         }
 
-        // ============================================================
-        //  FUNCIÓN: GENERAR MENSAJE
-        // ============================================================
         function generarMensaje(cantidad, nombres) {
             let mensaje = `Hola @Djirikian Damian Uriel, te paso ${cantidad} archivos para alta de contratos DMS\n\n`;
             mensaje += nombres.join('\n');
@@ -417,44 +576,33 @@
             COPY_BTN.classList.remove('copiado');
         }
 
-        // ============================================================
-        //  FUNCIÓN: NORMALIZAR CÓDIGO SOLICITANTE
-        // ============================================================
         function normalizarCodigoSolicitante(valor) {
             if (!valor) return null;
 
             const strValor = String(valor).trim();
 
-            // Verificar que sea numérico
             if (!/^\d+$/.test(strValor)) {
                 return { error: 'El código debe ser numérico' };
             }
 
             const longitud = strValor.length;
 
-            // Si tiene 6 dígitos, es válido
             if (longitud === 6) {
                 return { valor: strValor };
             }
 
-            // Si tiene 10 dígitos y comienza con 4 ceros, normalizar
             if (longitud === 10 && strValor.startsWith('0000')) {
                 const normalizado = strValor.substring(4);
                 return { valor: normalizado };
             }
 
-            // Si tiene 10 dígitos pero no comienza con 4 ceros
             if (longitud === 10) {
                 return { error: 'El código tiene 10 dígitos pero no comienza con 4 ceros' };
             }
 
-            // Otros casos: menos de 6 o más de 10
             return { error: `El código tiene ${longitud} dígitos, debe tener 6 dígitos (o 10 dígitos comenzando con 4 ceros)` };
         }
 
-        // ============================================================
-        //  FUNCIÓN: OBTENER DATOS PARA NOMBRE DE ARCHIVO
-        // ============================================================
         function getNombreArchivoData(workbook) {
             const sheet = workbook.Sheets['Formulario'];
             if (!sheet) {
@@ -463,16 +611,10 @@
 
             const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
 
-            // Buscar los valores en las filas correspondientes
-            // Fila 3 (index 2) = CodigoContratoERP
-            // Fila 5 (index 4) = CodigoSolicitanteERP
-            // Fila 14 (index 13) = ClientName
-
             const codigoERP = String(data[2]?.[2] || '').trim();
             const codigoSolicitanteRaw = String(data[4]?.[2] || '').trim();
             const clientName = String(data[13]?.[2] || '').trim();
 
-            // Validar campos obligatorios
             if (!codigoERP) {
                 return { error: 'Campo "CodigoContratoERP" (C3) está vacío. Es obligatorio.' };
             }
@@ -481,7 +623,6 @@
                 return { error: 'Campo "CodigoSolicitanteERP" (C5) está vacío. Es obligatorio.' };
             }
 
-            // Validar y normalizar CodigoSolicitanteERP
             const resultadoNormalizacion = normalizarCodigoSolicitante(codigoSolicitanteRaw);
             if (resultadoNormalizacion.error) {
                 return { error: `Campo "CodigoSolicitanteERP" = "${codigoSolicitanteRaw}" - ${resultadoNormalizacion.error}` };
@@ -496,9 +637,6 @@
             };
         }
 
-        // ============================================================
-        //  FUNCIÓN: NORMALIZAR HasDeliveryNote
-        // ============================================================
         function normalizarHasDeliveryNote(valor) {
             if (!valor) return 'SIN_REMITO';
 
@@ -519,9 +657,6 @@
             return 'SIN_REMITO';
         }
 
-        // ============================================================
-        //  FUNCIÓN: VALIDAR FORMULARIO
-        // ============================================================
         function validateFormulario(workbook, fileName) {
             const errors = [];
             const sheet = workbook.Sheets['Formulario'];
@@ -555,7 +690,6 @@
 
                 if (!campo) continue;
 
-                // Normalización: HasDeliveryNote
                 if (campo === 'HasDeliveryNote' && valor) {
                     const valorNormalizado = normalizarHasDeliveryNote(valor);
                     if (valorNormalizado !== valor) {
@@ -566,21 +700,18 @@
                     }
                 }
 
-                // Validar contra referencias con normalización
                 const camposReferencia = ['TipoDeEnvio', 'Logística Solicitada', 'Continente', 'SLA', 'Plazo', 'FormularioMobileB2B'];
                 if (camposReferencia.includes(campo)) {
                     const resultado = validarContraReferencias(campo, valor, referencias);
-                    
+
                     if (resultado.normalizado) {
-                        // Actualizar el valor en la fila
                         row[2] = resultado.valor;
                         huboNormalizacion = true;
                         log(`   → Campo "${campo}" normalizado de "${valor}" a "${resultado.valor}"`, 'info');
                         valor = resultado.valor;
                     }
-                    
+
                     if (!resultado.valido) {
-                        // Obtener lista de valores válidos para el mensaje de error
                         let valoresValidos = [];
                         if (campo === 'TipoDeEnvio') {
                             valoresValidos = [
@@ -601,36 +732,32 @@
                                 valoresValidos = referencias[tableName].map(item => item.key);
                             }
                         }
-                        
+
                         const listaValores = valoresValidos.join(', ');
                         errors.push(`Campo "${campo}" = "${valor}" no es válido. Valores válidos: ${listaValores}`);
                     }
                 }
 
-                // Validar HasDeliveryNote (con normalización incluida en validarContraReferencias)
                 if (campo === 'HasDeliveryNote' && valor) {
                     const resultado = validarContraReferencias(campo, valor, referencias);
-                    
+
                     if (resultado.normalizado) {
-                        // Actualizar el valor en la fila
                         row[2] = resultado.valor;
                         huboNormalizacion = true;
                         log(`   → Campo "HasDeliveryNote" normalizado de "${valor}" a "${resultado.valor}"`, 'info');
                         valor = resultado.valor;
                     }
-                    
+
                     if (!resultado.valido) {
                         errors.push(`Campo "${campo}" = "${valor}" no es válido. Valores válidos: CON_REMITO, SIN_REMITO, DIGITALIZADO`);
                     }
                 }
 
-                // Campos opcionales
                 const opcionales = ['CondicionDeEntrega', 'DescripcionContratoERP'];
                 if (!opcionales.includes(campo) && !valor) {
                     errors.push(`Campo "${campo}" está vacío (fila ${rowIdx+1})`);
                 }
 
-                // Validaciones específicas
                 if (campo === 'CodigoContratoERP' && valor && !/^\d{9}$/.test(valor)) {
                     errors.push(`Campo "CodigoContratoERP" = "${valor}" debe tener 9 dígitos`);
                 }
@@ -643,7 +770,6 @@
                     errors.push(`Campo "Habilitado" = "${valor}" debe ser 1 o 0`);
                 }
 
-                // Booleanos
                 const booleanFields = ['AllowRescue', 'AllowWithdrawPartialValues', 'ObligatoryGauge',
                     'AllowPartialDelivery', 'IsCentralizedReturn', 'HasCollectionManagement',
                     'AllowPrintDocumentationReturn', '¿Es recambio?'
@@ -664,15 +790,11 @@
             return { hasErrors: errors.length > 0, errors };
         }
 
-        // ============================================================
-        //  FUNCIÓN: NORMALIZAR VALOR CON DICCIONARIO
-        // ============================================================
         function normalizarValorConDiccionario(campo, valor, referencias) {
             if (!valor) return { valor: valor, normalizado: false };
-            
+
             const valorLimpio = String(valor).trim();
-            
-            // Diccionario de sinónimos por campo
+
             const diccionarios = {
                 'TipoDeEnvio': {
                     'minorista': 'Minorista',
@@ -701,7 +823,6 @@
                 }
             };
 
-            // Buscar en el diccionario del campo específico
             const diccionario = diccionarios[campo];
             if (diccionario) {
                 const valorLower = valorLimpio.toLowerCase();
@@ -712,7 +833,6 @@
                 }
             }
 
-            // Para campos que vienen de Referencias (Logística Solicitada, Continente, SLA, FormularioMobileB2B)
             const map = {
                 'Logística Solicitada': 'logistica',
                 'Continente': 'continente',
@@ -725,15 +845,14 @@
             if (tableName && referencias[tableName]) {
                 const table = referencias[tableName];
                 const valorLower = valorLimpio.toLowerCase();
-                
-                // Buscar coincidencia exacta (case-insensitive)
+
                 for (const item of table) {
                     const itemKey = String(item.key || '').toLowerCase();
                     const itemCode = String(item.code || '').toLowerCase();
                     const itemDesc = String(item.desc || '').toLowerCase();
-                    
-                    if (valorLower === itemKey || 
-                        valorLower === itemCode || 
+
+                    if (valorLower === itemKey ||
+                        valorLower === itemCode ||
                         (itemDesc && valorLower === itemDesc)) {
                         return { valor: item.key, normalizado: true };
                     }
@@ -743,16 +862,10 @@
             return { valor: valorLimpio, normalizado: false };
         }
 
-        // ============================================================
-        //  FUNCIÓN: VALIDAR CONTRA REFERENCIAS
-        // ============================================================
         function validarContraReferencias(campo, valor, referencias) {
-            // Primero intentar normalizar
             const resultado = normalizarValorConDiccionario(campo, valor, referencias);
-            
-            // Si se normalizó, usar el valor normalizado
             const valorNormalizado = resultado.valor;
-            
+
             if (campo === 'TipoDeEnvio') {
                 const tiposValidos = [
                     'Minorista', 'Mayorista', 'Cadena de frío',
@@ -760,8 +873,8 @@
                     'Paquetería', 'Retira depósito', 'Logística Asegurada'
                 ];
                 const esValido = tiposValidos.some(t => t === valorNormalizado);
-                return { 
-                    valido: esValido, 
+                return {
+                    valido: esValido,
                     valor: esValido ? valorNormalizado : valor,
                     normalizado: resultado.normalizado
                 };
@@ -787,16 +900,13 @@
                     item.desc === valorNormalizado;
             });
 
-            return { 
-                valido: esValido, 
+            return {
+                valido: esValido,
                 valor: esValido ? valorNormalizado : valor,
                 normalizado: resultado.normalizado
             };
         }
 
-        // ============================================================
-        //  FUNCIÓN: EXTRAER REFERENCIAS
-        // ============================================================
         function extractReferences(refData) {
             const refs = {};
 
@@ -854,43 +964,29 @@
             return refs;
         }
 
-        // ============================================================
-        //  FUNCIÓN: NORMALIZAR WORKBOOK
-        // ============================================================
         function normalizeWorkbook(workbook) {
             const newWB = XLSX.utils.book_new();
 
             for (const sheetName of workbook.SheetNames) {
                 const originalSheet = workbook.Sheets[sheetName];
                 const data = XLSX.utils.sheet_to_json(originalSheet, { header: 1, defval: '', raw: false });
-                
-                // ============================================
-                // REGLA ESPECIAL: AllowsStorage = FALSE en hoja Contrato
-                // ============================================
+
                 if (sheetName === 'Contrato') {
-                    // Buscar la fila donde está "AllowsStorage" (fila 2, columna Y = index 24)
-                    // Y forzar su valor a "false"
                     if (data.length > 1) {
-                        // La fila 2 (index 1) contiene los valores
-                        const rowIndex = 1; // Fila 2 en 0-based
+                        const rowIndex = 1;
                         if (data[rowIndex] && data[rowIndex].length > 24) {
-                            // Columna Y = índice 24
                             data[rowIndex][24] = 'false';
                             log(`   → AllowsStorage forzado a "false" en hoja "Contrato"`, 'info');
                         }
                     }
                 }
-                
+
                 const newSheet = XLSX.utils.aoa_to_sheet(data);
                 XLSX.utils.book_append_sheet(newWB, newSheet, sheetName);
             }
 
             return newWB;
         }
-
-        // ============================================================
-        //  UTILIDADES
-        // ============================================================
 
         function downloadFile(data, filename) {
             const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
