@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Normalizador de Contratos DMS - Andreani</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
@@ -212,15 +214,85 @@
         });
 
         // ============================================================
-        //  FUNCIÓN: GENERAR PLANTILLA
+        //  FUNCIÓN: GENERAR PLANTILLA CON EXCELJS
         // ============================================================
-        function generarPlantilla() {
-            const wb = XLSX.utils.book_new();
+        async function generarPlantilla() {
+            const workbook = new ExcelJS.Workbook();
+            workbook.creator = 'Andreani DMS Normalizer';
+            workbook.created = new Date();
 
             // ============================================
-            // HOJA: Formulario (simplificada con referencias amigables)
+            // HOJA: Formulario
             // ============================================
-            const formularioData = [
+            const ws = workbook.addWorksheet('Formulario', {
+                properties: { tabColor: { argb: 'FFC8102E' } },
+                pageSetup: { orientation: 'portrait', fitToPage: true, margins: {
+                    left: 0.7, right: 0.7, top: 0.7, bottom: 0.7, header: 0.3, footer: 0.3
+                }}
+            });
+
+            // Columnas
+            ws.columns = [
+                { header: 'Campo', key: 'campo', width: 30 },
+                { header: 'Descripción / Ayuda', key: 'descripcion', width: 45 },
+                { header: 'Valor', key: 'valor', width: 35 },
+                { header: 'Comentario', key: 'comentario', width: 25 }
+            ];
+
+            // Estilos predefinidos
+            const styles = {
+                header: {
+                    font: { name: 'Segoe UI', bold: true, size: 11, color: { argb: 'FFFFFFFF' } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8102E' } },
+                    alignment: { horizontal: 'center', vertical: 'middle', wrapText: true },
+                    border: {
+                        top: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        bottom: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        left: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        right: { style: 'thin', color: { argb: 'FFB0B0B0' } }
+                    }
+                },
+                section: {
+                    font: { name: 'Segoe UI', bold: true, size: 12, color: { argb: 'FFC8102E' } },
+                    alignment: { horizontal: 'left', vertical: 'middle' },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF5F5F5' } }
+                },
+                editable: {
+                    font: { name: 'Segoe UI', size: 11, color: { argb: 'FF1A1A1A' } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } },
+                    alignment: { horizontal: 'left', vertical: 'middle', wrapText: true },
+                    border: {
+                        top: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                        bottom: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                        left: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                        right: { style: 'thin', color: { argb: 'FFD0D0D0' } }
+                    }
+                },
+                locked: {
+                    font: { name: 'Segoe UI', size: 11, color: { argb: 'FF666666' } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0F0' } },
+                    alignment: { horizontal: 'center', vertical: 'middle' },
+                    border: {
+                        top: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                        bottom: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                        left: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                        right: { style: 'thin', color: { argb: 'FFD0D0D0' } }
+                    }
+                },
+                help: {
+                    font: { name: 'Segoe UI', size: 10, color: { argb: 'FF888888' } },
+                    alignment: { horizontal: 'left', vertical: 'middle', wrapText: true },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF9F9F9' } }
+                },
+                comment: {
+                    font: { name: 'Segoe UI', size: 10, color: { argb: 'FF0088CC' }, italic: true },
+                    alignment: { horizontal: 'left', vertical: 'middle', wrapText: true },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F8FF' } }
+                }
+            };
+
+            // Datos de la plantilla
+            const rows = [
                 ['Campo', 'Descripción / Ayuda', 'Valor', 'Comentario'],
                 ['', '🔑 DATOS DEL CONTRATO', '', ''],
                 ['Código de Contrato', '9 dígitos, ej: 351005959', '', ''],
@@ -267,43 +339,216 @@
                 ['DEVOLUCION_COBROS', '', '', '']
             ];
 
-            const wsFormulario = XLSX.utils.aoa_to_sheet(formularioData);
-            XLSX.utils.book_append_sheet(wb, wsFormulario, 'Formulario');
+            // Agregar filas con estilos
+            rows.forEach((rowData, rowIndex) => {
+                const row = ws.addRow(rowData);
+                row.height = 28;
+
+                row.eachCell((cell, colIndex) => {
+                    const value = cell.value ? String(cell.value).trim() : '';
+
+                    // Estilo por defecto
+                    let style = { ...styles.editable };
+
+                    // Detectar tipo de fila
+                    const isHeader = rowIndex === 0;
+                    const isSection = value.startsWith('🔑') || value.startsWith('📦') || 
+                                     value.startsWith('🏢') || value.startsWith('⚙️') ||
+                                     value.startsWith('📋') || value.startsWith('📍') ||
+                                     value === '📋 NIVELES DE ESFUERZO' ||
+                                     value === '📍 DIRECCIONES (obligatorias: Devolución y Devolución de Remitos)';
+                    const isComment = colIndex === 3 && value;
+                    const isLocked = value === '1100' || value === '1' || 
+                                    value === '=TODAY()' || value === '2025-01-01' ||
+                                    value === '9999-12-08' || value === 'Dejar como 1' ||
+                                    value === 'No modificar' || value === 'ALERTRAN ESTANDAR MOTIVES V4' ||
+                                    value === 'false' || rowData[0] === 'Sociedad SAP' ||
+                                    rowData[0] === 'Habilitado' || rowData[0] === 'Fecha Habilitación' ||
+                                    rowData[0] === 'Válido Desde' || rowData[0] === 'Válido Hasta';
+                    const isHelp = colIndex === 1 && value && !isHeader;
+                    const isEditable = colIndex === 2 && !isLocked && value !== '';
+
+                    if (isHeader) {
+                        style = { ...styles.header };
+                    } else if (isSection) {
+                        style = { ...styles.section };
+                        // Combinar celdas para secciones
+                        ws.mergeCells(`A${rowIndex+1}:D${rowIndex+1}`);
+                    } else if (isComment) {
+                        style = { ...styles.comment };
+                    } else if (isLocked && colIndex === 2) {
+                        style = { ...styles.locked };
+                    } else if (isHelp) {
+                        style = { ...styles.help };
+                    } else if (isEditable) {
+                        style = { ...styles.editable };
+                    }
+
+                    // Aplicar estilo
+                    Object.assign(cell, { style });
+                });
+            });
+
+            // Bloquear celdas
+            ws.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+                row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                    const value = cell.value ? String(cell.value).trim() : '';
+                    const isLocked = value === '1100' || value === '1' || 
+                                    value === '=TODAY()' || value === '2025-01-01' ||
+                                    value === '9999-12-08' || value === 'Dejar como 1' ||
+                                    value === 'No modificar' || value === 'ALERTRAN ESTANDAR MOTIVES V4' ||
+                                    value === 'false';
+                    
+                    if (isLocked && colNumber === 3) {
+                        cell.protection = { locked: true };
+                    } else if (colNumber === 3 && rowNumber > 1) {
+                        cell.protection = { locked: false };
+                    }
+                });
+            });
 
             // ============================================
             // HOJA: Contrato
             // ============================================
-            const contratoData = [
-                ['NombreContratoDMS', 'CodigoContratoERP', 'DescripcionContratoERP', 'CodigoSolicitanteERP', 'IDSociedadSAP', 'TipoDeEnvio', 'CondicionDeEntrega', 'Habilitado', 'TipoEntrega', 'FechaHabilitado', 'ValidoDesde', 'ValidoHasta', 'ClientName', 'SLA', 'AllowRescue', 'AllowWithdrawPartialValues', 'ObligatoryGauge', 'AllowPartialDelivery', 'IsCentralizedReturn', 'HasCollectionManagement', 'DeliveryNote', 'AllowPrintDocumentationReturn', 'MotiveStateMap', 'AutomaticAdmission', 'AllowsStorage', 'HasChange'],
-                ['', '', '', '', '1100', '', '', '1', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'ALERTRAN ESTANDAR MOTIVES V4', 'false', 'false', '']
+            const wsContrato = workbook.addWorksheet('Contrato', {
+                properties: { tabColor: { argb: 'FFC8102E' } }
+            });
+
+            const contratoHeaders = [
+                'NombreContratoDMS', 'CodigoContratoERP', 'DescripcionContratoERP',
+                'CodigoSolicitanteERP', 'IDSociedadSAP', 'TipoDeEnvio', 'CondicionDeEntrega',
+                'Habilitado', 'TipoEntrega', 'FechaHabilitado', 'ValidoDesde', 'ValidoHasta',
+                'ClientName', 'SLA', 'AllowRescue', 'AllowWithdrawPartialValues',
+                'ObligatoryGauge', 'AllowPartialDelivery', 'IsCentralizedReturn',
+                'HasCollectionManagement', 'DeliveryNote', 'AllowPrintDocumentationReturn',
+                'MotiveStateMap', 'AutomaticAdmission', 'AllowsStorage', 'HasChange'
             ];
 
-            const wsContrato = XLSX.utils.aoa_to_sheet(contratoData);
-            XLSX.utils.book_append_sheet(wb, wsContrato, 'Contrato');
+            const contratoValues = [
+                '', '', '', '', '1100', '', '', '1', '', '', '', '',
+                '', '', '', '', '', '', '', '', '', '',
+                'ALERTRAN ESTANDAR MOTIVES V4', 'false', 'false', ''
+            ];
+
+            const headerRow = wsContrato.addRow(contratoHeaders);
+            headerRow.height = 28;
+            headerRow.eachCell((cell) => {
+                cell.style = {
+                    font: { name: 'Segoe UI', bold: true, size: 10, color: { argb: 'FFFFFFFF' } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8102E' } },
+                    alignment: { horizontal: 'center', vertical: 'middle', wrapText: true },
+                    border: {
+                        top: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        bottom: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        left: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        right: { style: 'thin', color: { argb: 'FFB0B0B0' } }
+                    }
+                };
+            });
+
+            const valueRow = wsContrato.addRow(contratoValues);
+            valueRow.height = 24;
+            valueRow.eachCell((cell, colIndex) => {
+                const isLocked = colIndex === 5 || colIndex === 8 || colIndex === 23 || colIndex === 24;
+                cell.style = isLocked ? {
+                    font: { name: 'Segoe UI', size: 10, color: { argb: 'FF666666' } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0F0' } },
+                    alignment: { horizontal: 'center', vertical: 'middle' },
+                    border: {
+                        top: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                        bottom: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                        left: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                        right: { style: 'thin', color: { argb: 'FFD0D0D0' } }
+                    }
+                } : {
+                    font: { name: 'Segoe UI', size: 10, color: { argb: 'FF1A1A1A' } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } },
+                    alignment: { horizontal: 'left', vertical: 'middle' },
+                    border: {
+                        top: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                        bottom: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                        left: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                        right: { style: 'thin', color: { argb: 'FFD0D0D0' } }
+                    }
+                };
+                if (isLocked) {
+                    cell.protection = { locked: true };
+                }
+            });
+
+            // Ajustar ancho de columnas en Contrato
+            wsContrato.columns.forEach((col, index) => {
+                col.width = index === 0 ? 20 : index === 1 ? 18 : index === 2 ? 22 : index === 3 ? 18 : 15;
+            });
 
             // ============================================
             // HOJA: Direcciones
             // ============================================
-            const direccionesData = [
-                ['Street', 'Number', 'Floor', 'Department', 'City', 'PostalCode', 'State', 'Country', 'Phone', 'MailBox', 'AddressType'],
-                ['', '', '', '', '', '', '', '', '', '', '1'],
-                ['', '', '', '', '', '', '', '', '', '', '2'],
-                ['', '', '', '', '', '', '', '', '', '', '3'],
-                ['', '', '', '', '', '', '', '', '', '', '4'],
-                ['', '', '', '', '', '', '', '', '', '', '5'],
-                ['', '', '', '', '', '', '', '', '', '', '6'],
-                ['', '', '', '', '', '', '', '', '', '', '7'],
-                ['', '', '', '', '', '', '', '', '', '', '8']
-            ];
+            const wsDirecciones = workbook.addWorksheet('Direcciones', {
+                properties: { tabColor: { argb: 'FFC8102E' } }
+            });
 
-            const wsDirecciones = XLSX.utils.aoa_to_sheet(direccionesData);
-            XLSX.utils.book_append_sheet(wb, wsDirecciones, 'Direcciones');
+            const direccionesHeaders = ['Street', 'Number', 'Floor', 'Department', 'City', 'PostalCode', 'State', 'Country', 'Phone', 'MailBox', 'AddressType'];
+            const dirHeaderRow = wsDirecciones.addRow(direccionesHeaders);
+            dirHeaderRow.height = 28;
+            dirHeaderRow.eachCell((cell) => {
+                cell.style = {
+                    font: { name: 'Segoe UI', bold: true, size: 10, color: { argb: 'FFFFFFFF' } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8102E' } },
+                    alignment: { horizontal: 'center', vertical: 'middle' },
+                    border: {
+                        top: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        bottom: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        left: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        right: { style: 'thin', color: { argb: 'FFB0B0B0' } }
+                    }
+                };
+            });
+
+            for (let i = 1; i <= 8; i++) {
+                const row = wsDirecciones.addRow(['', '', '', '', '', '', '', '', '', '', i]);
+                row.height = 24;
+                row.eachCell((cell, colIndex) => {
+                    const isLocked = colIndex === 11;
+                    cell.style = isLocked ? {
+                        font: { name: 'Segoe UI', size: 10, color: { argb: 'FF666666' } },
+                        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0F0' } },
+                        alignment: { horizontal: 'center', vertical: 'middle' },
+                        border: {
+                            top: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                            bottom: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                            left: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                            right: { style: 'thin', color: { argb: 'FFD0D0D0' } }
+                        }
+                    } : {
+                        font: { name: 'Segoe UI', size: 10, color: { argb: 'FF1A1A1A' } },
+                        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } },
+                        alignment: { horizontal: 'left', vertical: 'middle' },
+                        border: {
+                            top: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                            bottom: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                            left: { style: 'thin', color: { argb: 'FFD0D0D0' } },
+                            right: { style: 'thin', color: { argb: 'FFD0D0D0' } }
+                        }
+                    };
+                    if (isLocked) {
+                        cell.protection = { locked: true };
+                    }
+                });
+            }
+
+            // Ajustar ancho de columnas en Direcciones
+            wsDirecciones.columns.forEach((col, index) => {
+                const widths = [18, 12, 10, 14, 16, 12, 14, 14, 14, 18, 14];
+                col.width = widths[index] || 14;
+            });
 
             // ============================================
             // ESCRIBIR Y DESCARGAR
             // ============================================
-            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-            downloadFile(wbout, 'Modelo de alta de contrato DMS.xlsx');
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, 'Modelo de alta de contrato DMS.xlsx');
             log('📥 Plantilla descargada correctamente', 'success');
         }
 
