@@ -182,6 +182,7 @@
         let uploadedFiles = [];
         let processedResults = [];
         let processedFileNames = [];
+        let razonSocialCopiada = '';
 
         // ============================================================
         //  MODAL DE DESCARGA DE PLANTILLA
@@ -600,6 +601,7 @@
             COPY_BTN.disabled = true;
             COPY_BTN.classList.remove('copiado');
             COPY_BTN.textContent = '📋 Copiar mensaje';
+            razonSocialCopiada = '';
         }
 
         function renderFileList() {
@@ -629,6 +631,7 @@
             COPY_BTN.classList.remove('copiado');
             COPY_BTN.textContent = '📋 Copiar mensaje';
             LOG.textContent = '📋 Todo limpiado. Esperando archivos...';
+            razonSocialCopiada = '';
         });
 
         // ============================================================
@@ -645,6 +648,52 @@
             LOG.innerHTML += `<span class="${cls}">${msg}</span>\n`;
             LOG.scrollTop = LOG.scrollHeight;
         }
+
+        // ============================================================
+        //  COPIAR RAZÓN SOCIAL (click en el mensaje de error)
+        // ============================================================
+        function copiarRazonSocial(texto) {
+            // Extraer la Razón Social del texto (entre comillas)
+            const match = texto.match(/Razón Social: "([^"]+)"/);
+            if (match) {
+                const razonSocial = match[1];
+                if (razonSocial && razonSocial !== 'No especificada') {
+                    navigator.clipboard.writeText(razonSocial).then(() => {
+                        const msg = `✅ Razón Social "${razonSocial}" copiada al portapapeles!`;
+                        if (razonSocialCopiada !== razonSocial) {
+                            razonSocialCopiada = razonSocial;
+                            log(msg, 'success');
+                        }
+                    }).catch(() => {
+                        // Fallback para navegadores sin clipboard API
+                        const textarea = document.createElement('textarea');
+                        textarea.value = razonSocial;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        const msg = `✅ Razón Social "${razonSocial}" copiada al portapapeles!`;
+                        if (razonSocialCopiada !== razonSocial) {
+                            razonSocialCopiada = razonSocial;
+                            log(msg, 'success');
+                        }
+                    });
+                }
+            }
+        }
+
+        // Event listener para click en el log (para copiar Razón Social)
+        LOG.addEventListener('click', function(e) {
+            const target = e.target;
+            // Buscar el elemento más cercano con clase log-error
+            const errorElement = target.closest('.log-error');
+            if (errorElement) {
+                const texto = errorElement.textContent;
+                if (texto.includes('Razón Social:')) {
+                    copiarRazonSocial(texto);
+                }
+            }
+        });
 
         // ============================================================
         //  COPIAR MENSAJE
@@ -865,12 +914,14 @@
             }
 
             if (!codigoSolicitanteRaw) {
-                return { error: 'Campo "CodigoSolicitanteERP" (C5) está vacío. Es obligatorio.' };
+                const razonSocial = clientName || 'No especificada';
+                return { error: `Campo "CodigoSolicitanteERP" (C5) está vacío. Es obligatorio. - Razón Social: "${razonSocial}"` };
             }
 
             const resultadoNormalizacion = normalizarCodigoSolicitante(codigoSolicitanteRaw);
             if (resultadoNormalizacion.error) {
-                return { error: `Campo "CodigoSolicitanteERP" = "${codigoSolicitanteRaw}" - ${resultadoNormalizacion.error}` };
+                const razonSocial = clientName || 'No especificada';
+                return { error: `Campo "CodigoSolicitanteERP" = "${codigoSolicitanteRaw}" - ${resultadoNormalizacion.error} - Razón Social: "${razonSocial}"` };
             }
 
             const codigoSolicitante = resultadoNormalizacion.valor;
@@ -998,9 +1049,17 @@
                     }
                 }
 
+                // Obtener Razón Social para mensajes de error de CodigoSolicitanteERP
+                const razonSocial = String(data[13]?.[2] || '').trim() || 'No especificada';
+
                 const opcionales = ['CondicionDeEntrega', 'DescripcionContratoERP'];
                 if (!opcionales.includes(campo) && !valor) {
-                    errors.push(`Campo "${campo}" está vacío (fila ${rowIdx+1})`);
+                    // Mensaje especial para CodigoSolicitanteERP
+                    if (campo === 'CodigoSolicitanteERP') {
+                        errors.push(`Campo "${campo}" está vacío (fila ${rowIdx+1}) - Razón Social: "${razonSocial}"`);
+                    } else {
+                        errors.push(`Campo "${campo}" está vacío (fila ${rowIdx+1})`);
+                    }
                 }
 
                 if (campo === 'CodigoContratoERP' && valor && !/^\d{9}$/.test(valor)) {
@@ -1013,6 +1072,15 @@
 
                 if (campo === 'Habilitado' && valor && valor !== '1' && valor !== '0') {
                     errors.push(`Campo "Habilitado" = "${valor}" debe ser 1 o 0`);
+                }
+
+                // Validación especial para CodigoSolicitanteERP en validateFormulario
+                if (campo === 'CodigoSolicitanteERP' && valor) {
+                    const razonSocial2 = String(data[13]?.[2] || '').trim() || 'No especificada';
+                    const resultado = normalizarCodigoSolicitante(valor);
+                    if (resultado.error) {
+                        errors.push(`Campo "CodigoSolicitanteERP" = "${valor}" - ${resultado.error} - Razón Social: "${razonSocial2}"`);
+                    }
                 }
 
                 const booleanFields = ['AllowRescue', 'AllowWithdrawPartialValues', 'ObligatoryGauge',
