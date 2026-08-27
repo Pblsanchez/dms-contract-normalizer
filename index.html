@@ -9,26 +9,84 @@
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     <link rel="stylesheet" href="css/styles.css" />
     <style>
-        /* Estilos para el campo de corrección de código */
-        .correccion-container {
-            background: #f8f9fc;
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin: 8px 0;
-            border-left: 4px solid var(--andreani-red);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
+        /* ========== FOUR COLUMN LAYOUT ========== */
+        .four-column-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
-        .correccion-container label {
-            font-weight: 600;
-            font-size: 14px;
+        @media (max-width: 1200px) {
+            .four-column-layout {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .four-column-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ========== CORRECCIÓN CARD ========== */
+        .correccion-card {
+            background: var(--card-bg);
+            border-radius: var(--radio);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--sombra-card);
+            padding: 20px;
+            height: 100%;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 300ms ease;
+            border-left: 4px solid var(--andreani-red);
+        }
+
+        .correccion-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--andreani-red);
+        }
+
+        .correccion-card-header h3 {
+            font-size: 16px;
+            font-weight: 700;
             color: var(--dark);
         }
 
-        .correccion-container input {
+        .correccion-card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .correccion-card-body .razon-social {
+            font-weight: 700;
+            color: var(--andreani-red);
+            font-size: 16px;
+        }
+
+        .correccion-card-body .label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .correccion-card-body .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .correccion-card-body input {
             padding: 8px 12px;
             border: 2px solid #ccc;
             border-radius: 6px;
@@ -37,18 +95,19 @@
             transition: border-color var(--transicion);
             outline: none;
             width: 150px;
+            flex: 0 1 150px;
         }
 
-        .correccion-container input:focus {
+        .correccion-card-body input:focus {
             border-color: var(--andreani-red);
             box-shadow: 0 0 0 3px var(--andreani-red-soft);
         }
 
         .btn-reprocesar {
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: 6px;
             border: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             font-family: inherit;
             color: white;
@@ -57,10 +116,11 @@
             transition: all var(--transicion);
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+            white-space: nowrap;
         }
 
-        .btn-reprocesar:hover {
+        .btn-reprocesar:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px var(--andreani-red-soft);
         }
@@ -71,36 +131,38 @@
             transform: none;
         }
 
-        .correccion-container .razon-social {
-            font-weight: 700;
-            color: var(--andreani-red);
-        }
-
-        .correccion-container .hint {
+        .correccion-card-body .hint {
             font-size: 12px;
             color: var(--gray-light);
-            margin-left: auto;
         }
 
-        /* Estilos para el mensaje de copiado de Razón Social */
-        .razon-social-copiada {
-            color: #0a7a3a;
-            font-weight: 600;
+        .correccion-card-body .error-msg {
+            font-size: 13px;
+            color: var(--andreani-red);
+            font-weight: 500;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1200px) {
+            .correccion-card-body .input-row {
+                flex-wrap: wrap;
+            }
+            .correccion-card-body input {
+                flex: 1;
+                min-width: 120px;
+            }
         }
 
         @media (max-width: 640px) {
-            .correccion-container {
-                flex-direction: column;
-                align-items: stretch;
+            .correccion-card {
+                min-height: 200px;
             }
-            .correccion-container .hint {
-                margin-left: 0;
-                text-align: center;
-            }
-            .correccion-container input {
+            .correccion-card-body input {
                 width: 100%;
+                flex: 1;
             }
             .btn-reprocesar {
+                width: 100%;
                 justify-content: center;
             }
         }
@@ -132,8 +194,8 @@
             <p class="subtitle">Subí archivos Excel para validar, convertir fórmulas a valores y generar el contrato normalizado</p>
         </div>
 
-        <!-- THREE COLUMN LAYOUT -->
-        <div class="three-column-layout">
+        <!-- LAYOUT: 3 o 4 columnas según estado -->
+        <div id="mainLayout" class="three-column-layout">
             <!-- LEFT: PLANTILLA CARD -->
             <div>
                 <div class="plantilla-card">
@@ -155,7 +217,7 @@
                 </div>
             </div>
 
-            <!-- CENTER: DROP ZONE -->
+            <!-- CENTER LEFT: DROP ZONE -->
             <div>
                 <div id="dropZone" class="drop-zone">
                     <p>📂 Arrastrá tus archivos <strong>.xlsx</strong> aquí</p>
@@ -165,7 +227,7 @@
                 </div>
             </div>
 
-            <!-- RIGHT: MESSAGE CARD -->
+            <!-- CENTER RIGHT: MESSAGE CARD -->
             <div>
                 <div class="message-card">
                     <div class="message-card-header">
@@ -177,6 +239,33 @@
                         <button id="copyBtn" class="btn-copiar" disabled>
                             📋 Copiar mensaje
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: CORRECCIÓN CARD (oculta por defecto) -->
+            <div id="correccionCardWrapper" style="display:none;">
+                <div class="correccion-card" id="correccionCard">
+                    <div class="correccion-card-header">
+                        <span style="font-size:20px;">🔄</span>
+                        <h3>Corregir código del cliente</h3>
+                    </div>
+                    <div class="correccion-card-body">
+                        <div>
+                            <span class="label">📋 Razón Social:</span>
+                            <span class="razon-social" id="razonSocialDisplay">-</span>
+                        </div>
+                        <div>
+                            <span class="label">✏️ Código correcto:</span>
+                            <div class="input-row">
+                                <input type="text" id="codigoCorreccion" placeholder="Ej: 123456" maxlength="10" />
+                                <button class="btn-reprocesar" id="btnReprocesarCorreccion">
+                                    🔁 Reprocesar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="hint">💡 Ingresá el código de 6 dígitos y presioná Enter o el botón</div>
+                        <div id="correccionError" class="error-msg" style="display:none;"></div>
                     </div>
                 </div>
             </div>
@@ -275,12 +364,48 @@
         const CLEAR_BTN = document.getElementById('clearBtn');
         const MESSAGE_BODY = document.getElementById('messageBody');
         const COPY_BTN = document.getElementById('copyBtn');
+        const MAIN_LAYOUT = document.getElementById('mainLayout');
+        const CORRECCION_WRAPPER = document.getElementById('correccionCardWrapper');
+        const RAZON_SOCIAL_DISPLAY = document.getElementById('razonSocialDisplay');
+        const CODIGO_CORRECCION = document.getElementById('codigoCorreccion');
+        const BTN_REPROCESAR = document.getElementById('btnReprocesarCorreccion');
+        const CORRECCION_ERROR = document.getElementById('correccionError');
 
         let uploadedFiles = [];
         let processedResults = [];
         let processedFileNames = [];
         let razonSocialCopiada = '';
-        let pendingFileForReprocess = null; // Archivo pendiente de reprocesar
+        let pendingFileForReprocess = null;
+
+        // ============================================================
+        //  FUNCIONES DE LAYOUT
+        // ============================================================
+        function mostrarCorreccion(razonSocial, file) {
+            RAZON_SOCIAL_DISPLAY.textContent = razonSocial;
+            pendingFileForReprocess = {
+                file: file,
+                razonSocial: razonSocial
+            };
+            CORRECCION_WRAPPER.style.display = 'block';
+            MAIN_LAYOUT.className = 'four-column-layout';
+            // Enfocar el input
+            setTimeout(() => CODIGO_CORRECCION.focus(), 100);
+            // Limpiar error previo
+            CORRECCION_ERROR.style.display = 'none';
+            CORRECCION_ERROR.textContent = '';
+            // Habilitar botón
+            BTN_REPROCESAR.disabled = false;
+            BTN_REPROCESAR.textContent = '🔁 Reprocesar';
+        }
+
+        function ocultarCorreccion() {
+            CORRECCION_WRAPPER.style.display = 'none';
+            MAIN_LAYOUT.className = 'three-column-layout';
+            pendingFileForReprocess = null;
+            CODIGO_CORRECCION.value = '';
+            CORRECCION_ERROR.style.display = 'none';
+            CORRECCION_ERROR.textContent = '';
+        }
 
         // ============================================================
         //  MODAL DE DESCARGA DE PLANTILLA
@@ -700,7 +825,7 @@
             COPY_BTN.classList.remove('copiado');
             COPY_BTN.textContent = '📋 Copiar mensaje';
             razonSocialCopiada = '';
-            pendingFileForReprocess = null;
+            ocultarCorreccion();
         }
 
         function renderFileList() {
@@ -731,7 +856,7 @@
             COPY_BTN.textContent = '📋 Copiar mensaje';
             LOG.textContent = '📋 Todo limpiado. Esperando archivos...';
             razonSocialCopiada = '';
-            pendingFileForReprocess = null;
+            ocultarCorreccion();
         });
 
         // ============================================================
@@ -750,7 +875,7 @@
         }
 
         // ============================================================
-        //  COPIAR RAZÓN SOCIAL (click en el mensaje de error)
+        //  COPIAR RAZÓN SOCIAL
         // ============================================================
         function copiarRazonSocial(texto) {
             const match = texto.match(/Razón Social: "([^"]+)"/);
@@ -780,7 +905,6 @@
             }
         }
 
-        // Event listener para click en el log (para copiar Razón Social)
         LOG.addEventListener('click', function(e) {
             const target = e.target;
             const errorElement = target.closest('.log-error');
@@ -795,16 +919,21 @@
         // ============================================================
         //  FUNCIÓN: REPROCESAR ARCHIVO CON NUEVO CÓDIGO
         // ============================================================
-        async function reprocesarConCodigo(archivo, nuevoCodigo, nombreArchivo) {
+        async function reprocesarConCodigo(archivo, nuevoCodigo, razonSocial) {
             // Validar el código ingresado
             const validacion = normalizarCodigoSolicitante(nuevoCodigo);
             if (validacion.error) {
-                log(`❌ El código "${nuevoCodigo}" no es válido. ${validacion.error}`, 'error');
+                CORRECCION_ERROR.textContent = `❌ ${validacion.error}`;
+                CORRECCION_ERROR.style.display = 'block';
                 return;
             }
 
             const codigoNormalizado = validacion.valor;
-            log(`🔄 Reprocesando "${nombreArchivo}" con código "${codigoNormalizado}"...`, 'info');
+            CORRECCION_ERROR.style.display = 'none';
+            BTN_REPROCESAR.disabled = true;
+            BTN_REPROCESAR.textContent = '⏳ Procesando...';
+
+            log(`🔄 Reprocesando con código "${codigoNormalizado}" para "${razonSocial}"...`, 'info');
 
             try {
                 const buffer = await archivo.arrayBuffer();
@@ -814,30 +943,33 @@
                 const sheet = workbook.Sheets['Formulario'];
                 if (!sheet) {
                     log(`❌ No se encuentra la hoja "Formulario" en el archivo`, 'error');
+                    BTN_REPROCESAR.disabled = false;
+                    BTN_REPROCESAR.textContent = '🔁 Reprocesar';
                     return;
                 }
 
-                // Convertir a array para modificar
                 const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
                 if (data.length > 4) {
-                    // Fila 5 (index 4) columna C (index 2)
                     data[4][2] = codigoNormalizado;
-                    // Actualizar la hoja con el nuevo valor
                     const newSheet = XLSX.utils.aoa_to_sheet(data);
                     workbook.Sheets['Formulario'] = newSheet;
                     log(`   → Código actualizado en el archivo a "${codigoNormalizado}"`, 'info');
                 } else {
                     log(`❌ No se encontró la fila del código de cliente en el archivo`, 'error');
+                    BTN_REPROCESAR.disabled = false;
+                    BTN_REPROCESAR.textContent = '🔁 Reprocesar';
                     return;
                 }
 
-                // Revalidar el archivo completo después del cambio
-                const validation = validateFormulario(workbook, nombreArchivo);
+                // Revalidar el archivo completo
+                const validation = validateFormulario(workbook, archivo.name);
                 if (validation.hasErrors) {
                     log(`❌ El archivo sigue teniendo errores después de la corrección:`, 'error');
                     for (const err of validation.errors) {
                         log(`   → ${err}`, 'error');
                     }
+                    BTN_REPROCESAR.disabled = false;
+                    BTN_REPROCESAR.textContent = '🔁 Reprocesar';
                     return;
                 }
 
@@ -845,12 +977,13 @@
                 const nombreData = getNombreArchivoData(workbook);
                 if (nombreData.error) {
                     log(`❌ ${nombreData.error}`, 'error');
+                    BTN_REPROCESAR.disabled = false;
+                    BTN_REPROCESAR.textContent = '🔁 Reprocesar';
                     return;
                 }
 
                 const normalizedWB = normalizeWorkbook(workbook);
 
-                // Eliminar Formulario
                 const sheetNames = normalizedWB.SheetNames;
                 const formularioIndex = sheetNames.indexOf('Formulario');
                 if (formularioIndex !== -1) {
@@ -858,7 +991,6 @@
                     delete normalizedWB.Sheets['Formulario'];
                 }
 
-                // Mover Referencias al final
                 const refIndex = normalizedWB.SheetNames.indexOf('Referencias');
                 if (refIndex !== -1) {
                     const refName = normalizedWB.SheetNames.splice(refIndex, 1)[0];
@@ -867,7 +999,6 @@
 
                 limpiarDireccionesVacias(normalizedWB);
 
-                // Generar nombre de salida
                 let outputName = `Alta de contrato DMS ${nombreData.codigoERP} ${nombreData.codigoSolicitante}`;
                 if (nombreData.clientName) {
                     outputName += ` ${nombreData.clientName}`;
@@ -881,17 +1012,44 @@
 
                 // Agregar el nombre al mensaje
                 processedFileNames.push(outputName);
-                // Mostrar mensaje actualizado
                 generarMensaje(processedFileNames.length, processedFileNames);
 
-                // Limpiar el estado de reprocesamiento
-                pendingFileForReprocess = null;
+                // Ocultar la card de corrección
+                ocultarCorreccion();
 
             } catch (err) {
                 log(`❌ Error al reprocesar: ${err.message}`, 'error');
                 console.error(err);
             }
+
+            BTN_REPROCESAR.disabled = false;
+            BTN_REPROCESAR.textContent = '🔁 Reprocesar';
         }
+
+        // ============================================================
+        //  EVENTOS DEL CAMPO DE CORRECCIÓN
+        // ============================================================
+        BTN_REPROCESAR.addEventListener('click', function() {
+            const codigo = CODIGO_CORRECCION.value.trim();
+            if (!codigo) {
+                CORRECCION_ERROR.textContent = '⚠️ Ingresá un código válido';
+                CORRECCION_ERROR.style.display = 'block';
+                return;
+            }
+            if (pendingFileForReprocess) {
+                reprocesarConCodigo(
+                    pendingFileForReprocess.file,
+                    codigo,
+                    pendingFileForReprocess.razonSocial
+                );
+            }
+        });
+
+        CODIGO_CORRECCION.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                BTN_REPROCESAR.click();
+            }
+        });
 
         // ============================================================
         //  COPIAR MENSAJE
@@ -936,11 +1094,8 @@
             let errorCount = 0;
             processedResults = [];
             processedFileNames = [];
-            pendingFileForReprocess = null;
+            ocultarCorreccion();
 
-            // Limpiar el log para que los mensajes sean claros
-            // Mantenemos el título, pero borramos el contenido anterior
-            // No borramos completamente para conservar el historial, pero marcamos el inicio del nuevo proceso
             log('', 'info');
             log('═══════════════════════════════════════', 'info');
             log(`🔄 Iniciando procesamiento de ${uploadedFiles.length} archivo(s)...`, 'info');
@@ -959,10 +1114,8 @@
                         let tieneErrorSolicitante = false;
                         for (const err of validation.errors) {
                             log(`   → ${err}`, 'error');
-                            // Detectar si es un error de CodigoSolicitanteERP para mostrar campo de corrección
                             if (err.includes('CodigoSolicitanteERP') || err.includes('Código del Cliente')) {
                                 tieneErrorSolicitante = true;
-                                // Extraer la Razón Social del mensaje de error
                                 const match = err.match(/Razón Social: "([^"]+)"/);
                                 if (match) {
                                     razonSocialEncontrada = match[1];
@@ -970,63 +1123,10 @@
                             }
                         }
 
-                        // Si el error es por CodigoSolicitanteERP, mostrar campo para corregir
-                        if (tieneErrorSolicitante) {
-                            const razonSocial = razonSocialEncontrada || 'No especificada';
-                            // Guardar referencia al archivo para reprocesarlo
-                            pendingFileForReprocess = {
-                                file: file,
-                                nombre: file.name,
-                                razonSocial: razonSocial,
-                                containerId: `reprocesar-${Date.now()}`
-                            };
-
-                            // Agregar el campo de corrección al log
-                            const correccionHTML = `
-                                <div class="correccion-container" id="${pendingFileForReprocess.containerId}">
-                                    <span>✏️ <strong>Corregir código para</strong> <span class="razon-social">"${razonSocial}"</span></span>
-                                    <input type="text" id="codigoInput-${pendingFileForReprocess.containerId}" placeholder="Ej: 123456" maxlength="10" />
-                                    <button class="btn-reprocesar" id="btnReprocesar-${pendingFileForReprocess.containerId}">
-                                        🔁 Reprocesar
-                                    </button>
-                                    <span class="hint">Ingresá el código correcto de 6 dígitos y presioná Enter o el botón</span>
-                                </div>
-                            `;
-                            LOG.innerHTML += correccionHTML + '\n';
-                            LOG.scrollTop = LOG.scrollHeight;
-
-                            // Eventos para el campo de corrección
-                            const input = document.getElementById(`codigoInput-${pendingFileForReprocess.containerId}`);
-                            const btn = document.getElementById(`btnReprocesar-${pendingFileForReprocess.containerId}`);
-
-                            function manejarReprocesar() {
-                                const codigo = input.value.trim();
-                                if (!codigo) {
-                                    log(`⚠️ Ingresá un código válido`, 'warning');
-                                    return;
-                                }
-                                reprocesarConCodigo(
-                                    pendingFileForReprocess.file,
-                                    codigo,
-                                    pendingFileForReprocess.nombre
-                                );
-                                // Deshabilitar temporalmente para evitar múltiples clicks
-                                btn.disabled = true;
-                                btn.textContent = '⏳ Procesando...';
-                                setTimeout(() => {
-                                    btn.disabled = false;
-                                    btn.textContent = '🔁 Reprocesar';
-                                }, 3000);
-                            }
-
-                            btn.addEventListener('click', manejarReprocesar);
-                            input.addEventListener('keypress', function(e) {
-                                if (e.key === 'Enter') {
-                                    manejarReprocesar();
-                                }
-                            });
-                            // Enfoque automático en el input
-                            setTimeout(() => input.focus(), 100);
+                        if (tieneErrorSolicitante && razonSocialEncontrada && razonSocialEncontrada !== 'No especificada') {
+                            // Mostrar la card de corrección
+                            mostrarCorreccion(razonSocialEncontrada, file);
+                            log(`💡 Podés corregir el código en la card "Corregir código del cliente"`, 'info');
                         }
                         continue;
                     }
@@ -1329,7 +1429,6 @@
                     }
                 }
 
-                // Obtener Razón Social para mensajes de error de CodigoSolicitanteERP
                 const razonSocial = String(data[13]?.[2] || '').trim() || 'No especificada';
 
                 const opcionales = ['CondicionDeEntrega', 'DescripcionContratoERP'];
@@ -1596,7 +1695,7 @@
         // ============================================================
         log('📌 Sistema listo. Arrastrá archivos .xlsx o hacé clic para subir.', 'info');
         log('📋 Los archivos serán validados, normalizados y descargados automáticamente.', 'info');
-        log('💡 Si el código del cliente es incorrecto, podés corregirlo directamente desde el log.', 'info');
+        log('💡 Si el código del cliente es incorrecto, aparecerá una card para corregirlo.', 'info');
     </script>
 </body>
 </html>
