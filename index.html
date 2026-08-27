@@ -939,7 +939,7 @@
                 const buffer = await archivo.arrayBuffer();
                 const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
 
-                // Actualizar el valor en la hoja Formulario (fila 5, columna C)
+                // Actualizar el valor en la hoja Formulario
                 const sheet = workbook.Sheets['Formulario'];
                 if (!sheet) {
                     log(`❌ No se encuentra la hoja "Formulario" en el archivo`, 'error');
@@ -948,20 +948,56 @@
                     return;
                 }
 
+                // Convertir a array para modificar
                 const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-                if (data.length > 4) {
-                    data[4][2] = codigoNormalizado;
-                    const newSheet = XLSX.utils.aoa_to_sheet(data);
-                    workbook.Sheets['Formulario'] = newSheet;
-                    log(`   → Código actualizado en el archivo a "${codigoNormalizado}"`, 'info');
-                } else {
-                    log(`❌ No se encontró la fila del código de cliente en el archivo`, 'error');
+
+                // Buscar la fila correcta de CodigoSolicitanteERP
+                let filaEncontrada = false;
+                let filaIndex = -1;
+                let razonSocialEncontrada = '';
+
+                // Buscar por el campo "Código del Cliente" o "CodigoSolicitanteERP"
+                for (let i = 0; i < data.length; i++) {
+                    const row = data[i];
+                    if (row && row[0]) {
+                        const campo = String(row[0]).trim();
+                        if (campo === 'Código del Cliente' || campo === 'CodigoSolicitanteERP') {
+                            filaIndex = i;
+                            filaEncontrada = true;
+                            // También obtenemos la Razón Social si está disponible
+                            if (data[i + 10] && data[i + 10][2]) {
+                                razonSocialEncontrada = String(data[i + 10][2]).trim();
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                if (!filaEncontrada || filaIndex === -1) {
+                    log(`❌ No se encontró la fila "Código del Cliente" en el archivo`, 'error');
                     BTN_REPROCESAR.disabled = false;
                     BTN_REPROCESAR.textContent = '🔁 Reprocesar';
                     return;
                 }
 
-                // Revalidar el archivo completo
+                // Actualizar el valor en la columna C (índice 2)
+                log(`   → Actualizando código en fila ${filaIndex + 1} de "${String(data[filaIndex][2] || '').trim()}" a "${codigoNormalizado}"`, 'info');
+                data[filaIndex][2] = codigoNormalizado;
+
+                // Reconstruir la hoja con el nuevo valor
+                const newSheet = XLSX.utils.aoa_to_sheet(data);
+                workbook.Sheets['Formulario'] = newSheet;
+
+                // Verificar que el cambio se aplicó correctamente
+                const verificarData = XLSX.utils.sheet_to_json(workbook.Sheets['Formulario'], { header: 1, defval: '' });
+                const valorVerificado = String(verificarData[filaIndex]?.[2] || '').trim();
+                if (valorVerificado !== codigoNormalizado) {
+                    log(`⚠️ Advertencia: El código no se actualizó correctamente. Esperado: "${codigoNormalizado}", Actual: "${valorVerificado}"`, 'warning');
+                } else {
+                    log(`   → ✅ Código actualizado correctamente a "${codigoNormalizado}"`, 'success');
+                }
+
+                // Revalidar el archivo completo con el nuevo valor
                 const validation = validateFormulario(workbook, archivo.name);
                 if (validation.hasErrors) {
                     log(`❌ El archivo sigue teniendo errores después de la corrección:`, 'error');
@@ -973,7 +1009,7 @@
                     return;
                 }
 
-                // Procesar el archivo normalizado
+                // Obtener datos para el nombre del archivo
                 const nombreData = getNombreArchivoData(workbook);
                 if (nombreData.error) {
                     log(`❌ ${nombreData.error}`, 'error');
@@ -982,8 +1018,10 @@
                     return;
                 }
 
+                // Normalizar el workbook
                 const normalizedWB = normalizeWorkbook(workbook);
 
+                // Eliminar Formulario
                 const sheetNames = normalizedWB.SheetNames;
                 const formularioIndex = sheetNames.indexOf('Formulario');
                 if (formularioIndex !== -1) {
@@ -991,6 +1029,7 @@
                     delete normalizedWB.Sheets['Formulario'];
                 }
 
+                // Mover Referencias al final
                 const refIndex = normalizedWB.SheetNames.indexOf('Referencias');
                 if (refIndex !== -1) {
                     const refName = normalizedWB.SheetNames.splice(refIndex, 1)[0];
@@ -999,6 +1038,7 @@
 
                 limpiarDireccionesVacias(normalizedWB);
 
+                // Generar nombre de salida
                 let outputName = `Alta de contrato DMS ${nombreData.codigoERP} ${nombreData.codigoSolicitante}`;
                 if (nombreData.clientName) {
                     outputName += ` ${nombreData.clientName}`;
