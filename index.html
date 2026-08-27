@@ -8,6 +8,103 @@
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     <link rel="stylesheet" href="css/styles.css" />
+    <style>
+        /* Estilos para el campo de corrección de código */
+        .correccion-container {
+            background: #f8f9fc;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 8px 0;
+            border-left: 4px solid var(--andreani-red);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .correccion-container label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        .correccion-container input {
+            padding: 8px 12px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color var(--transicion);
+            outline: none;
+            width: 150px;
+        }
+
+        .correccion-container input:focus {
+            border-color: var(--andreani-red);
+            box-shadow: 0 0 0 3px var(--andreani-red-soft);
+        }
+
+        .btn-reprocesar {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            color: white;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--andreani-red), var(--andreani-red-dark));
+            transition: all var(--transicion);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-reprocesar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--andreani-red-soft);
+        }
+
+        .btn-reprocesar:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .correccion-container .razon-social {
+            font-weight: 700;
+            color: var(--andreani-red);
+        }
+
+        .correccion-container .hint {
+            font-size: 12px;
+            color: var(--gray-light);
+            margin-left: auto;
+        }
+
+        /* Estilos para el mensaje de copiado de Razón Social */
+        .razon-social-copiada {
+            color: #0a7a3a;
+            font-weight: 600;
+        }
+
+        @media (max-width: 640px) {
+            .correccion-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .correccion-container .hint {
+                margin-left: 0;
+                text-align: center;
+            }
+            .correccion-container input {
+                width: 100%;
+            }
+            .btn-reprocesar {
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- HEADER -->
@@ -183,6 +280,7 @@
         let processedResults = [];
         let processedFileNames = [];
         let razonSocialCopiada = '';
+        let pendingFileForReprocess = null; // Archivo pendiente de reprocesar
 
         // ============================================================
         //  MODAL DE DESCARGA DE PLANTILLA
@@ -602,6 +700,7 @@
             COPY_BTN.classList.remove('copiado');
             COPY_BTN.textContent = '📋 Copiar mensaje';
             razonSocialCopiada = '';
+            pendingFileForReprocess = null;
         }
 
         function renderFileList() {
@@ -632,6 +731,7 @@
             COPY_BTN.textContent = '📋 Copiar mensaje';
             LOG.textContent = '📋 Todo limpiado. Esperando archivos...';
             razonSocialCopiada = '';
+            pendingFileForReprocess = null;
         });
 
         // ============================================================
@@ -653,7 +753,6 @@
         //  COPIAR RAZÓN SOCIAL (click en el mensaje de error)
         // ============================================================
         function copiarRazonSocial(texto) {
-            // Extraer la Razón Social del texto (entre comillas)
             const match = texto.match(/Razón Social: "([^"]+)"/);
             if (match) {
                 const razonSocial = match[1];
@@ -665,7 +764,6 @@
                             log(msg, 'success');
                         }
                     }).catch(() => {
-                        // Fallback para navegadores sin clipboard API
                         const textarea = document.createElement('textarea');
                         textarea.value = razonSocial;
                         document.body.appendChild(textarea);
@@ -685,7 +783,6 @@
         // Event listener para click en el log (para copiar Razón Social)
         LOG.addEventListener('click', function(e) {
             const target = e.target;
-            // Buscar el elemento más cercano con clase log-error
             const errorElement = target.closest('.log-error');
             if (errorElement) {
                 const texto = errorElement.textContent;
@@ -694,6 +791,107 @@
                 }
             }
         });
+
+        // ============================================================
+        //  FUNCIÓN: REPROCESAR ARCHIVO CON NUEVO CÓDIGO
+        // ============================================================
+        async function reprocesarConCodigo(archivo, nuevoCodigo, nombreArchivo) {
+            // Validar el código ingresado
+            const validacion = normalizarCodigoSolicitante(nuevoCodigo);
+            if (validacion.error) {
+                log(`❌ El código "${nuevoCodigo}" no es válido. ${validacion.error}`, 'error');
+                return;
+            }
+
+            const codigoNormalizado = validacion.valor;
+            log(`🔄 Reprocesando "${nombreArchivo}" con código "${codigoNormalizado}"...`, 'info');
+
+            try {
+                const buffer = await archivo.arrayBuffer();
+                const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
+
+                // Actualizar el valor en la hoja Formulario (fila 5, columna C)
+                const sheet = workbook.Sheets['Formulario'];
+                if (!sheet) {
+                    log(`❌ No se encuentra la hoja "Formulario" en el archivo`, 'error');
+                    return;
+                }
+
+                // Convertir a array para modificar
+                const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                if (data.length > 4) {
+                    // Fila 5 (index 4) columna C (index 2)
+                    data[4][2] = codigoNormalizado;
+                    // Actualizar la hoja con el nuevo valor
+                    const newSheet = XLSX.utils.aoa_to_sheet(data);
+                    workbook.Sheets['Formulario'] = newSheet;
+                    log(`   → Código actualizado en el archivo a "${codigoNormalizado}"`, 'info');
+                } else {
+                    log(`❌ No se encontró la fila del código de cliente en el archivo`, 'error');
+                    return;
+                }
+
+                // Revalidar el archivo completo después del cambio
+                const validation = validateFormulario(workbook, nombreArchivo);
+                if (validation.hasErrors) {
+                    log(`❌ El archivo sigue teniendo errores después de la corrección:`, 'error');
+                    for (const err of validation.errors) {
+                        log(`   → ${err}`, 'error');
+                    }
+                    return;
+                }
+
+                // Procesar el archivo normalizado
+                const nombreData = getNombreArchivoData(workbook);
+                if (nombreData.error) {
+                    log(`❌ ${nombreData.error}`, 'error');
+                    return;
+                }
+
+                const normalizedWB = normalizeWorkbook(workbook);
+
+                // Eliminar Formulario
+                const sheetNames = normalizedWB.SheetNames;
+                const formularioIndex = sheetNames.indexOf('Formulario');
+                if (formularioIndex !== -1) {
+                    normalizedWB.SheetNames.splice(formularioIndex, 1);
+                    delete normalizedWB.Sheets['Formulario'];
+                }
+
+                // Mover Referencias al final
+                const refIndex = normalizedWB.SheetNames.indexOf('Referencias');
+                if (refIndex !== -1) {
+                    const refName = normalizedWB.SheetNames.splice(refIndex, 1)[0];
+                    normalizedWB.SheetNames.push(refName);
+                }
+
+                limpiarDireccionesVacias(normalizedWB);
+
+                // Generar nombre de salida
+                let outputName = `Alta de contrato DMS ${nombreData.codigoERP} ${nombreData.codigoSolicitante}`;
+                if (nombreData.clientName) {
+                    outputName += ` ${nombreData.clientName}`;
+                }
+                outputName += '.xlsx';
+
+                const wbout = XLSX.write(normalizedWB, { bookType: 'xlsx', type: 'array' });
+                downloadFile(wbout, outputName);
+
+                log(`✅ ¡Archivo reprocesado correctamente! Descargando "${outputName}"`, 'success');
+
+                // Agregar el nombre al mensaje
+                processedFileNames.push(outputName);
+                // Mostrar mensaje actualizado
+                generarMensaje(processedFileNames.length, processedFileNames);
+
+                // Limpiar el estado de reprocesamiento
+                pendingFileForReprocess = null;
+
+            } catch (err) {
+                log(`❌ Error al reprocesar: ${err.message}`, 'error');
+                console.error(err);
+            }
+        }
 
         // ============================================================
         //  COPIAR MENSAJE
@@ -738,6 +936,14 @@
             let errorCount = 0;
             processedResults = [];
             processedFileNames = [];
+            pendingFileForReprocess = null;
+
+            // Limpiar el log para que los mensajes sean claros
+            // Mantenemos el título, pero borramos el contenido anterior
+            // No borramos completamente para conservar el historial, pero marcamos el inicio del nuevo proceso
+            log('', 'info');
+            log('═══════════════════════════════════════', 'info');
+            log(`🔄 Iniciando procesamiento de ${uploadedFiles.length} archivo(s)...`, 'info');
 
             try {
                 for (const file of uploadedFiles) {
@@ -749,8 +955,78 @@
                     if (validation.hasErrors) {
                         errorCount++;
                         log(`❌ ${file.name}: ${validation.errors.length} error(es) de validación`, 'error');
+                        let razonSocialEncontrada = '';
+                        let tieneErrorSolicitante = false;
                         for (const err of validation.errors) {
                             log(`   → ${err}`, 'error');
+                            // Detectar si es un error de CodigoSolicitanteERP para mostrar campo de corrección
+                            if (err.includes('CodigoSolicitanteERP') || err.includes('Código del Cliente')) {
+                                tieneErrorSolicitante = true;
+                                // Extraer la Razón Social del mensaje de error
+                                const match = err.match(/Razón Social: "([^"]+)"/);
+                                if (match) {
+                                    razonSocialEncontrada = match[1];
+                                }
+                            }
+                        }
+
+                        // Si el error es por CodigoSolicitanteERP, mostrar campo para corregir
+                        if (tieneErrorSolicitante) {
+                            const razonSocial = razonSocialEncontrada || 'No especificada';
+                            // Guardar referencia al archivo para reprocesarlo
+                            pendingFileForReprocess = {
+                                file: file,
+                                nombre: file.name,
+                                razonSocial: razonSocial,
+                                containerId: `reprocesar-${Date.now()}`
+                            };
+
+                            // Agregar el campo de corrección al log
+                            const correccionHTML = `
+                                <div class="correccion-container" id="${pendingFileForReprocess.containerId}">
+                                    <span>✏️ <strong>Corregir código para</strong> <span class="razon-social">"${razonSocial}"</span></span>
+                                    <input type="text" id="codigoInput-${pendingFileForReprocess.containerId}" placeholder="Ej: 123456" maxlength="10" />
+                                    <button class="btn-reprocesar" id="btnReprocesar-${pendingFileForReprocess.containerId}">
+                                        🔁 Reprocesar
+                                    </button>
+                                    <span class="hint">Ingresá el código correcto de 6 dígitos y presioná Enter o el botón</span>
+                                </div>
+                            `;
+                            LOG.innerHTML += correccionHTML + '\n';
+                            LOG.scrollTop = LOG.scrollHeight;
+
+                            // Eventos para el campo de corrección
+                            const input = document.getElementById(`codigoInput-${pendingFileForReprocess.containerId}`);
+                            const btn = document.getElementById(`btnReprocesar-${pendingFileForReprocess.containerId}`);
+
+                            function manejarReprocesar() {
+                                const codigo = input.value.trim();
+                                if (!codigo) {
+                                    log(`⚠️ Ingresá un código válido`, 'warning');
+                                    return;
+                                }
+                                reprocesarConCodigo(
+                                    pendingFileForReprocess.file,
+                                    codigo,
+                                    pendingFileForReprocess.nombre
+                                );
+                                // Deshabilitar temporalmente para evitar múltiples clicks
+                                btn.disabled = true;
+                                btn.textContent = '⏳ Procesando...';
+                                setTimeout(() => {
+                                    btn.disabled = false;
+                                    btn.textContent = '🔁 Reprocesar';
+                                }, 3000);
+                            }
+
+                            btn.addEventListener('click', manejarReprocesar);
+                            input.addEventListener('keypress', function(e) {
+                                if (e.key === 'Enter') {
+                                    manejarReprocesar();
+                                }
+                            });
+                            // Enfoque automático en el input
+                            setTimeout(() => input.focus(), 100);
                         }
                         continue;
                     }
@@ -810,7 +1086,11 @@
                     log(`✅ ¡Completado! Se descargaron ${processedResults.length} archivos.`, 'success');
                     generarMensaje(processedResults.length, processedFileNames);
                 } else {
-                    log(`⚠️ No se generaron archivos para descargar.`, 'warning');
+                    if (errorCount > 0) {
+                        log(`⚠️ No se generaron archivos para descargar. Revisá los errores arriba.`, 'warning');
+                    } else {
+                        log(`⚠️ No se generaron archivos para descargar.`, 'warning');
+                    }
                     MESSAGE_BODY.textContent = '';
                     COPY_BTN.disabled = true;
                 }
@@ -1054,7 +1334,6 @@
 
                 const opcionales = ['CondicionDeEntrega', 'DescripcionContratoERP'];
                 if (!opcionales.includes(campo) && !valor) {
-                    // Mensaje especial para CodigoSolicitanteERP
                     if (campo === 'CodigoSolicitanteERP') {
                         errors.push(`Campo "${campo}" está vacío (fila ${rowIdx+1}) - Razón Social: "${razonSocial}"`);
                     } else {
@@ -1074,7 +1353,6 @@
                     errors.push(`Campo "Habilitado" = "${valor}" debe ser 1 o 0`);
                 }
 
-                // Validación especial para CodigoSolicitanteERP en validateFormulario
                 if (campo === 'CodigoSolicitanteERP' && valor) {
                     const razonSocial2 = String(data[13]?.[2] || '').trim() || 'No especificada';
                     const resultado = normalizarCodigoSolicitante(valor);
@@ -1318,6 +1596,7 @@
         // ============================================================
         log('📌 Sistema listo. Arrastrá archivos .xlsx o hacé clic para subir.', 'info');
         log('📋 Los archivos serán validados, normalizados y descargados automáticamente.', 'info');
+        log('💡 Si el código del cliente es incorrecto, podés corregirlo directamente desde el log.', 'info');
     </script>
 </body>
 </html>
