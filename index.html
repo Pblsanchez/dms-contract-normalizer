@@ -1697,13 +1697,42 @@
         function normalizeWorkbook(workbook) {
             const newWB = XLSX.utils.book_new();
 
+            // PRIMERO: Extraer el valor de CodigoSolicitanteERP desde Formulario
+            let codigoSolicitante = '';
+            const formularioSheet = workbook.Sheets['Formulario'];
+            if (formularioSheet) {
+                const formularioData = XLSX.utils.sheet_to_json(formularioSheet, { header: 1, defval: '' });
+                for (let i = 0; i < formularioData.length; i++) {
+                    const row = formularioData[i];
+                    if (row && row[0]) {
+                        const campo = String(row[0]).trim();
+                        if (campo === 'Código del Cliente' || campo === 'CodigoSolicitanteERP') {
+                            codigoSolicitante = String(row[2] || '').trim();
+                            log(`   → 🔍 normalizeWorkbook: Valor leído de Formulario: "${codigoSolicitante}"`, 'info');
+                            break;
+                        }
+                    }
+                }
+            }
+
             for (const sheetName of workbook.SheetNames) {
                 const originalSheet = workbook.Sheets[sheetName];
                 const data = XLSX.utils.sheet_to_json(originalSheet, { header: 1, defval: '', raw: false });
 
                 if (sheetName === 'Contrato') {
                     if (data.length > 1) {
-                        const rowIndex = 1;
+                        const rowIndex = 1; // Fila 2 (index 1)
+                        // Columna D = índice 3 (CodigoSolicitanteERP)
+                        if (data[rowIndex] && data[rowIndex].length > 3) {
+                            // Actualizar con el valor obtenido de Formulario
+                            if (codigoSolicitante) {
+                                data[rowIndex][3] = codigoSolicitante;
+                                log(`   → ✅ Actualizado CodigoSolicitanteERP en Contrato a "${codigoSolicitante}"`, 'info');
+                            } else {
+                                log(`   → ⚠️ No se encontró CodigoSolicitanteERP en Formulario. Valor actual: "${data[rowIndex][3] || ''}"`, 'warning');
+                            }
+                        }
+                        // AllowsStorage = false (columna Y = índice 24)
                         if (data[rowIndex] && data[rowIndex].length > 24) {
                             data[rowIndex][24] = 'false';
                             log(`   → AllowsStorage forzado a "false" en hoja "Contrato"`, 'info');
