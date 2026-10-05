@@ -629,6 +629,31 @@
                         <code>sin remito / SIN_REMITO / SinRemito</code> → <strong>SIN_REMITO</strong><br />
                         <code>digitalizado / DIGITALIZADO / Digitalizado</code> → <strong>DIGITALIZADO</strong>
                     </div>
+
+                    <div class="highlight-box" style="border-left-color: #f57f17;">
+                        <strong>🔗 Validación cruzada automática (bidireccional)</strong><br />
+                        La herramienta corrige automáticamente combinaciones inválidas entre ciertos campos.
+                        <strong>Si uno de los campos se completa, el otro se ajusta automáticamente:</strong>
+                        <ul>
+                            <li>
+                                <strong>Tipo de Envío = "Logística Asegurada"</strong> ↔
+                                <strong>SLA = "SLA 4 - Logistica Asegurada V2"</strong>
+                            </li>
+                            <li>
+                                <strong>Continente = "Pallets"</strong> ↔
+                                <strong>SLA = "SLA PALLET"</strong>
+                            </li>
+                            <li>
+                                <strong>Continente = "Bultos Bigger"</strong> ↔
+                                <strong>SLA = "SLA BIGGER"</strong>
+                            </li>
+                        </ul>
+                        <div style="font-size:13px; color:#666; margin-top:8px;">
+                            💡 <strong>Ejemplo:</strong> Si seleccionás Tipo de Envío = "Logística Asegurada"
+                            pero el SLA es "SLA 1 - Estándar B2B", la herramienta auto-corrige el SLA
+                            a "SLA 4 - Logistica Asegurada V2" e informa en el log.
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -816,6 +841,17 @@
                             ❌ "sin remito"    → ✅ <strong>"SIN_REMITO"</strong>
                             ❌ "CONREMITO"     → ✅ <strong>"CON_REMITO"</strong>
                             ❌ "digitalizado"  → ✅ <strong>"DIGITALIZADO"</strong>
+
+                            <span style="color:#c8102e; font-weight:600; display:block; margin-top:8px;">Campo: Continente</span>
+                            ❌ "pallet"        → ✅ <strong>"Pallets"</strong>
+                            ❌ "pallets"       → ✅ <strong>"Pallets"</strong>
+                            ❌ "bigger"        → ✅ <strong>"Bultos Bigger"</strong>
+                            ❌ "bulto bigger"  → ✅ <strong>"Bultos Bigger"</strong>
+
+                            <span style="color:#c8102e; font-weight:600; display:block; margin-top:8px;">Campo: SLA</span>
+                            ❌ "sla pallet"    → ✅ <strong>"SLA PALLET"</strong>
+                            ❌ "sla bigger"    → ✅ <strong>"SLA BIGGER"</strong>
+                            ❌ "logistica asegurada v2" → ✅ <strong>"SLA 4 - Logistica Asegurada V2"</strong>
                         </div>
                     </div>
 
@@ -930,7 +966,7 @@
                             • Código del Cliente: 6 dígitos, ej: 125383
 
                             📦 DATOS DEL ENVÍO
-                            • Tipo de Envío: Minorista, Mayorista, etc.
+                            • Tipo de Envío: Minorista, Mayorista, Logística Asegurada, etc.
                             • Condición de Entrega: Texto libre
                             • Modalidad de Entrega: Domicilio, Sucursal, etc.
 
@@ -938,9 +974,15 @@
                             • Razón Social: Nombre completo del cliente
 
                             ⚙️ CONFIGURACIÓN
-                            • Nivel de Servicio (SLA): SLA 1, SLA 2, SLA 3
+                            • Nivel de Servicio (SLA): SLA 1, SLA 2, SLA 3, SLA 4 - Logistica Asegurada V2, SLA PALLET, SLA BIGGER
                             • ¿Usa remito?: CON_REMITO, SIN_REMITO, DIGITALIZADO
                             • Campos booleanos: true / false
+
+                            📋 NIVELES DE ESFUERZO
+                            • Logística Solicitada: Entrega, Logística inversa, etc.
+                            • Continente: Contenedor, Pallets, Bultos Bigger, Sobre, etc.
+                            • Plazo: SLA 1, SLA 2, SLA 3, SLA 4, SLA PALLET, SLA BIGGER
+                            • Formulario Mobile B2B: Formulario B2B 1 al 13
 
                             📍 DIRECCIONES (obligatorias: Devolución y Devolución de Remitos)
                         </div>
