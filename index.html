@@ -534,7 +534,7 @@
                 ['', '🏢 DATOS DEL CLIENTE', '', ''],
                 ['Razón Social', 'Nombre completo del cliente', '', ''],
                 ['', '⚙️ CONFIGURACIÓN', '', ''],
-                ['Nivel de Servicio (SLA)', 'SLA 1 - Estándar B2B, SLA 2 - Acordado con cliente, SLA 3 - Urgente', '', 'Seleccionar de la lista'],
+                ['Nivel de Servicio (SLA)', 'SLA 1 - Estándar B2B, SLA 2 - Acordado con cliente, SLA 3 - Urgente, SLA 4 - Logistica Asegurada V2, SLA PALLET, SLA BIGGER', '', 'Seleccionar de la lista'],
                 ['¿Permite Rescate?', 'true / false', '', ''],
                 ['¿Permite retiro parcial de valores?', 'true / false', '', ''],
                 ['¿Aforo Obligatorio?', 'true / false', '', ''],
@@ -547,8 +547,8 @@
                 ['', '', '', ''],
                 ['', '📋 NIVELES DE ESFUERZO', '', ''],
                 ['Logística Solicitada', 'Entrega, Logística inversa, Punto a punto, Retiro, Cambio', '', 'Seleccionar de la lista'],
-                ['Continente', 'Contenedor, Bulto, Pallet, Sobre, Bodega, etc.', '', 'Seleccionar de la lista'],
-                ['Plazo', 'SLA 1 - Estándar B2B, SLA 2 - Acordado con cliente, SLA 3 - Urgente', '', 'Seleccionar de la lista'],
+                ['Continente', 'Contenedor, Bulto, Pallets, Bultos Bigger, Sobre, Bodega, etc.', '', 'Seleccionar de la lista'],
+                ['Plazo', 'SLA 1 - Estándar B2B, SLA 2 - Acordado con cliente, SLA 3 - Urgente, SLA 4 - Logistica Asegurada V2, SLA PALLET, SLA BIGGER', '', 'Seleccionar de la lista'],
                 ['Formulario Mobile B2B', 'Formulario B2B 1 al 13', '', 'Seleccionar de la lista'],
                 ['', '', '', ''],
                 ['', '📍 DIRECCIONES (obligatorias: Devolución y Devolución de Remitos)', '', ''],
@@ -1435,12 +1435,19 @@
                                 'Cargas completas', 'Congelado', 'Logística inversa',
                                 'Paquetería', 'Retira depósito', 'Logística Asegurada'
                             ];
+                        } else if (campo === 'SLA' || campo === 'Plazo') {
+                            valoresValidos = [
+                                'SLA 1 - Estándar B2B',
+                                'SLA 2 - Acordado con cliente',
+                                'SLA 3 - Urgente',
+                                'SLA 4 - Logistica Asegurada V2',
+                                'SLA PALLET',
+                                'SLA BIGGER'
+                            ];
                         } else {
                             const map = {
                                 'Logística Solicitada': 'logistica',
                                 'Continente': 'continente',
-                                'SLA': 'sla',
-                                'Plazo': 'sla',
                                 'FormularioMobileB2B': 'formulario'
                             };
                             const tableName = map[campo];
@@ -1500,6 +1507,102 @@
                     }
                 }
 
+                // ============================================
+                // VALIDACIÓN CRUZADA: TipoDeEnvio ↔ SLA
+                // (bidireccional: Logística Asegurada ↔ SLA 4)
+                // ============================================
+                const SLA_ASEGURADA = 'SLA 4 - Logistica Asegurada V2';
+                const TIPO_ASEGURADA = 'Logística Asegurada';
+
+                if (campo === 'TipoDeEnvio' && valor === TIPO_ASEGURADA) {
+                    // Buscar el SLA en la data
+                    for (let j = 0; j < data.length; j++) {
+                        const r = data[j];
+                        if (r && String(r[0] || '').trim() === 'SLA') {
+                            const slaActual = String(r[2] || '').trim();
+                            if (slaActual !== SLA_ASEGURADA) {
+                                // Auto-corregir
+                                r[2] = SLA_ASEGURADA;
+                                huboNormalizacion = true;
+                                log(`   → ⚠️ Tipo de Envío = "Logística Asegurada" → SLA auto-corregido de "${slaActual}" a "${SLA_ASEGURADA}"`, 'warning');
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                if (campo === 'SLA' && valor === SLA_ASEGURADA) {
+                    // Buscar el TipoDeEnvio en la data
+                    for (let j = 0; j < data.length; j++) {
+                        const r = data[j];
+                        if (r && String(r[0] || '').trim() === 'TipoDeEnvio') {
+                            const tipoActual = String(r[2] || '').trim();
+                            if (tipoActual !== TIPO_ASEGURADA) {
+                                // Auto-corregir
+                                r[2] = TIPO_ASEGURADA;
+                                huboNormalizacion = true;
+                                log(`   → ⚠️ SLA = "SLA 4 - Logistica Asegurada V2" → Tipo de Envío auto-corregido de "${tipoActual}" a "${TIPO_ASEGURADA}"`, 'warning');
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                // ============================================
+                // VALIDACIÓN CRUZADA: Continente ↔ SLA
+                // (bidireccional: Pallets ↔ SLA PALLET, Bultos Bigger ↔ SLA BIGGER)
+                // ============================================
+                const CONTINENTE_PALLETS = 'Pallets';
+                const CONTINENTE_BIGGER = 'Bultos Bigger';
+                const SLA_PALLET = 'SLA PALLET';
+                const SLA_BIGGER = 'SLA BIGGER';
+
+                // Mapeo Continente → SLA
+                const continenteASla = {
+                    [CONTINENTE_PALLETS]: SLA_PALLET,
+                    [CONTINENTE_BIGGER]: SLA_BIGGER
+                };
+
+                // Mapeo SLA → Continente
+                const slaAContinente = {
+                    [SLA_PALLET]: CONTINENTE_PALLETS,
+                    [SLA_BIGGER]: CONTINENTE_BIGGER
+                };
+
+                if (campo === 'Continente' && continenteASla[valor]) {
+                    // Si Continente es Pallets o Bultos Bigger → forzar SLA
+                    const slaRequerido = continenteASla[valor];
+                    for (let j = 0; j < data.length; j++) {
+                        const r = data[j];
+                        if (r && String(r[0] || '').trim() === 'SLA') {
+                            const slaActual = String(r[2] || '').trim();
+                            if (slaActual !== slaRequerido) {
+                                r[2] = slaRequerido;
+                                huboNormalizacion = true;
+                                log(`   → ⚠️ Continente = "${valor}" → SLA auto-corregido de "${slaActual}" a "${slaRequerido}"`, 'warning');
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                if ((campo === 'SLA' || campo === 'Plazo') && slaAContinente[valor]) {
+                    // Si SLA es SLA PALLET o SLA BIGGER → forzar Continente
+                    const continenteRequerido = slaAContinente[valor];
+                    for (let j = 0; j < data.length; j++) {
+                        const r = data[j];
+                        if (r && String(r[0] || '').trim() === 'Continente') {
+                            const continenteActual = String(r[2] || '').trim();
+                            if (continenteActual !== continenteRequerido) {
+                                r[2] = continenteRequerido;
+                                huboNormalizacion = true;
+                                log(`   → ⚠️ SLA = "${valor}" → Continente auto-corregido de "${continenteActual}" a "${continenteRequerido}"`, 'warning');
+                            }
+                            break;
+                        }
+                    }
+                }
+
                 const booleanFields = ['AllowRescue', 'AllowWithdrawPartialValues', 'ObligatoryGauge',
                     'AllowPartialDelivery', 'IsCentralizedReturn', 'HasCollectionManagement',
                     'AllowPrintDocumentationReturn', '¿Es recambio?'
@@ -1543,6 +1646,31 @@
                     'paqueteria': 'Paquetería',
                     'paquetería': 'Paquetería',
                     'congelado': 'Congelado'
+                },
+                'SLA': {
+                    'sla 4 - logistica asegurada v2': 'SLA 4 - Logistica Asegurada V2',
+                    'sla 4 - logística asegurada v2': 'SLA 4 - Logistica Asegurada V2',
+                    'sla 4 - logistica asegurada': 'SLA 4 - Logistica Asegurada V2',
+                    'sla 4 - logística asegurada': 'SLA 4 - Logistica Asegurada V2',
+                    'sla4 - logistica asegurada v2': 'SLA 4 - Logistica Asegurada V2',
+                    'sla 4 logistica asegurada v2': 'SLA 4 - Logistica Asegurada V2',
+                    'logistica asegurada v2': 'SLA 4 - Logistica Asegurada V2',
+                    'sla pallet': 'SLA PALLET',
+                    'sla pallets': 'SLA PALLET',
+                    'slapallet': 'SLA PALLET',
+                    'sla bigger': 'SLA BIGGER',
+                    'sla biger': 'SLA BIGGER',
+                    'slabigger': 'SLA BIGGER'
+                },
+                'Continente': {
+                    'pallet': 'Pallets',
+                    'pallets': 'Pallets',
+                    'pallets ': 'Pallets',
+                    'bigger': 'Bultos Bigger',
+                    'bultos bigger': 'Bultos Bigger',
+                    'bulto bigger': 'Bultos Bigger',
+                    'bultos biger': 'Bultos Bigger',
+                    'bulto biger': 'Bultos Bigger'
                 },
                 'HasDeliveryNote': {
                     'con remito': 'CON_REMITO',
@@ -1610,11 +1738,29 @@
                 };
             }
 
+            // Lista de SLAs válidos (hardcodeada)
+            const slasValidos = [
+                'SLA 1 - Estándar B2B',
+                'SLA 1 - Estandar B2B',
+                'SLA 2 - Acordado con cliente',
+                'SLA 3 - Urgente',
+                'SLA 4 - Logistica Asegurada V2',
+                'SLA PALLET',
+                'SLA BIGGER'
+            ];
+
+            if (campo === 'SLA' || campo === 'Plazo') {
+                const esValido = slasValidos.includes(valorNormalizado);
+                return {
+                    valido: esValido,
+                    valor: esValido ? valorNormalizado : valor,
+                    normalizado: resultado.normalizado
+                };
+            }
+
             const map = {
                 'Logística Solicitada': 'logistica',
                 'Continente': 'continente',
-                'SLA': 'sla',
-                'Plazo': 'sla',
                 'FormularioMobileB2B': 'formulario'
             };
 
