@@ -1698,7 +1698,9 @@
                 const valorLower = valorLimpio.toLowerCase();
                 for (const [key, value] of Object.entries(diccionario)) {
                     if (valorLower === key.toLowerCase()) {
-                        return { valor: value, normalizado: true };
+                        // Solo marcar como normalizado si el valor cambió
+                        const cambio = (valorLimpio !== value);
+                        return { valor: value, normalizado: cambio };
                     }
                 }
             }
@@ -1724,7 +1726,9 @@
                     if (valorLower === itemKey ||
                         valorLower === itemCode ||
                         (itemDesc && valorLower === itemDesc)) {
-                        return { valor: item.key, normalizado: true };
+                        // Solo marcar como normalizado si el valor cambió
+                        const cambio = (valorLimpio !== item.key);
+                        return { valor: item.key, normalizado: cambio };
                     }
                 }
             }

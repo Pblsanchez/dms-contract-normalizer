@@ -630,6 +630,23 @@
                         <code>digitalizado / DIGITALIZADO / Digitalizado</code> → <strong>DIGITALIZADO</strong>
                     </div>
 
+                    <div class="highlight-box" style="border-left-color: #0a7a3a;">
+                        <strong>📌 Valores válidos del campo SLA</strong><br />
+                        El campo <code>SLA</code> acepta únicamente estos valores exactos:
+                        <ul>
+                            <li><code>SLA 1</code></li>
+                            <li><code>SLA 2</code></li>
+                            <li><code>SLA 3</code></li>
+                            <li><code>SLA 4 - Logistica Asegurada V2</code></li>
+                            <li><code>SLA PALLET</code></li>
+                            <li><code>SLA BIGGER</code></li>
+                        </ul>
+                        <div style="font-size:13px; color:#666; margin-top:8px;">
+                            💡 <strong>Nota:</strong> SLA 1, 2 y 3 se usan en formato corto (no "SLA 1 - Estándar B2B").
+                            El SLA 4 mantiene su descripción completa.
+                        </div>
+                    </div>
+
                     <div class="highlight-box" style="border-left-color: #f57f17;">
                         <strong>🔗 Validación cruzada automática (bidireccional)</strong><br />
                         La herramienta corrige automáticamente combinaciones inválidas entre ciertos campos.
@@ -650,7 +667,7 @@
                         </ul>
                         <div style="font-size:13px; color:#666; margin-top:8px;">
                             💡 <strong>Ejemplo:</strong> Si seleccionás Tipo de Envío = "Logística Asegurada"
-                            pero el SLA es "SLA 1 - Estándar B2B", la herramienta auto-corrige el SLA
+                            pero el SLA es "SLA 1", la herramienta auto-corrige el SLA
                             a "SLA 4 - Logistica Asegurada V2" e informa en el log.
                         </div>
                     </div>
@@ -849,6 +866,9 @@
                             ❌ "bulto bigger"  → ✅ <strong>"Bultos Bigger"</strong>
 
                             <span style="color:#c8102e; font-weight:600; display:block; margin-top:8px;">Campo: SLA</span>
+                            ❌ "sla1"          → ✅ <strong>"SLA 1"</strong>
+                            ❌ "sla 2"         → ✅ <strong>"SLA 2"</strong>
+                            ❌ "sla3"          → ✅ <strong>"SLA 3"</strong>
                             ❌ "sla pallet"    → ✅ <strong>"SLA PALLET"</strong>
                             ❌ "sla bigger"    → ✅ <strong>"SLA BIGGER"</strong>
                             ❌ "logistica asegurada v2" → ✅ <strong>"SLA 4 - Logistica Asegurada V2"</strong>
