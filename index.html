@@ -534,7 +534,7 @@
                 ['', '🏢 DATOS DEL CLIENTE', '', ''],
                 ['Razón Social', 'Nombre completo del cliente', '', ''],
                 ['', '⚙️ CONFIGURACIÓN', '', ''],
-                ['Nivel de Servicio (SLA)', 'SLA 1 - Estándar B2B, SLA 2 - Acordado con cliente, SLA 3 - Urgente, SLA 4 - Logistica Asegurada V2, SLA PALLET, SLA BIGGER', '', 'Seleccionar de la lista'],
+                ['Nivel de Servicio (SLA)', 'SLA 1, SLA 2, SLA 3, SLA 4 - Logistica Asegurada V2, SLA PALLET, SLA BIGGER', '', 'Seleccionar de la lista'],
                 ['¿Permite Rescate?', 'true / false', '', ''],
                 ['¿Permite retiro parcial de valores?', 'true / false', '', ''],
                 ['¿Aforo Obligatorio?', 'true / false', '', ''],
@@ -1435,14 +1435,20 @@
                                 'Cargas completas', 'Congelado', 'Logística inversa',
                                 'Paquetería', 'Retira depósito', 'Logística Asegurada'
                             ];
-                        } else if (campo === 'SLA' || campo === 'Plazo') {
+                        } else if (campo === 'SLA') {
                             valoresValidos = [
-                                'SLA 1 - Estándar B2B',
-                                'SLA 2 - Acordado con cliente',
-                                'SLA 3 - Urgente',
+                                'SLA 1',
+                                'SLA 2',
+                                'SLA 3',
                                 'SLA 4 - Logistica Asegurada V2',
                                 'SLA PALLET',
                                 'SLA BIGGER'
+                            ];
+                        } else if (campo === 'Plazo') {
+                            valoresValidos = [
+                                'SLA 1 - Estándar B2B',
+                                'SLA 2 - Acordado con cliente',
+                                'SLA 3 - Urgente'
                             ];
                         } else {
                             const map = {
@@ -1648,6 +1654,12 @@
                     'congelado': 'Congelado'
                 },
                 'SLA': {
+                    'sla 1': 'SLA 1',
+                    'sla1': 'SLA 1',
+                    'sla 2': 'SLA 2',
+                    'sla2': 'SLA 2',
+                    'sla 3': 'SLA 3',
+                    'sla3': 'SLA 3',
                     'sla 4 - logistica asegurada v2': 'SLA 4 - Logistica Asegurada V2',
                     'sla 4 - logística asegurada v2': 'SLA 4 - Logistica Asegurada V2',
                     'sla 4 - logistica asegurada': 'SLA 4 - Logistica Asegurada V2',
@@ -1740,10 +1752,9 @@
 
             // Lista de SLAs válidos (hardcodeada)
             const slasValidos = [
-                'SLA 1 - Estándar B2B',
-                'SLA 1 - Estandar B2B',
-                'SLA 2 - Acordado con cliente',
-                'SLA 3 - Urgente',
+                'SLA 1',
+                'SLA 2',
+                'SLA 3',
                 'SLA 4 - Logistica Asegurada V2',
                 'SLA PALLET',
                 'SLA BIGGER'
