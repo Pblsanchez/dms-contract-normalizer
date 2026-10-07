@@ -534,7 +534,7 @@
                 ['', '🏢 DATOS DEL CLIENTE', '', ''],
                 ['Razón Social', 'Nombre completo del cliente', '', ''],
                 ['', '⚙️ CONFIGURACIÓN', '', ''],
-                ['Nivel de Servicio (SLA)', 'SLA 1, SLA 2, SLA 3, SLA 4 - Logistica Asegurada V2, SLA PALLET, SLA BIGGER', '', 'Seleccionar de la lista'],
+                ['Nivel de Servicio (SLA)', 'SLA 1, SLA 2, SLA 3, SLA 4 - Logistica Asegurada V2, SLA PALLETS, SLA BIGGER', '', 'Seleccionar de la lista'],
                 ['¿Permite Rescate?', 'true / false', '', ''],
                 ['¿Permite retiro parcial de valores?', 'true / false', '', ''],
                 ['¿Aforo Obligatorio?', 'true / false', '', ''],
@@ -548,7 +548,7 @@
                 ['', '📋 NIVELES DE ESFUERZO', '', ''],
                 ['Logística Solicitada', 'Entrega, Logística inversa, Punto a punto, Retiro, Cambio', '', 'Seleccionar de la lista'],
                 ['Continente', 'Contenedor, Bulto, Pallets, Bultos Bigger, Sobre, Bodega, etc.', '', 'Seleccionar de la lista'],
-                ['Plazo', 'SLA 1 - Estándar B2B, SLA 2 - Acordado con cliente, SLA 3 - Urgente, SLA 4 - Logistica Asegurada V2, SLA PALLET, SLA BIGGER', '', 'Seleccionar de la lista'],
+                ['Plazo', 'SLA 1 - Estándar B2B, SLA 2 - Acordado con cliente, SLA 3 - Urgente, SLA 4 - Logistica Asegurada V2, SLA PALLETS, SLA BIGGER', '', 'Seleccionar de la lista'],
                 ['Formulario Mobile B2B', 'Formulario B2B 1 al 13', '', 'Seleccionar de la lista'],
                 ['', '', '', ''],
                 ['', '📍 DIRECCIONES (obligatorias: Devolución y Devolución de Remitos)', '', ''],
@@ -1441,7 +1441,7 @@
                                 'SLA 2',
                                 'SLA 3',
                                 'SLA 4 - Logistica Asegurada V2',
-                                'SLA PALLET',
+                                'SLA PALLETS',
                                 'SLA BIGGER'
                             ];
                         } else if (campo === 'Plazo') {
@@ -1560,18 +1560,18 @@
                 // ============================================
                 const CONTINENTE_PALLETS = 'Pallets';
                 const CONTINENTE_BIGGER = 'Bultos Bigger';
-                const SLA_PALLET = 'SLA PALLET';
+                const SLA_PALLETS = 'SLA PALLETS';
                 const SLA_BIGGER = 'SLA BIGGER';
 
                 // Mapeo Continente → SLA
                 const continenteASla = {
-                    [CONTINENTE_PALLETS]: SLA_PALLET,
+                    [CONTINENTE_PALLETS]: SLA_PALLETS,
                     [CONTINENTE_BIGGER]: SLA_BIGGER
                 };
 
                 // Mapeo SLA → Continente
                 const slaAContinente = {
-                    [SLA_PALLET]: CONTINENTE_PALLETS,
+                    [SLA_PALLETS]: CONTINENTE_PALLETS,
                     [SLA_BIGGER]: CONTINENTE_BIGGER
                 };
 
@@ -1667,9 +1667,10 @@
                     'sla4 - logistica asegurada v2': 'SLA 4 - Logistica Asegurada V2',
                     'sla 4 logistica asegurada v2': 'SLA 4 - Logistica Asegurada V2',
                     'logistica asegurada v2': 'SLA 4 - Logistica Asegurada V2',
-                    'sla pallet': 'SLA PALLET',
-                    'sla pallets': 'SLA PALLET',
-                    'slapallet': 'SLA PALLET',
+                    'sla pallet': 'SLA PALLETS',
+                    'sla pallets': 'SLA PALLETS',
+                    'slapallet': 'SLA PALLETS',
+                    'slapallets': 'SLA PALLETS',
                     'sla bigger': 'SLA BIGGER',
                     'sla biger': 'SLA BIGGER',
                     'slabigger': 'SLA BIGGER'
@@ -1760,7 +1761,7 @@
                 'SLA 2',
                 'SLA 3',
                 'SLA 4 - Logistica Asegurada V2',
-                'SLA PALLET',
+                'SLA PALLETS',
                 'SLA BIGGER'
             ];
 
