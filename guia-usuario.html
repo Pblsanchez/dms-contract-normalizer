@@ -7,46 +7,50 @@
     <link rel="stylesheet" href="css/styles.css" />
     <style>
         /* ========== ESTILOS EXCLUSIVOS DE LA GUÍA ========== */
+
         .guide-container {
             max-width: 1000px;
             margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            padding: 40px 50px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            background: var(--c-color-surface);
+            border-radius: var(--c-border-radius-medium);
+            padding: var(--c-spacing-7) var(--c-spacing-8);
+            box-shadow: var(--c-shadow-bottom-regular);
         }
 
         .guide-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: var(--c-spacing-6);
         }
 
         .guide-header .logo {
             font-size: 48px;
-            margin-bottom: 10px;
+            margin-bottom: var(--c-spacing-3);
         }
 
         .guide-header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            color: #1a1a1a;
+            font-family: var(--c-font-family-headline);
+            font-size: var(--c-font-size-headline3);
+            line-height: var(--c-line-height-headline3);
+            font-weight: var(--c-font-weight-bold);
+            color: var(--c-color-text-strong);
         }
 
         .guide-header .badge {
             display: inline-block;
-            background: #c8102e;
-            color: white;
-            padding: 4px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-top: 8px;
+            background: var(--c-color-fill-primary);
+            color: var(--c-color-text-inverse);
+            padding: var(--c-spacing-1) var(--c-spacing-4);
+            border-radius: var(--c-border-radius-xlarge);
+            font-family: var(--c-font-family-label);
+            font-size: var(--c-font-size-labelsmall);
+            font-weight: var(--c-font-weight-medium);
+            margin-top: var(--c-spacing-2);
         }
 
         .guide-header .subtitle {
-            color: #666;
-            font-size: 16px;
-            margin-top: 8px;
+            color: var(--c-color-text);
+            font-size: var(--c-font-size-bodylarge);
+            margin-top: var(--c-spacing-2);
         }
 
         /* ========== TABS ========== */
@@ -54,41 +58,46 @@
             position: sticky;
             top: 80px;
             z-index: 50;
-            background: white;
-            padding: 10px 0 0 0;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--border);
+            background: var(--c-color-surface);
+            padding: var(--c-spacing-3) 0 0 0;
+            margin-bottom: var(--c-spacing-5);
+            border-bottom: var(--c-border-width-regular) solid var(--c-color-border-neutral-subtle);
         }
 
         .tabs {
             display: flex;
             flex-wrap: wrap;
-            gap: 4px;
-            padding: 0 0 8px 0;
+            gap: var(--c-spacing-1);
+            padding: 0 0 var(--c-spacing-2) 0;
         }
 
         .tab-btn {
-            padding: 10px 20px;
+            padding: var(--c-spacing-3) var(--c-spacing-5);
             border: none;
             background: transparent;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--gray);
-            border-radius: 8px 8px 0 0;
-            transition: all var(--transicion);
-            font-family: inherit;
+            font-family: var(--c-font-family-label);
+            font-size: var(--c-font-size-labelsmall);
+            font-weight: var(--c-font-weight-medium);
+            color: var(--c-color-text);
+            border-radius: var(--c-border-radius-small) var(--c-border-radius-small) 0 0;
+            transition: all var(--c-transition-regular);
             position: relative;
         }
 
         .tab-btn:hover {
-            background: rgba(200, 16, 46, 0.05);
-            color: var(--andreani-red);
+            background: var(--c-color-fill-primary-subtle);
+            color: var(--c-color-text-error);
+        }
+
+        .tab-btn:focus-visible {
+            outline: none;
+            box-shadow: var(--c-shadow-focus-regular);
         }
 
         .tab-btn.active {
-            color: var(--andreani-red);
-            background: rgba(200, 16, 46, 0.08);
+            color: var(--c-color-text-error);
+            background: var(--c-color-fill-primary-subtle);
         }
 
         .tab-btn.active::after {
@@ -98,18 +107,18 @@
             left: 0;
             width: 100%;
             height: 3px;
-            background: var(--andreani-red);
+            background: var(--c-color-fill-primary);
             border-radius: 3px 3px 0 0;
         }
 
         .tab-btn .icon {
-            margin-right: 6px;
+            margin-right: var(--c-spacing-1);
         }
 
         /* ========== TAB CONTENT ========== */
         .tab-content {
             display: none;
-            animation: fadeIn 300ms ease;
+            animation: fadeIn var(--c-transition-slow);
         }
 
         .tab-content.active {
@@ -118,9 +127,9 @@
 
         /* ========== SECTION STYLES ========== */
         .section {
-            margin-bottom: 32px;
-            padding-bottom: 32px;
-            border-bottom: 2px solid #f0f2f5;
+            margin-bottom: var(--c-spacing-6);
+            padding-bottom: var(--c-spacing-6);
+            border-bottom: var(--c-border-width-regular) solid var(--c-color-border-neutral-subtle);
         }
 
         .section:last-child {
@@ -132,11 +141,13 @@
         .section-title {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 22px;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 16px;
+            gap: var(--c-spacing-3);
+            font-family: var(--c-font-family-title);
+            font-size: var(--c-font-size-titlelarge);
+            line-height: var(--c-line-height-titlelarge);
+            font-weight: var(--c-font-weight-bold);
+            color: var(--c-color-text-strong);
+            margin-bottom: var(--c-spacing-4);
         }
 
         .section-title .icon {
@@ -144,22 +155,23 @@
         }
 
         .section-title .step {
-            background: #c8102e;
-            color: white;
+            background: var(--c-color-fill-primary);
+            color: var(--c-color-text-inverse);
             border-radius: 50%;
             width: 32px;
             height: 32px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            font-weight: 700;
+            font-family: var(--c-font-family-label);
+            font-size: var(--c-font-size-labelsmall);
+            font-weight: var(--c-font-weight-bold);
             flex-shrink: 0;
         }
 
         .section p {
-            color: #444;
-            margin-bottom: 12px;
+            color: var(--c-color-text);
+            margin-bottom: var(--c-spacing-3);
         }
 
         .section ul {
@@ -168,184 +180,204 @@
         }
 
         .section ul li {
-            padding: 8px 0 8px 28px;
+            padding: var(--c-spacing-2) 0 var(--c-spacing-2) var(--c-spacing-5);
             position: relative;
-            color: #444;
+            color: var(--c-color-text);
         }
 
         .section ul li::before {
             content: "•";
-            color: #c8102e;
-            font-weight: 700;
+            color: var(--c-color-text-error);
+            font-weight: var(--c-font-weight-bold);
             font-size: 20px;
             position: absolute;
-            left: 4px;
-            top: 6px;
+            left: var(--c-spacing-1);
+            top: var(--c-spacing-1);
         }
 
+        /* ========== HIGHLIGHT BOX ========== */
         .highlight-box {
-            background: #f8f9fc;
-            border-left: 4px solid #c8102e;
-            padding: 16px 20px;
-            border-radius: 0 8px 8px 0;
-            margin: 12px 0;
+            background: var(--c-color-surface-neutral-subtle);
+            border-left: var(--c-border-width-regular) solid var(--c-color-border-primary);
+            padding: var(--c-spacing-4) var(--c-spacing-5);
+            border-radius: 0 var(--c-border-radius-small) var(--c-border-radius-small) 0;
+            margin: var(--c-spacing-3) 0;
         }
 
         .highlight-box strong {
-            color: #c8102e;
+            color: var(--c-color-text-error);
         }
 
         .highlight-box ul {
-            margin-top: 8px;
+            margin-top: var(--c-spacing-2);
         }
 
         .highlight-box ul li {
-            padding: 4px 0 4px 24px;
+            padding: var(--c-spacing-1) 0 var(--c-spacing-1) var(--c-spacing-5);
         }
 
+        /* ========== CODE BLOCK ========== */
         .code-block {
-            background: #1a1a1a;
-            color: #e0e0e0;
-            padding: 14px 18px;
-            border-radius: 8px;
-            font-family: "Cascadia Code", "Consolas", monospace;
-            font-size: 13px;
+            background: var(--c-gray-900);
+            color: var(--c-gray-100);
+            padding: var(--c-spacing-3) var(--c-spacing-4);
+            border-radius: var(--c-border-radius-small);
+            font-family: 'Cascadia Code', 'Consolas', monospace;
+            font-size: var(--c-font-size-caption);
             overflow-x: auto;
-            margin: 12px 0;
+            margin: var(--c-spacing-3) 0;
             white-space: pre-wrap;
         }
 
         .code-block .highlight {
-            color: #f0a030;
+            color: var(--c-yellow-500);
         }
 
         .code-block .success {
-            color: #4caf50;
+            color: var(--c-green-400);
         }
 
         .code-block .error {
-            color: #f44336;
+            color: var(--c-red-400);
         }
 
+        /* ========== GRID 2 ========== */
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin: 12px 0;
+            gap: var(--c-spacing-4);
+            margin: var(--c-spacing-3) 0;
         }
 
         .grid-2 .card {
-            background: #f8f9fc;
-            padding: 16px 20px;
-            border-radius: 8px;
-            border: 1px solid #e8eaed;
+            background: var(--c-color-surface-neutral-subtle);
+            padding: var(--c-spacing-4) var(--c-spacing-5);
+            border-radius: var(--c-border-radius-small);
+            border: var(--c-border-width-subtle) solid var(--c-color-border-neutral-subtle);
         }
 
         .grid-2 .card .label {
-            font-weight: 600;
-            font-size: 13px;
-            color: #888;
+            font-family: var(--c-font-family-label);
+            font-weight: var(--c-font-weight-medium);
+            font-size: var(--c-font-size-labelsmall);
+            color: var(--c-color-text-subtle);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            margin-bottom: var(--c-spacing-1);
         }
 
         .grid-2 .card .value {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: var(--c-font-size-titlelarge);
+            font-weight: var(--c-font-weight-medium);
+            font-family: var(--c-font-family-title);
         }
 
         .grid-2 .card .value.valid {
-            color: #0a7a3a;
+            color: var(--c-color-text-success);
         }
 
         .grid-2 .card .value.invalid {
-            color: #c8102e;
+            color: var(--c-color-text-error);
         }
 
         .grid-2 .card .value.normalized {
-            color: #1a5a8a;
+            color: var(--c-color-text-info);
         }
 
+        /* ========== FLOW DIAGRAM ========== */
         .flow-diagram {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: var(--c-spacing-3);
             flex-wrap: wrap;
-            padding: 20px;
-            background: #f8f9fc;
-            border-radius: 12px;
-            margin: 16px 0;
+            padding: var(--c-spacing-5);
+            background: var(--c-color-surface-neutral-subtle);
+            border-radius: var(--c-border-radius-small);
+            margin: var(--c-spacing-4) 0;
         }
 
         .flow-step {
-            background: white;
-            padding: 10px 18px;
-            border-radius: 8px;
-            border: 2px solid #e8eaed;
-            font-weight: 600;
-            font-size: 13px;
+            background: var(--c-color-surface);
+            padding: var(--c-spacing-3) var(--c-spacing-4);
+            border-radius: var(--c-border-radius-small);
+            border: var(--c-border-width-regular) solid var(--c-color-border-neutral-subtle);
+            font-family: var(--c-font-family-label);
+            font-weight: var(--c-font-weight-medium);
+            font-size: var(--c-font-size-labelsmall);
             text-align: center;
             min-width: 80px;
         }
 
         .flow-step.active {
-            border-color: #c8102e;
-            background: rgba(200, 16, 46, 0.05);
+            border-color: var(--c-color-border-primary);
+            background: var(--c-color-fill-primary-subtle);
         }
 
         .flow-arrow {
             font-size: 20px;
-            color: #aaa;
+            color: var(--c-color-text-subtle);
         }
 
+        /* ========== BOTONES DEMO ========== */
         .btn-demo {
             display: inline-block;
-            background: #c8102e;
-            color: white;
-            padding: 10px 28px;
-            border-radius: 8px;
-            font-weight: 600;
+            background: var(--c-color-fill-primary);
+            color: var(--c-color-text-inverse);
+            padding: var(--c-spacing-3) var(--c-spacing-6);
+            border-radius: var(--c-border-radius-xlarge);
+            font-family: var(--c-font-family-label);
+            font-weight: var(--c-font-weight-medium);
             text-decoration: none;
-            transition: 0.2s;
-            margin-top: 8px;
+            transition: all var(--c-transition-regular);
+            margin-top: var(--c-spacing-2);
         }
 
         .btn-demo:hover {
-            background: #980b23;
+            background: var(--c-color-fill-primary-hover);
             transform: translateY(-2px);
+        }
+
+        .btn-demo:focus-visible {
+            outline: none;
+            box-shadow: var(--c-shadow-focus-regular);
         }
 
         .btn-volver {
             display: inline-block;
             background: transparent;
-            color: #c8102e;
-            padding: 10px 28px;
-            border-radius: 8px;
-            font-weight: 600;
+            color: var(--c-color-text-error);
+            padding: var(--c-spacing-3) var(--c-spacing-6);
+            border-radius: var(--c-border-radius-xlarge);
+            font-family: var(--c-font-family-label);
+            font-weight: var(--c-font-weight-medium);
             text-decoration: none;
-            border: 2px solid #c8102e;
-            transition: 0.2s;
-            margin-top: 8px;
+            border: var(--c-border-width-regular) solid var(--c-color-border-primary);
+            transition: all var(--c-transition-regular);
+            margin-top: var(--c-spacing-2);
         }
 
         .btn-volver:hover {
-            background: #c8102e;
-            color: white;
+            background: var(--c-color-fill-primary-subtle);
         }
 
+        .btn-volver:focus-visible {
+            outline: none;
+            box-shadow: var(--c-shadow-focus-regular);
+        }
+
+        /* ========== SUMMARY GRID ========== */
         .summary-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 16px;
-            margin-top: 12px;
+            gap: var(--c-spacing-4);
+            margin-top: var(--c-spacing-3);
         }
 
         .summary-grid .item {
-            background: #f8f9fc;
-            padding: 16px;
-            border-radius: 8px;
+            background: var(--c-color-surface-neutral-subtle);
+            padding: var(--c-spacing-4);
+            border-radius: var(--c-border-radius-small);
             text-align: center;
         }
 
@@ -354,18 +386,75 @@
         }
 
         .summary-grid .item .title {
-            font-weight: 600;
+            font-family: var(--c-font-family-label);
+            font-weight: var(--c-font-weight-medium);
         }
 
         .summary-grid .item .desc {
-            font-size: 13px;
-            color: #666;
+            font-size: var(--c-font-size-caption);
+            color: var(--c-color-text);
         }
 
-        /* ========== RESPONSIVE: Accordion en móvil ========== */
+        /* ========== UTILIDADES ========== */
+        .text-center {
+            text-align: center;
+        }
+
+        .text-subtle {
+            color: var(--c-color-text-subtle);
+        }
+
+        .text-sm {
+            font-size: var(--c-font-size-caption);
+        }
+
+        .mt-3 {
+            margin-top: var(--c-spacing-3);
+        }
+
+        .mt-4 {
+            margin-top: var(--c-spacing-4);
+        }
+
+        .mb-3 {
+            margin-bottom: var(--c-spacing-3);
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .d-flex-center {
+            display: flex;
+            gap: var(--c-spacing-3);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .fw-bold {
+            font-weight: var(--c-font-weight-bold);
+        }
+
+        .text-primary {
+            color: var(--c-color-text-error);
+        }
+
+        .text-success {
+            color: var(--c-color-text-success);
+        }
+
+        .text-info {
+            color: var(--c-color-text-info);
+        }
+
+        .text-warning {
+            color: var(--c-color-text-caution);
+        }
+
+        /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
             .guide-container {
-                padding: 20px 16px;
+                padding: var(--c-spacing-5) var(--c-spacing-4);
             }
 
             .tabs-wrapper {
@@ -379,9 +468,9 @@
 
             .tab-btn {
                 text-align: left;
-                padding: 12px 16px;
-                border-radius: 8px;
-                border-bottom: 1px solid var(--border-light);
+                padding: var(--c-spacing-3) var(--c-spacing-4);
+                border-radius: var(--c-border-radius-small);
+                border-bottom: var(--c-border-width-subtle) solid var(--c-color-border-neutral-subtle);
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -389,24 +478,15 @@
             }
 
             .tab-btn.active {
-                background: rgba(200, 16, 46, 0.08);
+                background: var(--c-color-fill-primary-subtle);
             }
 
             .tab-btn.active::after {
                 display: none;
             }
 
-            .tab-btn .arrow {
-                transition: transform 0.3s ease;
-                font-size: 12px;
-            }
-
-            .tab-btn.active .arrow {
-                transform: rotate(180deg);
-            }
-
             .tab-content {
-                padding-top: 12px;
+                padding-top: var(--c-spacing-3);
             }
 
             .grid-2 {
@@ -422,7 +502,8 @@
             }
 
             .guide-header h1 {
-                font-size: 24px;
+                font-size: var(--c-font-size-headline4);
+                line-height: var(--c-line-height-headline4);
             }
 
             .summary-grid {
@@ -432,7 +513,7 @@
 
         @media (max-width: 640px) {
             .guide-container {
-                padding: 16px 12px;
+                padding: var(--c-spacing-4) var(--c-spacing-3);
             }
 
             .tabs-wrapper {
@@ -451,7 +532,7 @@
             </div>
             <span class="header-tag">DMS · Normalizador</span>
         </div>
-        <div style="display:flex; align-items:center; gap:16px; font-size:13px; color: var(--gray);">
+        <div style="display:flex; align-items:center; gap:var(--c-spacing-4); font-size:var(--c-font-size-labelsmall); color: var(--c-color-text);">
             <a href="index.html" class="header-link">
                 <span style="font-size:16px;">🏠</span> Inicio
             </a>
@@ -565,7 +646,7 @@
                         <div class="flow-step">💬 Copiar<br /><small>mensaje</small></div>
                     </div>
 
-                    <p style="text-align:center; font-size:14px; color:#888;">
+                    <p class="text-center text-subtle text-sm">
                         Solo 6 pasos: <strong>Plantilla → Subir → Validar → Normalizar → Descargar → Copiar mensaje</strong>
                     </p>
                 </div>
@@ -590,22 +671,22 @@
                         <div class="card">
                             <div class="label">📌 Código de Contrato (C3)</div>
                             <div class="value valid">✅ 9 dígitos</div>
-                            <div style="font-size:13px; color:#666; margin-top:4px;">Ej: <code>351005959</code></div>
+                            <div class="text-sm text-subtle mt-1">Ej: <code>351005959</code></div>
                         </div>
                         <div class="card">
                             <div class="label">📌 Sociedad SAP (C7)</div>
                             <div class="value valid">✅ Debe ser "1100"</div>
-                            <div style="font-size:13px; color:#666; margin-top:4px;">Para B2B siempre es <code>1100</code></div>
+                            <div class="text-sm text-subtle mt-1">Para B2B siempre es <code>1100</code></div>
                         </div>
                         <div class="card">
                             <div class="label">📌 Habilitado (C8)</div>
                             <div class="value valid">✅ 1 o 0</div>
-                            <div style="font-size:13px; color:#666; margin-top:4px;">1 = Activo, 0 = Inactivo</div>
+                            <div class="text-sm text-subtle mt-1">1 = Activo, 0 = Inactivo</div>
                         </div>
                         <div class="card">
                             <div class="label">📌 Campos booleanos</div>
                             <div class="value valid">✅ true/false, 1/0, si/no</div>
-                            <div style="font-size:13px; color:#666; margin-top:4px;">AllowRescue, ObligatoryGauge, etc.</div>
+                            <div class="text-sm text-subtle mt-1">AllowRescue, ObligatoryGauge, etc.</div>
                         </div>
                     </div>
 
@@ -621,7 +702,7 @@
                         </ul>
                     </div>
 
-                    <div class="highlight-box" style="border-left-color: #0a7a3a;">
+                    <div class="highlight-box" style="border-left-color: var(--c-color-border-success);">
                         <strong>📌 ¿Usa remito? (HasDeliveryNote)</strong> — Normalización automática:<br />
                         <code>true / 1 / si</code> → <strong>CON_REMITO</strong><br />
                         <code>false / 0 / no</code> → <strong>SIN_REMITO</strong><br />
@@ -630,7 +711,7 @@
                         <code>digitalizado / DIGITALIZADO / Digitalizado</code> → <strong>DIGITALIZADO</strong>
                     </div>
 
-                    <div class="highlight-box" style="border-left-color: #0a7a3a;">
+                    <div class="highlight-box" style="border-left-color: var(--c-color-border-success);">
                         <strong>📌 Valores válidos del campo SLA</strong><br />
                         El campo <code>SLA</code> acepta únicamente estos valores exactos:
                         <ul>
@@ -641,13 +722,13 @@
                             <li><code>SLA PALLETS</code></li>
                             <li><code>SLA BIGGER</code></li>
                         </ul>
-                        <div style="font-size:13px; color:#666; margin-top:8px;">
+                        <div class="text-sm text-subtle mt-2">
                             💡 <strong>Nota:</strong> SLA 1, 2 y 3 se usan en formato corto (no "SLA 1 - Estándar B2B").
                             El SLA 4 mantiene su descripción completa.
                         </div>
                     </div>
 
-                    <div class="highlight-box" style="border-left-color: #f57f17;">
+                    <div class="highlight-box" style="border-left-color: var(--c-color-border-warning);">
                         <strong>🔗 Validación cruzada automática (bidireccional)</strong><br />
                         La herramienta corrige automáticamente combinaciones inválidas entre ciertos campos.
                         <strong>Si uno de los campos se completa, el otro se ajusta automáticamente:</strong>
@@ -665,7 +746,7 @@
                                 <strong>SLA = "SLA BIGGER"</strong>
                             </li>
                         </ul>
-                        <div style="font-size:13px; color:#666; margin-top:8px;">
+                        <div class="text-sm text-subtle mt-2">
                             💡 <strong>Ejemplo:</strong> Si seleccionás Tipo de Envío = "Logística Asegurada"
                             pero el SLA es "SLA 1", la herramienta auto-corrige el SLA
                             a "SLA 4 - Logistica Asegurada V2" e informa en el log.
@@ -693,26 +774,26 @@
                         <div class="card">
                             <div class="label">✅ Válido</div>
                             <div class="value valid">6 dígitos</div>
-                            <div style="font-size:13px; color:#666; margin-top:4px;">Ej: <code>123456</code></div>
+                            <div class="text-sm text-subtle mt-1">Ej: <code>123456</code></div>
                         </div>
                         <div class="card">
                             <div class="label">🔄 Normalizado</div>
                             <div class="value normalized">10 dígitos con 4 ceros</div>
-                            <div style="font-size:13px; color:#666; margin-top:4px;">
+                            <div class="text-sm text-subtle mt-1">
                                 <code>0000120761</code> → <strong>120761</strong>
                             </div>
                         </div>
                         <div class="card">
                             <div class="label">❌ Inválido</div>
                             <div class="value invalid">10 dígitos sin 4 ceros</div>
-                            <div style="font-size:13px; color:#666; margin-top:4px;">
+                            <div class="text-sm text-subtle mt-1">
                                 <code>1234567890</code> → ❌ Error
                             </div>
                         </div>
                         <div class="card">
                             <div class="label">❌ Inválido</div>
                             <div class="value invalid">Menos de 6 o más de 10</div>
-                            <div style="font-size:13px; color:#666; margin-top:4px;">
+                            <div class="text-sm text-subtle mt-1">
                                 <code>12345</code> o <code>12345678901</code> → ❌ Error
                             </div>
                         </div>
@@ -735,10 +816,10 @@
                         las filas vacías de la hoja <code>Direcciones</code>.
                     </p>
 
-                    <div style="background:#f8f9fc; border-radius:8px; padding:16px; margin:12px 0;">
-                        <div style="font-weight:600; color:#666; font-size:13px; margin-bottom:8px;">📋 Ejemplo:</div>
-                        <div class="code-block" style="background:#f0f2f5; color:#333;">
-                            <span style="color:#c8102e; font-weight:600;">ANTES</span>
+                    <div style="background:var(--c-color-surface-neutral-subtle); border-radius:var(--c-border-radius-small); padding:var(--c-spacing-4); margin:var(--c-spacing-3) 0;">
+                        <div class="fw-bold text-subtle text-sm mb-2">📋 Ejemplo:</div>
+                        <div class="code-block" style="background:var(--c-color-surface-neutral); color:var(--c-color-text-strong);">
+                            <span class="text-primary fw-bold">ANTES</span>
                             Street         | City      | AddressType
                             Amado Aufranc  | ESPERANZA | 1
                             0              | 0         | 2     ← vacía
@@ -746,14 +827,14 @@
                             Amado Aufranc  | ESPERANZA | 7
                             0              | 0         | 8     ← vacía
                         </div>
-                        <div style="text-align:center; font-size:24px; margin:8px 0;">⬇️</div>
-                        <div class="code-block" style="background:#e8f5e9; color:#333;">
-                            <span style="color:#0a7a3a; font-weight:600;">DESPUÉS</span>
+                        <div class="text-center" style="font-size:24px; margin:var(--c-spacing-2) 0;">⬇️</div>
+                        <div class="code-block" style="background:var(--c-color-surface-success-subtle); color:var(--c-color-text-strong);">
+                            <span class="text-success fw-bold">DESPUÉS</span>
                             Street         | City      | AddressType
                             Amado Aufranc  | ESPERANZA | 1     ← se conserva
                             Amado Aufranc  | ESPERANZA | 7     ← se conserva
                         </div>
-                        <div style="font-size:13px; color:#666; margin-top:8px;">
+                        <div class="text-sm text-subtle mt-2">
                             ✅ Solo se conservan las filas que tienen al menos un campo con información real
                         </div>
                     </div>
@@ -775,14 +856,14 @@
                     </p>
 
                     <div class="code-block">
-                        <span style="color:#f0a030;">Alta de contrato DMS</span> <span style="color:#4caf50;">351005959</span> <span style="color:#4fc3f7;">120761</span> <span style="color:#ffb74d;">NOISACO SA</span><span style="color:#888;">.xlsx</span>
+                        <span class="highlight">Alta de contrato DMS</span> <span class="success">351005959</span> <span class="text-info">120761</span> <span style="color:var(--c-orange-400);">NOISACO SA</span><span class="text-subtle">.xlsx</span>
                     </div>
 
                     <ul>
                         <li><strong>Alta de contrato DMS</strong> → Texto fijo</li>
-                        <li><strong>351005959</strong> → Código de Contrato (C3) — <span style="color:#c8102e;">Obligatorio</span></li>
-                        <li><strong>120761</strong> → Código del Cliente (C5) — <span style="color:#c8102e;">Obligatorio</span></li>
-                        <li><strong>NOISACO SA</strong> → Razón Social (C14) — <span style="color:#888;">Opcional</span></li>
+                        <li><strong>351005959</strong> → Código de Contrato (C3) — <span class="text-primary">Obligatorio</span></li>
+                        <li><strong>120761</strong> → Código del Cliente (C5) — <span class="text-primary">Obligatorio</span></li>
+                        <li><strong>NOISACO SA</strong> → Razón Social (C14) — <span class="text-subtle">Opcional</span></li>
                     </ul>
                 </div>
             </div>
@@ -804,7 +885,7 @@
 
                     <div class="highlight-box">
                         <strong>📋 Formato del mensaje:</strong>
-                        <div class="code-block" style="background:#1a1a1a; color:#e0e0e0; margin-top:8px;">
+                        <div class="code-block" style="background:var(--c-gray-900); color:var(--c-gray-100); margin-top:var(--c-spacing-2);">
                             Hola @Djirikian Damian Uriel, te paso 2 archivos para alta de contratos DMS
 
                             Alta de contrato DMS 351005959 120761 NOISACO SA.xlsx
@@ -844,28 +925,28 @@
                         <li>❌ <strong>Error:</strong> Si el valor no se reconoce, muestra un error con la lista de valores válidos</li>
                     </ul>
 
-                    <div style="background:#f8f9fc; border-radius:8px; padding:16px; margin:12px 0;">
-                        <div style="font-weight:600; color:#666; font-size:13px; margin-bottom:8px;">📋 Ejemplos de normalización:</div>
-                        <div class="code-block" style="background:#f0f2f5; color:#333; font-size:12px;">
-                            <span style="color:#c8102e; font-weight:600;">Campo: Tipo de Envío</span>
+                    <div style="background:var(--c-color-surface-neutral-subtle); border-radius:var(--c-border-radius-small); padding:var(--c-spacing-4); margin:var(--c-spacing-3) 0;">
+                        <div class="fw-bold text-subtle text-sm mb-2">📋 Ejemplos de normalización:</div>
+                        <div class="code-block" style="background:var(--c-color-surface-neutral); color:var(--c-color-text-strong); font-size:var(--c-font-size-caption);">
+                            <span class="text-primary fw-bold">Campo: Tipo de Envío</span>
                             ❌ "paqueteria"    → ✅ <strong>"Paquetería"</strong>
                             ❌ "logistica inversa" → ✅ <strong>"Logística inversa"</strong>
                             ❌ "cadena de frio"    → ✅ <strong>"Cadena de frío"</strong>
                             ❌ "retira deposito"   → ✅ <strong>"Retira depósito"</strong>
 
-                            <span style="color:#c8102e; font-weight:600; display:block; margin-top:8px;">Campo: ¿Usa remito?</span>
+                            <span class="text-primary fw-bold" style="display:block; margin-top:var(--c-spacing-2);">Campo: ¿Usa remito?</span>
                             ❌ "con remito"    → ✅ <strong>"CON_REMITO"</strong>
                             ❌ "sin remito"    → ✅ <strong>"SIN_REMITO"</strong>
                             ❌ "CONREMITO"     → ✅ <strong>"CON_REMITO"</strong>
                             ❌ "digitalizado"  → ✅ <strong>"DIGITALIZADO"</strong>
 
-                            <span style="color:#c8102e; font-weight:600; display:block; margin-top:8px;">Campo: Continente</span>
+                            <span class="text-primary fw-bold" style="display:block; margin-top:var(--c-spacing-2);">Campo: Continente</span>
                             ❌ "pallet"        → ✅ <strong>"Pallets"</strong>
                             ❌ "pallets"       → ✅ <strong>"Pallets"</strong>
                             ❌ "bigger"        → ✅ <strong>"Bultos Bigger"</strong>
                             ❌ "bulto bigger"  → ✅ <strong>"Bultos Bigger"</strong>
 
-                            <span style="color:#c8102e; font-weight:600; display:block; margin-top:8px;">Campo: SLA</span>
+                            <span class="text-primary fw-bold" style="display:block; margin-top:var(--c-spacing-2);">Campo: SLA</span>
                             ❌ "sla1"          → ✅ <strong>"SLA 1"</strong>
                             ❌ "sla 2"         → ✅ <strong>"SLA 2"</strong>
                             ❌ "sla3"          → ✅ <strong>"SLA 3"</strong>
@@ -875,7 +956,7 @@
                         </div>
                     </div>
 
-                    <div class="highlight-box" style="border-left-color: #1a5a8a;">
+                    <div class="highlight-box" style="border-left-color: var(--c-color-border-info);">
                         <strong>💡 Beneficios:</strong><br />
                         ✅ Reduce errores por tipeo manual<br />
                         ✅ Acepta valores sin acentos o con mayúsculas/minúsculas incorrectas<br />
@@ -923,7 +1004,7 @@
                         </div>
                     </div>
 
-                    <div style="text-align:center; margin-top:24px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                    <div class="d-flex-center mt-5">
                         <a href="index.html" class="btn-demo">🚀 Ir a la herramienta</a>
                         <a href="index.html" class="btn-volver">⬅️ Volver</a>
                     </div>
@@ -946,7 +1027,7 @@
                         completarla y luego arrastrarla a la herramienta.
                     </p>
 
-                    <div class="highlight-box" style="border-left-color: #1a5a8a;">
+                    <div class="highlight-box" style="border-left-color: var(--c-color-border-info);">
                         <strong>📋 Características de la plantilla:</strong>
                         <ul>
                             <li>✅ <strong>Etiquetas amigables:</strong> Los campos tienen nombres comerciales fáciles de entender</li>
@@ -958,29 +1039,29 @@
                     </div>
 
                     <p><strong>¿Cómo obtenerla?</strong></p>
-                    <div style="background:#f8f9fc; border-radius:8px; padding:16px; margin:12px 0;">
-                        <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center; justify-content:center;">
-                            <div style="display:flex; align-items:center; gap:8px;">
+                    <div style="background:var(--c-color-surface-neutral-subtle); border-radius:var(--c-border-radius-small); padding:var(--c-spacing-4); margin:var(--c-spacing-3) 0;">
+                        <div class="d-flex-center">
+                            <div style="display:flex; align-items:center; gap:var(--c-spacing-2);">
                                 <span style="font-size:24px;">1️⃣</span>
                                 <span>Hacé clic en <strong>"📥 Descargar plantilla"</strong> en la pantalla principal</span>
                             </div>
-                            <span style="font-size:20px; color:#aaa;">→</span>
-                            <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:20px; color:var(--c-color-text-subtle);">→</span>
+                            <div style="display:flex; align-items:center; gap:var(--c-spacing-2);">
                                 <span style="font-size:24px;">2️⃣</span>
                                 <span>Completá los datos en el Excel</span>
                             </div>
-                            <span style="font-size:20px; color:#aaa;">→</span>
-                            <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:20px; color:var(--c-color-text-subtle);">→</span>
+                            <div style="display:flex; align-items:center; gap:var(--c-spacing-2);">
                                 <span style="font-size:24px;">3️⃣</span>
                                 <span>Arrastrá el archivo a la herramienta</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="highlight-box" style="border-left-color: #0a7a3a;">
+                    <div class="highlight-box" style="border-left-color: var(--c-color-border-success);">
                         <strong>📌 Estructura de la plantilla:</strong><br />
-                        <div class="code-block" style="background:#f0f2f5; color:#333; margin-top:8px; font-size:12px;">
-                            <span style="color:#c8102e; font-weight:600;">📋 Hoja: Formulario</span>
+                        <div class="code-block" style="background:var(--c-color-surface-neutral); color:var(--c-color-text-strong); margin-top:var(--c-spacing-2); font-size:var(--c-font-size-caption);">
+                            <span class="text-primary fw-bold">📋 Hoja: Formulario</span>
                             🔑 DATOS DEL CONTRATO
                             • Código de Contrato: 9 dígitos, ej: 351005959
                             • Código del Cliente: 6 dígitos, ej: 125383
@@ -994,21 +1075,21 @@
                             • Razón Social: Nombre completo del cliente
 
                             ⚙️ CONFIGURACIÓN
-                            • Nivel de Servicio (SLA): SLA 1, SLA 2, SLA 3, SLA 4 - Logistica Asegurada V2, SLA PALLET, SLA BIGGER
+                            • Nivel de Servicio (SLA): SLA 1, SLA 2, SLA 3, SLA 4 - Logistica Asegurada V2, SLA PALLETS, SLA BIGGER
                             • ¿Usa remito?: CON_REMITO, SIN_REMITO, DIGITALIZADO
                             • Campos booleanos: true / false
 
                             📋 NIVELES DE ESFUERZO
                             • Logística Solicitada: Entrega, Logística inversa, etc.
                             • Continente: Contenedor, Pallets, Bultos Bigger, Sobre, etc.
-                            • Plazo: SLA 1, SLA 2, SLA 3, SLA 4, SLA PALLET, SLA BIGGER
+                            • Plazo: SLA 1, SLA 2, SLA 3, SLA 4, SLA PALLETS, SLA BIGGER
                             • Formulario Mobile B2B: Formulario B2B 1 al 13
 
                             📍 DIRECCIONES (obligatorias: Devolución y Devolución de Remitos)
                         </div>
                     </div>
 
-                    <div style="text-align:center; margin-top:16px;">
+                    <div class="text-center mt-4">
                         <a href="index.html" class="btn-demo">🚀 Ir a la herramienta para descargar la plantilla</a>
                     </div>
                 </div>

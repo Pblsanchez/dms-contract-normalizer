@@ -8,165 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     <link rel="stylesheet" href="css/styles.css" />
-    <style>
-        /* ========== FOUR COLUMN LAYOUT ========== */
-        .four-column-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        @media (max-width: 1200px) {
-            .four-column-layout {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .four-column-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* ========== CORRECCIÓN CARD ========== */
-        .correccion-card {
-            background: var(--card-bg);
-            border-radius: var(--radio);
-            border: 1px solid var(--border-light);
-            box-shadow: var(--sombra-card);
-            padding: 20px;
-            height: 100%;
-            min-height: 280px;
-            display: flex;
-            flex-direction: column;
-            animation: fadeIn 300ms ease;
-            border-left: 4px solid var(--andreani-red);
-        }
-
-        .correccion-card-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--andreani-red);
-        }
-
-        .correccion-card-header h3 {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        .correccion-card-body {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .correccion-card-body .razon-social {
-            font-weight: 700;
-            color: var(--andreani-red);
-            font-size: 16px;
-        }
-
-        .correccion-card-body .label {
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--gray);
-        }
-
-        .correccion-card-body .input-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .correccion-card-body input {
-            padding: 8px 12px;
-            border: 2px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: border-color var(--transicion);
-            outline: none;
-            width: 150px;
-            flex: 0 1 150px;
-        }
-
-        .correccion-card-body input:focus {
-            border-color: var(--andreani-red);
-            box-shadow: 0 0 0 3px var(--andreani-red-soft);
-        }
-
-        .btn-reprocesar {
-            padding: 6px 14px;
-            border-radius: 6px;
-            border: none;
-            font-size: 13px;
-            font-weight: 600;
-            font-family: inherit;
-            color: white;
-            cursor: pointer;
-            background: linear-gradient(135deg, var(--andreani-red), var(--andreani-red-dark));
-            transition: all var(--transicion);
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-
-        .btn-reprocesar:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px var(--andreani-red-soft);
-        }
-
-        .btn-reprocesar:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .correccion-card-body .hint {
-            font-size: 12px;
-            color: var(--gray-light);
-        }
-
-        .correccion-card-body .error-msg {
-            font-size: 13px;
-            color: var(--andreani-red);
-            font-weight: 500;
-        }
-
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 1200px) {
-            .correccion-card-body .input-row {
-                flex-wrap: wrap;
-            }
-            .correccion-card-body input {
-                flex: 1;
-                min-width: 120px;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .correccion-card {
-                min-height: 200px;
-            }
-            .correccion-card-body input {
-                width: 100%;
-                flex: 1;
-            }
-            .btn-reprocesar {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    </style>
 </head>
 <body>
     <!-- HEADER -->
@@ -178,8 +19,8 @@
             </div>
             <span class="header-tag">DMS · Normalizador</span>
         </div>
-        <div style="display:flex; align-items:center; gap:16px; font-size:13px; color: var(--gray);">
-            <a href="guia-usuario.html" target="_blank" style="color: var(--andreani-red); text-decoration: none; font-weight:600; display:flex; align-items:center; gap:4px; transition: all var(--transicion);">
+        <div style="display:flex; align-items:center; gap:var(--c-spacing-4); font-size:var(--c-font-size-labelsmall); color: var(--c-color-text);">
+            <a href="guia-usuario.html" target="_blank" class="header-link">
                 <span style="font-size:16px;">📖</span> Guía
             </a>
             <span>|</span>
@@ -449,7 +290,7 @@
             // HOJA: Formulario
             // ============================================
             const ws = workbook.addWorksheet('Formulario', {
-                properties: { tabColor: { argb: 'FFC8102E' } },
+                properties: { tabColor: { argb: 'FFD71920' } },
                 pageSetup: { orientation: 'portrait', fitToPage: true, margins: {
                     left: 0.7, right: 0.7, top: 0.7, bottom: 0.7, header: 0.3, footer: 0.3
                 }}
@@ -463,11 +304,11 @@
                 { header: 'Comentario', key: 'comentario', width: 25 }
             ];
 
-            // Estilos predefinidos
+            // Estilos predefinidos (alineados a paleta oficial Andreani DS)
             const styles = {
                 header: {
                     font: { name: 'Segoe UI', bold: true, size: 11, color: { argb: 'FFFFFFFF' } },
-                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8102E' } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD71920' } },
                     alignment: { horizontal: 'center', vertical: 'middle', wrapText: true },
                     border: {
                         top: { style: 'thin', color: { argb: 'FFB0B0B0' } },
@@ -477,12 +318,12 @@
                     }
                 },
                 section: {
-                    font: { name: 'Segoe UI', bold: true, size: 12, color: { argb: 'FFC8102E' } },
+                    font: { name: 'Segoe UI', bold: true, size: 12, color: { argb: 'FFD71920' } },
                     alignment: { horizontal: 'left', vertical: 'middle' },
-                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF5F5F5' } }
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFBE8E9' } }
                 },
                 editable: {
-                    font: { name: 'Segoe UI', size: 11, color: { argb: 'FF1A1A1A' } },
+                    font: { name: 'Segoe UI', size: 11, color: { argb: 'FF272A2F' } },
                     fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } },
                     alignment: { horizontal: 'left', vertical: 'middle', wrapText: true },
                     border: {
@@ -493,7 +334,7 @@
                     }
                 },
                 locked: {
-                    font: { name: 'Segoe UI', size: 11, color: { argb: 'FF666666' } },
+                    font: { name: 'Segoe UI', size: 11, color: { argb: 'FF818891' } },
                     fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0F0' } },
                     alignment: { horizontal: 'center', vertical: 'middle' },
                     border: {
@@ -504,14 +345,14 @@
                     }
                 },
                 help: {
-                    font: { name: 'Segoe UI', size: 10, color: { argb: 'FF888888' } },
+                    font: { name: 'Segoe UI', size: 10, color: { argb: 'FF818891' } },
                     alignment: { horizontal: 'left', vertical: 'middle', wrapText: true },
-                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF9F9F9' } }
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFAFAFA' } }
                 },
                 comment: {
-                    font: { name: 'Segoe UI', size: 10, color: { argb: 'FF0088CC' }, italic: true },
+                    font: { name: 'Segoe UI', size: 10, color: { argb: 'FF4E63D7' }, italic: true },
                     alignment: { horizontal: 'left', vertical: 'middle', wrapText: true },
-                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F8FF' } }
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEDEFFB' } }
                 }
             };
 
@@ -571,10 +412,8 @@
                 row.eachCell((cell, colIndex) => {
                     const value = cell.value ? String(cell.value).trim() : '';
 
-                    // Estilo por defecto
                     let style = { ...styles.editable };
 
-                    // Detectar tipo de fila
                     const isHeader = rowIndex === 0;
                     const isSection = value.startsWith('🔑') || value.startsWith('📦') || 
                                      value.startsWith('🏢') || value.startsWith('⚙️') ||
@@ -596,7 +435,6 @@
                         style = { ...styles.header };
                     } else if (isSection) {
                         style = { ...styles.section };
-                        // Combinar celdas para secciones
                         ws.mergeCells(`A${rowIndex+1}:D${rowIndex+1}`);
                     } else if (isComment) {
                         style = { ...styles.comment };
@@ -608,7 +446,6 @@
                         style = { ...styles.editable };
                     }
 
-                    // Aplicar estilo
                     Object.assign(cell, { style });
                 });
             });
@@ -635,7 +472,7 @@
             // HOJA: Contrato
             // ============================================
             const wsContrato = workbook.addWorksheet('Contrato', {
-                properties: { tabColor: { argb: 'FFC8102E' } }
+                properties: { tabColor: { argb: 'FFD71920' } }
             });
 
             const contratoHeaders = [
@@ -659,7 +496,7 @@
             headerRow.eachCell((cell) => {
                 cell.style = {
                     font: { name: 'Segoe UI', bold: true, size: 10, color: { argb: 'FFFFFFFF' } },
-                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8102E' } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD71920' } },
                     alignment: { horizontal: 'center', vertical: 'middle', wrapText: true },
                     border: {
                         top: { style: 'thin', color: { argb: 'FFB0B0B0' } },
@@ -675,7 +512,7 @@
             valueRow.eachCell((cell, colIndex) => {
                 const isLocked = colIndex === 5 || colIndex === 8 || colIndex === 23 || colIndex === 24;
                 cell.style = isLocked ? {
-                    font: { name: 'Segoe UI', size: 10, color: { argb: 'FF666666' } },
+                    font: { name: 'Segoe UI', size: 10, color: { argb: 'FF818891' } },
                     fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0F0' } },
                     alignment: { horizontal: 'center', vertical: 'middle' },
                     border: {
@@ -685,7 +522,7 @@
                         right: { style: 'thin', color: { argb: 'FFD0D0D0' } }
                     }
                 } : {
-                    font: { name: 'Segoe UI', size: 10, color: { argb: 'FF1A1A1A' } },
+                    font: { name: 'Segoe UI', size: 10, color: { argb: 'FF272A2F' } },
                     fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } },
                     alignment: { horizontal: 'left', vertical: 'middle' },
                     border: {
@@ -700,7 +537,6 @@
                 }
             });
 
-            // Ajustar ancho de columnas en Contrato
             wsContrato.columns.forEach((col, index) => {
                 col.width = index === 0 ? 20 : index === 1 ? 18 : index === 2 ? 22 : index === 3 ? 18 : 15;
             });
@@ -709,7 +545,7 @@
             // HOJA: Direcciones
             // ============================================
             const wsDirecciones = workbook.addWorksheet('Direcciones', {
-                properties: { tabColor: { argb: 'FFC8102E' } }
+                properties: { tabColor: { argb: 'FFD71920' } }
             });
 
             const direccionesHeaders = ['Street', 'Number', 'Floor', 'Department', 'City', 'PostalCode', 'State', 'Country', 'Phone', 'MailBox', 'AddressType'];
@@ -718,7 +554,7 @@
             dirHeaderRow.eachCell((cell) => {
                 cell.style = {
                     font: { name: 'Segoe UI', bold: true, size: 10, color: { argb: 'FFFFFFFF' } },
-                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8102E' } },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD71920' } },
                     alignment: { horizontal: 'center', vertical: 'middle' },
                     border: {
                         top: { style: 'thin', color: { argb: 'FFB0B0B0' } },
@@ -735,7 +571,7 @@
                 row.eachCell((cell, colIndex) => {
                     const isLocked = colIndex === 11;
                     cell.style = isLocked ? {
-                        font: { name: 'Segoe UI', size: 10, color: { argb: 'FF666666' } },
+                        font: { name: 'Segoe UI', size: 10, color: { argb: 'FF818891' } },
                         fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0F0' } },
                         alignment: { horizontal: 'center', vertical: 'middle' },
                         border: {
@@ -745,7 +581,7 @@
                             right: { style: 'thin', color: { argb: 'FFD0D0D0' } }
                         }
                     } : {
-                        font: { name: 'Segoe UI', size: 10, color: { argb: 'FF1A1A1A' } },
+                        font: { name: 'Segoe UI', size: 10, color: { argb: 'FF272A2F' } },
                         fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } },
                         alignment: { horizontal: 'left', vertical: 'middle' },
                         border: {
@@ -761,7 +597,6 @@
                 });
             }
 
-            // Ajustar ancho de columnas en Direcciones
             wsDirecciones.columns.forEach((col, index) => {
                 const widths = [18, 12, 10, 14, 16, 12, 14, 14, 14, 18, 14];
                 col.width = widths[index] || 14;
@@ -920,7 +755,6 @@
         //  FUNCIÓN: REPROCESAR ARCHIVO CON NUEVO CÓDIGO
         // ============================================================
         async function reprocesarConCodigo(archivo, nuevoCodigo, razonSocial) {
-            // Validar el código ingresado
             const validacion = normalizarCodigoSolicitante(nuevoCodigo);
             if (validacion.error) {
                 CORRECCION_ERROR.textContent = `❌ ${validacion.error}`;
@@ -939,7 +773,6 @@
                 const buffer = await archivo.arrayBuffer();
                 const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
 
-                // Actualizar el valor en la hoja Formulario
                 const sheet = workbook.Sheets['Formulario'];
                 if (!sheet) {
                     log(`❌ No se encuentra la hoja "Formulario" en el archivo`, 'error');
@@ -948,15 +781,11 @@
                     return;
                 }
 
-                // Convertir a array para modificar
                 const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
 
-                // Buscar la fila correcta de CodigoSolicitanteERP
                 let filaEncontrada = false;
                 let filaIndex = -1;
-                let razonSocialEncontrada = '';
 
-                // Buscar por el campo "Código del Cliente" o "CodigoSolicitanteERP"
                 for (let i = 0; i < data.length; i++) {
                     const row = data[i];
                     if (row && row[0]) {
@@ -964,10 +793,6 @@
                         if (campo === 'Código del Cliente' || campo === 'CodigoSolicitanteERP') {
                             filaIndex = i;
                             filaEncontrada = true;
-                            // También obtenemos la Razón Social si está disponible
-                            if (data[i + 10] && data[i + 10][2]) {
-                                razonSocialEncontrada = String(data[i + 10][2]).trim();
-                            }
                             break;
                         }
                     }
@@ -980,15 +805,12 @@
                     return;
                 }
 
-                // Actualizar el valor en la columna C (índice 2)
                 log(`   → Actualizando código en fila ${filaIndex + 1} de "${String(data[filaIndex][2] || '').trim()}" a "${codigoNormalizado}"`, 'info');
                 data[filaIndex][2] = codigoNormalizado;
 
-                // Reconstruir la hoja con el nuevo valor
                 const newSheet = XLSX.utils.aoa_to_sheet(data);
                 workbook.Sheets['Formulario'] = newSheet;
 
-                // Verificar que el cambio se aplicó correctamente
                 const verificarData = XLSX.utils.sheet_to_json(workbook.Sheets['Formulario'], { header: 1, defval: '' });
                 const valorVerificado = String(verificarData[filaIndex]?.[2] || '').trim();
                 if (valorVerificado !== codigoNormalizado) {
@@ -997,7 +819,6 @@
                     log(`   → ✅ Código actualizado correctamente a "${codigoNormalizado}"`, 'success');
                 }
 
-                // Revalidar el archivo completo con el nuevo valor
                 const validation = validateFormulario(workbook, archivo.name);
                 if (validation.hasErrors) {
                     log(`❌ El archivo sigue teniendo errores después de la corrección:`, 'error');
@@ -1009,7 +830,6 @@
                     return;
                 }
 
-                // Obtener datos para el nombre del archivo
                 const nombreData = getNombreArchivoData(workbook);
                 if (nombreData.error) {
                     log(`❌ ${nombreData.error}`, 'error');
@@ -1018,10 +838,8 @@
                     return;
                 }
 
-                // Normalizar el workbook
                 const normalizedWB = normalizeWorkbook(workbook);
 
-                // Eliminar Formulario
                 const sheetNames = normalizedWB.SheetNames;
                 const formularioIndex = sheetNames.indexOf('Formulario');
                 if (formularioIndex !== -1) {
@@ -1029,7 +847,6 @@
                     delete normalizedWB.Sheets['Formulario'];
                 }
 
-                // Mover Referencias al final
                 const refIndex = normalizedWB.SheetNames.indexOf('Referencias');
                 if (refIndex !== -1) {
                     const refName = normalizedWB.SheetNames.splice(refIndex, 1)[0];
@@ -1038,7 +855,6 @@
 
                 limpiarDireccionesVacias(normalizedWB);
 
-                // Generar nombre de salida
                 let outputName = `Alta de contrato DMS ${nombreData.codigoERP} ${nombreData.codigoSolicitante}`;
                 if (nombreData.clientName) {
                     outputName += ` ${nombreData.clientName}`;
@@ -1050,11 +866,9 @@
 
                 log(`✅ ¡Archivo reprocesado correctamente! Descargando "${outputName}"`, 'success');
 
-                // Agregar el nombre al mensaje
                 processedFileNames.push(outputName);
                 generarMensaje(processedFileNames.length, processedFileNames);
 
-                // Ocultar la card de corrección
                 ocultarCorreccion();
 
             } catch (err) {
@@ -1164,7 +978,6 @@
                         }
 
                         if (tieneErrorSolicitante && razonSocialEncontrada && razonSocialEncontrada !== 'No especificada') {
-                            // Mostrar la card de corrección
                             mostrarCorreccion(razonSocialEncontrada, file);
                             log(`💡 Podés corregir el código en la card "Corregir código del cliente"`, 'info');
                         }
@@ -1515,19 +1328,16 @@
 
                 // ============================================
                 // VALIDACIÓN CRUZADA: TipoDeEnvio ↔ SLA
-                // (bidireccional: Logística Asegurada ↔ SLA 4)
                 // ============================================
                 const SLA_ASEGURADA = 'SLA 4 - Logistica Asegurada V2';
                 const TIPO_ASEGURADA = 'Logística Asegurada';
 
                 if (campo === 'TipoDeEnvio' && valor === TIPO_ASEGURADA) {
-                    // Buscar el SLA en la data
                     for (let j = 0; j < data.length; j++) {
                         const r = data[j];
                         if (r && String(r[0] || '').trim() === 'SLA') {
                             const slaActual = String(r[2] || '').trim();
                             if (slaActual !== SLA_ASEGURADA) {
-                                // Auto-corregir
                                 r[2] = SLA_ASEGURADA;
                                 huboNormalizacion = true;
                                 log(`   → ⚠️ Tipo de Envío = "Logística Asegurada" → SLA auto-corregido de "${slaActual}" a "${SLA_ASEGURADA}"`, 'warning');
@@ -1538,13 +1348,11 @@
                 }
 
                 if (campo === 'SLA' && valor === SLA_ASEGURADA) {
-                    // Buscar el TipoDeEnvio en la data
                     for (let j = 0; j < data.length; j++) {
                         const r = data[j];
                         if (r && String(r[0] || '').trim() === 'TipoDeEnvio') {
                             const tipoActual = String(r[2] || '').trim();
                             if (tipoActual !== TIPO_ASEGURADA) {
-                                // Auto-corregir
                                 r[2] = TIPO_ASEGURADA;
                                 huboNormalizacion = true;
                                 log(`   → ⚠️ SLA = "SLA 4 - Logistica Asegurada V2" → Tipo de Envío auto-corregido de "${tipoActual}" a "${TIPO_ASEGURADA}"`, 'warning');
@@ -1556,27 +1364,23 @@
 
                 // ============================================
                 // VALIDACIÓN CRUZADA: Continente ↔ SLA
-                // (bidireccional: Pallets ↔ SLA PALLET, Bultos Bigger ↔ SLA BIGGER)
                 // ============================================
                 const CONTINENTE_PALLETS = 'Pallets';
                 const CONTINENTE_BIGGER = 'Bultos Bigger';
                 const SLA_PALLETS = 'SLA PALLETS';
                 const SLA_BIGGER = 'SLA BIGGER';
 
-                // Mapeo Continente → SLA
                 const continenteASla = {
                     [CONTINENTE_PALLETS]: SLA_PALLETS,
                     [CONTINENTE_BIGGER]: SLA_BIGGER
                 };
 
-                // Mapeo SLA → Continente
                 const slaAContinente = {
                     [SLA_PALLETS]: CONTINENTE_PALLETS,
                     [SLA_BIGGER]: CONTINENTE_BIGGER
                 };
 
                 if (campo === 'Continente' && continenteASla[valor]) {
-                    // Si Continente es Pallets o Bultos Bigger → forzar SLA
                     const slaRequerido = continenteASla[valor];
                     for (let j = 0; j < data.length; j++) {
                         const r = data[j];
@@ -1593,7 +1397,6 @@
                 }
 
                 if ((campo === 'SLA' || campo === 'Plazo') && slaAContinente[valor]) {
-                    // Si SLA es SLA PALLET o SLA BIGGER → forzar Continente
                     const continenteRequerido = slaAContinente[valor];
                     for (let j = 0; j < data.length; j++) {
                         const r = data[j];
@@ -1678,7 +1481,6 @@
                 'Continente': {
                     'pallet': 'Pallets',
                     'pallets': 'Pallets',
-                    'pallets ': 'Pallets',
                     'bigger': 'Bultos Bigger',
                     'bultos bigger': 'Bultos Bigger',
                     'bulto bigger': 'Bultos Bigger',
@@ -1699,7 +1501,6 @@
                 const valorLower = valorLimpio.toLowerCase();
                 for (const [key, value] of Object.entries(diccionario)) {
                     if (valorLower === key.toLowerCase()) {
-                        // Solo marcar como normalizado si el valor cambió
                         const cambio = (valorLimpio !== value);
                         return { valor: value, normalizado: cambio };
                     }
@@ -1727,7 +1528,6 @@
                     if (valorLower === itemKey ||
                         valorLower === itemCode ||
                         (itemDesc && valorLower === itemDesc)) {
-                        // Solo marcar como normalizado si el valor cambió
                         const cambio = (valorLimpio !== item.key);
                         return { valor: item.key, normalizado: cambio };
                     }
@@ -1755,7 +1555,6 @@
                 };
             }
 
-            // Lista de SLAs válidos (hardcodeada)
             const slasValidos = [
                 'SLA 1',
                 'SLA 2',
@@ -1859,7 +1658,6 @@
         function normalizeWorkbook(workbook) {
             const newWB = XLSX.utils.book_new();
 
-            // PRIMERO: Extraer el valor de CodigoSolicitanteERP desde Formulario
             let codigoSolicitante = '';
             const formularioSheet = workbook.Sheets['Formulario'];
             if (formularioSheet) {
@@ -1883,10 +1681,8 @@
 
                 if (sheetName === 'Contrato') {
                     if (data.length > 1) {
-                        const rowIndex = 1; // Fila 2 (index 1)
-                        // Columna D = índice 3 (CodigoSolicitanteERP)
+                        const rowIndex = 1;
                         if (data[rowIndex] && data[rowIndex].length > 3) {
-                            // Actualizar con el valor obtenido de Formulario
                             if (codigoSolicitante) {
                                 data[rowIndex][3] = codigoSolicitante;
                                 log(`   → ✅ Actualizado CodigoSolicitanteERP en Contrato a "${codigoSolicitante}"`, 'info');
@@ -1894,7 +1690,6 @@
                                 log(`   → ⚠️ No se encontró CodigoSolicitanteERP en Formulario. Valor actual: "${data[rowIndex][3] || ''}"`, 'warning');
                             }
                         }
-                        // AllowsStorage = false (columna Y = índice 24)
                         if (data[rowIndex] && data[rowIndex].length > 24) {
                             data[rowIndex][24] = 'false';
                             log(`   → AllowsStorage forzado a "false" en hoja "Contrato"`, 'info');
