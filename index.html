@@ -1061,6 +1061,49 @@
         //  FUNCIONES AUXILIARES
         // ============================================================
 
+        /**
+         * Limpia caracteres envolventes (comillas, guiones, asteriscos, etc.)
+         * del inicio y fin de un texto. Preserva caracteres del medio.
+         * Ejemplo: '"CVS CARGO S.A.S."' → 'CVS CARGO S.A.S.'
+         */
+        function limpiarTextoEnvolvente(texto) {
+            if (!texto) return '';
+            
+            let resultado = String(texto).trim();
+            
+            // Caracteres envolventes a eliminar del inicio y fin
+            const envolventes = [
+                '"', "'", '-', '_', '*', '–', '—', '`', '«', '»', '“', '”', '‘', '’', '(', ')'
+            ];
+            
+            let cambio = true;
+            while (cambio && resultado.length > 0) {
+                cambio = false;
+                
+                // Verificar primer carácter
+                for (const c of envolventes) {
+                    if (resultado.startsWith(c)) {
+                        resultado = resultado.substring(c.length).trim();
+                        cambio = true;
+                        break;
+                    }
+                }
+                
+                if (cambio) continue;
+                
+                // Verificar último carácter
+                for (const c of envolventes) {
+                    if (resultado.endsWith(c)) {
+                        resultado = resultado.substring(0, resultado.length - c.length).trim();
+                        cambio = true;
+                        break;
+                    }
+                }
+            }
+            
+            return resultado;
+        }
+
         function limpiarDireccionesVacias(workbook) {
             const sheetName = 'Direcciones';
             if (!workbook.Sheets[sheetName]) return;
@@ -1140,7 +1183,13 @@
 
             const codigoERP = String(data[2]?.[2] || '').trim();
             const codigoSolicitanteRaw = String(data[4]?.[2] || '').trim();
-            const clientName = String(data[13]?.[2] || '').trim();
+            const clientNameRaw = String(data[13]?.[2] || '').trim();
+            const clientName = limpiarTextoEnvolvente(clientNameRaw);
+            
+            // Log si hubo limpieza
+            if (clientNameRaw !== clientName) {
+                log(`   → Campo "ClientName" limpiado: "${clientNameRaw}" → "${clientName}"`, 'info');
+            }
 
             if (!codigoERP) {
                 return { error: 'Campo "CodigoContratoERP" (C3) está vacío. Es obligatorio.' };
@@ -1295,7 +1344,7 @@
                     }
                 }
 
-                const razonSocial = String(data[13]?.[2] || '').trim() || 'No especificada';
+                const razonSocial = limpiarTextoEnvolvente(String(data[13]?.[2] || '').trim()) || 'No especificada';
 
                 const opcionales = ['CondicionDeEntrega', 'DescripcionContratoERP'];
                 if (!opcionales.includes(campo) && !valor) {
@@ -1319,7 +1368,7 @@
                 }
 
                 if (campo === 'CodigoSolicitanteERP' && valor) {
-                    const razonSocial2 = String(data[13]?.[2] || '').trim() || 'No especificada';
+                    const razonSocial2 = limpiarTextoEnvolvente(String(data[13]?.[2] || '').trim()) || 'No especificada';
                     const resultado = normalizarCodigoSolicitante(valor);
                     if (resultado.error) {
                         errors.push(`Campo "CodigoSolicitanteERP" = "${valor}" - ${resultado.error} - Razón Social: "${razonSocial2}"`);
@@ -1659,6 +1708,7 @@
             const newWB = XLSX.utils.book_new();
 
             let codigoSolicitante = '';
+            let clientNameLimpio = '';
             const formularioSheet = workbook.Sheets['Formulario'];
             if (formularioSheet) {
                 const formularioData = XLSX.utils.sheet_to_json(formularioSheet, { header: 1, defval: '' });
@@ -1669,7 +1719,13 @@
                         if (campo === 'Código del Cliente' || campo === 'CodigoSolicitanteERP') {
                             codigoSolicitante = String(row[2] || '').trim();
                             log(`   → 🔍 normalizeWorkbook: Valor leído de Formulario: "${codigoSolicitante}"`, 'info');
-                            break;
+                        }
+                        if (campo === 'Razón Social' || campo === 'ClientName') {
+                            const valorRaw = String(row[2] || '').trim();
+                            clientNameLimpio = limpiarTextoEnvolvente(valorRaw);
+                            if (valorRaw !== clientNameLimpio) {
+                                log(`   → Campo "ClientName" limpiado en hoja Contrato: "${valorRaw}" → "${clientNameLimpio}"`, 'info');
+                            }
                         }
                     }
                 }
@@ -1688,6 +1744,13 @@
                                 log(`   → ✅ Actualizado CodigoSolicitanteERP en Contrato a "${codigoSolicitante}"`, 'info');
                             } else {
                                 log(`   → ⚠️ No se encontró CodigoSolicitanteERP en Formulario. Valor actual: "${data[rowIndex][3] || ''}"`, 'warning');
+                            }
+                        }
+                        // ClientName en Contrato: columna M = índice 12
+                        if (data[rowIndex] && data[rowIndex].length > 12) {
+                            if (clientNameLimpio) {
+                                data[rowIndex][12] = clientNameLimpio;
+                                log(`   → ✅ Actualizado ClientName en Contrato a "${clientNameLimpio}"`, 'info');
                             }
                         }
                         if (data[rowIndex] && data[rowIndex].length > 24) {
