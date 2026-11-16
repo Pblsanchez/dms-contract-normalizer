@@ -1,0 +1,50 @@
+/* Carga masiva por carpeta (T-014). Usa los tokens Cartesian de ../css/styles.css. Paleta D-045: rojo de marca + grises;
+   verde/naranja/rojo error solo para estados, siempre con texto. */
+.ms-skip { position: absolute; left: var(--c-spacing-4); top: -100px; z-index: 200; background: var(--c-color-surface); color: var(--c-color-text-strong); padding: var(--c-spacing-2) var(--c-spacing-4); border-radius: var(--c-border-radius-small); }
+.ms-skip:focus { top: var(--c-spacing-2); }
+.ms-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+main:focus { outline: none; }
+.ms-info { max-width: 900px; margin: 0 auto var(--c-spacing-4); padding: var(--c-spacing-3) var(--c-spacing-4); background: var(--c-color-surface); border: 1px solid var(--c-color-border-subtle); border-left: var(--c-border-width-strong) solid var(--c-color-border-primary); border-radius: var(--c-border-radius-small); color: var(--c-color-text-strong); font-size: var(--c-font-size-bodysmall); line-height: var(--c-line-height-bodysmall); }
+.ms-aviso { max-width: 900px; margin: 0 auto var(--c-spacing-4); padding: var(--c-spacing-3) var(--c-spacing-4); border: 1px solid; border-left-width: var(--c-border-width-strong); border-radius: var(--c-border-radius-small); font-size: var(--c-font-size-bodysmall); }
+.ms-aviso--info { background: var(--c-color-surface-info-subtle); border-color: var(--c-color-border-info); color: var(--c-color-text-info-strong); }
+.ms-aviso--success { background: var(--c-color-surface-success-subtle); border-color: var(--c-color-border-success); color: var(--c-color-text-success-strong); }
+.ms-aviso--warning { background: var(--c-color-surface-warning-subtle); border-color: var(--c-color-border-warning); color: var(--c-color-text-caution-strong); }
+.ms-aviso--error { background: var(--c-color-surface-error-subtle); border-color: var(--c-color-border-primary); color: var(--c-color-text-error-strong); }
+.ms-pasos { list-style: none; max-width: 900px; margin: 0 auto; padding: 0; display: flex; flex-direction: column; gap: var(--c-spacing-3); }
+.ms-paso { display: grid; grid-template-columns: 40px 1fr auto; gap: var(--c-spacing-4); align-items: center; background: var(--c-color-surface); border: 1px solid var(--c-color-border-neutral-subtle); border-radius: var(--c-border-radius-medium); padding: var(--c-spacing-4) var(--c-spacing-5); box-shadow: var(--c-shadow-bottom-subtle); }
+.ms-paso__n { width: 32px; height: 32px; border-radius: 50%; background: var(--c-color-fill-primary); color: var(--c-color-text-inverse); display: inline-flex; align-items: center; justify-content: center; font-family: var(--c-font-family-title); font-weight: var(--c-font-weight-bold); }
+.ms-paso h2 { font-size: var(--c-font-size-titlemedium); line-height: var(--c-line-height-titlemedium); }
+.ms-paso p { font-size: var(--c-font-size-bodysmall); line-height: var(--c-line-height-bodysmall); }
+.ms-paso__sel { margin-top: var(--c-spacing-1); font-weight: var(--c-font-weight-medium); color: var(--c-color-text-strong); }
+.ms-paso__acc { display: flex; gap: var(--c-spacing-2); flex-wrap: wrap; }
+.ms-paso code { background: var(--c-color-surface-neutral-subtle); padding: 0 4px; border-radius: 4px; }
+.ms-resultados { max-width: 1100px; margin: var(--c-spacing-6) auto 0; }
+.ms-resultados > h2 { margin-bottom: var(--c-spacing-3); }
+.ms-progreso { height: 10px; border-radius: var(--c-border-radius-xlarge); background: var(--c-color-surface-neutral); overflow: hidden; }
+.ms-progreso span { display: block; height: 100%; width: 0; background: var(--c-color-fill-primary); transition: width var(--c-transition-fast); }
+.ms-estado { margin: var(--c-spacing-2) 0 var(--c-spacing-3); color: var(--c-color-text-strong); font-size: var(--c-font-size-bodysmall); }
+.ms-cont { list-style: none; padding: 0; margin: 0 0 var(--c-spacing-4); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--c-spacing-3); }
+.ms-cont li { background: var(--c-color-surface); border: 1px solid var(--c-color-border-neutral-subtle); border-top: var(--c-border-width-strong) solid var(--c-color-border-neutral-strong); border-radius: var(--c-border-radius-small); padding: var(--c-spacing-3) var(--c-spacing-4); display: flex; flex-direction: column; gap: var(--c-spacing-1); }
+.ms-cont span { font-size: var(--c-font-size-labelsmall); color: var(--c-color-text); }
+.ms-cont strong { font-family: var(--c-font-family-headline); font-size: var(--c-font-size-headline4); line-height: var(--c-line-height-headline4); color: var(--c-color-text-strong); font-variant-numeric: tabular-nums; }
+.ms-cont--ok { border-top-color: var(--c-color-border-success) !important; }
+.ms-cont--err { border-top-color: var(--c-color-border-primary) !important; }
+.ms-cont--dup { border-top-color: var(--c-color-border-warning) !important; }
+.ms-msg { background: var(--c-color-surface); border: 1px solid var(--c-color-border-neutral-subtle); border-radius: var(--c-border-radius-medium); padding: var(--c-spacing-4) var(--c-spacing-5); margin-bottom: var(--c-spacing-4); }
+.ms-msg .message-card-body { min-height: 56px; }
+.ms-msg__acc { display: flex; justify-content: flex-end; gap: var(--c-spacing-2); flex-wrap: wrap; margin-top: var(--c-spacing-3); }
+.ms-tabla-wrap { overflow-x: auto; border: 1px solid var(--c-color-border-subtle); border-radius: var(--c-border-radius-small); background: var(--c-color-surface); max-height: 520px; overflow-y: auto; }
+.ms-tabla { width: 100%; border-collapse: collapse; font-size: var(--c-font-size-bodysmall); line-height: var(--c-line-height-bodysmall); }
+.ms-tabla th, .ms-tabla td { height: 40px; padding: var(--c-spacing-2) var(--c-spacing-4); text-align: left; border-bottom: 1px solid var(--c-color-border-subtle); vertical-align: middle; }
+.ms-tabla thead th { position: sticky; top: 0; background: var(--c-color-surface-hover); color: var(--c-color-text-strong); font-weight: var(--c-font-weight-bold); font-size: var(--c-font-size-caption); text-transform: uppercase; letter-spacing: .04em; border-bottom: var(--c-border-width-regular) solid var(--c-color-border-primary); }
+.ms-tabla tbody tr:nth-child(even) { background: var(--c-color-surface-hover); }
+.ms-tabla td { color: var(--c-color-text-strong); word-break: break-word; }
+.ms-tabla .n { text-align: right; width: 48px; font-variant-numeric: tabular-nums; }
+.ms-badge { display: inline-block; padding: 2px var(--c-spacing-2); border-radius: var(--c-border-radius-xlarge); font-size: var(--c-font-size-caption); font-weight: var(--c-font-weight-bold); white-space: nowrap; }
+.ms-badge--ok { background: var(--c-color-surface-success-subtle); color: var(--c-color-text-success-strong); }
+.ms-badge--neutro { background: var(--c-color-surface-neutral); color: var(--c-color-text-strong); }
+.ms-badge--error { background: var(--c-color-surface-error-subtle); color: var(--c-color-text-error-strong); }
+.ms-badge--warning { background: var(--c-color-surface-warning-subtle); color: var(--c-color-text-caution-strong); }
+.btn-secundario[hidden], .btn-descargar[hidden] { display: none; }
+.btn-secundario:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 768px) { .ms-paso { grid-template-columns: 32px 1fr; } .ms-paso > button, .ms-paso__acc { grid-column: 1 / -1; } .ms-cont { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

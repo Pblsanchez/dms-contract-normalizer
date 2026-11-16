@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Carga masiva por carpeta · Normalizador de Contratos DMS - Andreani</title>
+    <!-- Misma versión de SheetJS que el normalizador (por CDN: el archivo supera lo que se puede publicar desde el agente) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="masivo.css?v=1.0" />
+</head>
+<body>
+    <a class="ms-skip" href="#contenido">Saltar al contenido</a>
+    <header class="andreani-header">
+        <div class="header-left">
+            <div class="andreani-logo">
+                <span class="logo-icon" aria-hidden="true">📦</span>
+                <span class="logo-text">Andreani</span>
+            </div>
+            <span class="header-tag">DMS · Carga masiva</span>
+        </div>
+        <nav aria-label="Navegación" style="display:flex; align-items:center; gap:var(--c-spacing-4);">
+            <a href="../" class="header-link"><span aria-hidden="true">←</span> Volver al normalizador</a>
+        </nav>
+    </header>
+
+    <main class="main-container" id="contenido" tabindex="-1">
+        <div class="page-title-section">
+            <h1>Carga masiva por carpeta</h1>
+            <p class="subtitle">Normaliza todos los Excel de una carpeta, de a uno, con las mismas reglas del normalizador. Pensado para migraciones con cientos de contratos (Cruz del Sur).</p>
+        </div>
+
+        <div class="ms-info" role="note">
+            <strong>Cómo funciona.</strong> Elegís la carpeta con los archivos y una carpeta de salida. Cada archivo normalizado se guarda directo en la carpeta de salida (sin descargas) y al final queda un Excel de resumen. Si se corta o agregás archivos nuevos, volvé a procesar: <strong>solo genera lo pendiente</strong>. Los archivos no salen de tu computadora. Funciona en <strong>Chrome o Edge</strong>.
+        </div>
+
+        <p class="ms-aviso" id="aviso" role="status" aria-live="polite" hidden></p>
+
+        <ol class="ms-pasos">
+            <li class="ms-paso">
+                <span class="ms-paso__n" aria-hidden="true">1</span>
+                <div class="ms-paso__txt"><h2>Carpeta de origen</h2><p>La carpeta de OneDrive con los Excel a normalizar (sincronizada en esta PC). Solo se leen los <code>.xlsx</code> de esa carpeta, sin subcarpetas.</p>
+                    <p class="ms-paso__sel" id="in-nombre">Sin elegir</p></div>
+                <button type="button" class="btn-secundario" id="btn-in">Elegir carpeta de origen</button>
+            </li>
+            <li class="ms-paso">
+                <span class="ms-paso__n" aria-hidden="true">2</span>
+                <div class="ms-paso__txt"><h2>Carpeta de salida</h2><p>Donde se guardan los archivos normalizados y el resumen. Usá siempre la misma para poder retomar. Es la que compartís con Damián.</p>
+                    <p class="ms-paso__sel" id="out-nombre">Sin elegir</p></div>
+                <button type="button" class="btn-secundario" id="btn-out">Elegir carpeta de salida</button>
+            </li>
+            <li class="ms-paso">
+                <span class="ms-paso__n" aria-hidden="true">3</span>
+                <div class="ms-paso__txt"><h2>Procesar</h2><p>El navegador va a pedir permiso para ver y guardar en las carpetas: aceptá. Podés detener cuando quieras.</p></div>
+                <div class="ms-paso__acc">
+                    <button type="button" class="btn-descargar" id="btn-procesar" disabled>Procesar carpeta</button>
+                    <button type="button" class="btn-secundario" id="btn-detener" hidden>Detener</button>
+                </div>
+            </li>
+        </ol>
+
+        <section id="resultados" class="ms-resultados" aria-labelledby="t-res" hidden>
+            <h2 id="t-res">Resultado</h2>
+            <div class="ms-progreso" id="barra-wrap" role="progressbar" aria-label="Avance" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="barra"></span></div>
+            <p class="ms-estado" id="estado-actual" aria-live="polite"></p>
+            <ul class="ms-cont">
+                <li><span>Procesados</span><strong id="c-total">0</strong></li>
+                <li class="ms-cont--ok"><span>✓ Generados</span><strong id="c-ok">0</strong></li>
+                <li><span>Ya procesados</span><strong id="c-ya">0</strong></li>
+                <li class="ms-cont--err"><span>✕ Con error</span><strong id="c-err">0</strong></li>
+                <li class="ms-cont--dup"><span>! Duplicados</span><strong id="c-dup">0</strong></li>
+            </ul>
+            <div class="ms-msg">
+                <div class="message-card-header"><span aria-hidden="true" style="font-size:20px;">💬</span><h3>Mensaje para Damián</h3></div>
+                <div id="mensaje" class="message-card-body"></div>
+                <div class="ms-msg__acc">
+                    <button type="button" class="btn-secundario" id="btn-resumen" disabled>Descargar resumen</button>
+                    <button type="button" class="btn-copiar" id="btn-copiar" disabled>Copiar mensaje</button>
+                </div>
+            </div>
+            <div class="ms-tabla-wrap">
+                <table class="ms-tabla">
+                    <caption class="ms-sr">Resultado por archivo</caption>
+                    <thead><tr><th scope="col" class="n">N°</th><th scope="col">Archivo origen</th><th scope="col">Estado</th><th scope="col">Contrato ERP</th><th scope="col">Archivo generado</th><th scope="col">Detalle</th></tr></thead>
+                    <tbody id="tabla-cuerpo"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="andreani-footer">Andreani · Normalizador de Contratos DMS · Carga masiva por carpeta</footer>
+
+    <script src="masivo-reglas.js?v=1.0"></script>
+    <script src="masivo-app.js?v=1.0"></script>
+</body>
+</html>
