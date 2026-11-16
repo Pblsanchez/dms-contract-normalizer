@@ -656,6 +656,12 @@ var REGLAS = (function () {
                     if (campo === 'Código del Cliente' || campo === 'CodigoSolicitanteERP') {
                         codigoSolicitante = String(row[2] || '').trim();
                         log(`   → 🔍 normalizeWorkbook: Valor leído de Formulario: "${codigoSolicitante}"`, 'info');
+                        // T-014 (2026-11-16): 0000xxxxxx → xxxxxx también en la hoja Contrato (así lo recibe Damián)
+                        const codigoNorm = normalizarCodigoSolicitante(codigoSolicitante);
+                        if (codigoNorm && codigoNorm.valor && codigoNorm.valor !== codigoSolicitante) {
+                            log(`   → CodigoSolicitanteERP normalizado de "${codigoSolicitante}" a "${codigoNorm.valor}" en hoja Contrato`, 'info');
+                            codigoSolicitante = codigoNorm.valor;
+                        }
                     }
                     if (campo === 'Razón Social' || campo === 'ClientName') {
                         const valorRaw = String(row[2] || '').trim();
