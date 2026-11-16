@@ -67,9 +67,19 @@ var MASIVO = (function () {
     res.forEach(function (r) { c[r.estado] = (c[r.estado] || 0) + 1; });
     return c;
   }
+  /* Para Damián: solo el aviso de archivos nuevos en la carpeta compartida (el resumen es para Pablo / referente CDS) */
   function mensaje(n, carpeta) {
-    return DESTINATARIO + ", te paso " + n + " archivo" + (n === 1 ? "" : "s") + " para alta de contratos DMS (migración Cruz del Sur)" +
-      (carpeta ? ", en la carpeta «" + carpeta + "»" : "") + ". Adjunto el resumen.";
+    return DESTINATARIO + ", hay " + n + (n === 1 ? " archivo nuevo" : " archivos nuevos") + " para alta de contratos DMS (migración Cruz del Sur)" +
+      (carpeta ? " en la carpeta «" + carpeta + "»" : "") + ".";
+  }
+  /* OneDrive «solo en la nube»: al leer, Windows baja el archivo y puede fallar la 1.ª lectura (InvalidStateError / NotReadableError). Reintenta. */
+  async function leerConReintento(handle) {
+    var ultimo;
+    for (var k = 0; k < 4; k++) {
+      try { var f = await handle.getFile(); return { name: f.name, buf: await f.arrayBuffer() }; }
+      catch (e) { ultimo = e; await new Promise(function (ok) { setTimeout(ok, 1500 * (k + 1)); }); }
+    }
+    throw ultimo;
   }
   function sello(d) { var p = function (x) { return ("0" + x).slice(-2); }; return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + "-" + p(d.getMinutes()); }
 
@@ -132,8 +142,8 @@ var MASIVO = (function () {
       $("estado-actual").textContent = "Procesando " + (i + 1) + " de " + archivos.length + ": " + archivos[i].name;
       var r = null;
       try {
-        var file = await archivos[i].getFile();
-        var wb = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: false });
+        var file = await leerConReintento(archivos[i]);
+        var wb = XLSX.read(file.buf, { type: "array", cellDates: false });
         r = clasificar(procesar(wb, file.name), idx.existentes, idx.porContrato);
         if (r.estado === "OK") {
           await escribir(r.salida, XLSX.write(r.wb, { bookType: "xlsx", type: "array" }));
@@ -185,7 +195,7 @@ var MASIVO = (function () {
     pintarCarpetas();
   }
   iniciar();
-  return { procesar: procesar, clasificar: clasificar, indexarSalida: indexarSalida, filasResumen: filasResumen, contar: contar, mensaje: mensaje, COLS: COLS };
+  return { leerConReintento: leerConReintento, procesar: procesar, clasificar: clasificar, indexarSalida: indexarSalida, filasResumen: filasResumen, contar: contar, mensaje: mensaje, COLS: COLS };
 })();
 if (typeof module !== "undefined" && module.exports) module.exports = MASIVO;
 /* ==MASIVO-END== */

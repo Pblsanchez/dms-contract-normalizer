@@ -32,6 +32,7 @@ main:focus { outline: none; }
 .ms-cont--dup { border-top-color: var(--c-color-border-warning) !important; }
 .ms-msg { background: var(--c-color-surface); border: 1px solid var(--c-color-border-neutral-subtle); border-radius: var(--c-border-radius-medium); padding: var(--c-spacing-4) var(--c-spacing-5); margin-bottom: var(--c-spacing-4); }
 .ms-msg .message-card-body { min-height: 56px; }
+.ms-msg__nota { margin-top: var(--c-spacing-2); font-size: var(--c-font-size-caption); line-height: var(--c-line-height-caption); color: var(--c-color-text); }
 .ms-msg__acc { display: flex; justify-content: flex-end; gap: var(--c-spacing-2); flex-wrap: wrap; margin-top: var(--c-spacing-3); }
 .ms-tabla-wrap { overflow-x: auto; border: 1px solid var(--c-color-border-subtle); border-radius: var(--c-border-radius-small); background: var(--c-color-surface); max-height: 520px; overflow-y: auto; }
 .ms-tabla { width: 100%; border-collapse: collapse; font-size: var(--c-font-size-bodysmall); line-height: var(--c-line-height-bodysmall); }
