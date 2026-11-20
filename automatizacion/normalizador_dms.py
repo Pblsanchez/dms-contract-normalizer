@@ -4,7 +4,8 @@ Copia de las reglas de dms-contract-normalizer (js/normalizador-1.js + js/normal
 iguales a masivo/masivo-reglas.js), para que la automatizacion aplique exactamente lo mismo
 que el normalizador diario. Si cambia una regla alla, hay que copiarla aca tambien.
 
-Uso: python3 normalizador_dms.py <entrada.xlsx> <carpeta_salida>
+Uso: python3 normalizador_dms.py <entrada.xlsx | datos.json> <carpeta_salida>
+(datos.json = texto que devuelve el Office Script LeerAltaContratoDMS.ts del flujo de T-020)
 Salida: JSON con ok, errores, log, archivo, codigoERP, solicitante (6 digitos), razonSocial.
 Sin datos reales en este archivo (D-003).
 """
@@ -289,9 +290,37 @@ def validar_formulario(form, refs, log):
     return errores
 
 
+def libro_desde_json(texto):
+    """Arma un libro en memoria con la salida del Office Script LeerAltaContratoDMS
+    (todas las hojas con sus valores; las celdas con formato de fecha vienen como serial de Excel)."""
+    datos = json.loads(texto)
+    if isinstance(datos, str):  # el flujo puede devolverlo doblemente serializado
+        datos = json.loads(datos)
+    base = datetime.datetime(1899, 12, 30)
+    wb = openpyxl.Workbook()
+    wb.remove(wb.active)
+    for h in datos['hojas']:
+        ws = wb.create_sheet(h['nombre'])
+        fechas = {(r, c) for r, c in h.get('fechas', [])}
+        for r, fila in enumerate(h['valores']):
+            for c, v in enumerate(fila):
+                if v == '' or v is None:
+                    continue
+                if (r, c) in fechas and isinstance(v, (int, float)):
+                    v = base + datetime.timedelta(days=float(v))
+                ws.cell(row=r + 1, column=c + 1, value=v)
+    return wb
+
+
 def procesar(entrada, carpeta_salida):
+    """entrada: ruta a un .xlsx, un libro openpyxl o el texto JSON del Office Script."""
     log = []
-    wb_f = openpyxl.load_workbook(entrada, data_only=True)
+    if isinstance(entrada, openpyxl.Workbook):
+        wb_f = entrada
+    elif isinstance(entrada, str) and entrada.lstrip().startswith(('{', '"')):
+        wb_f = libro_desde_json(entrada)
+    else:
+        wb_f = openpyxl.load_workbook(entrada, data_only=True)
     if 'Formulario' not in wb_f.sheetnames:
         return {'ok': False, 'errores': ['No existe la hoja "Formulario"'], 'log': log}
     form = hoja_a_filas(wb_f['Formulario'])
@@ -350,4 +379,8 @@ def procesar(entrada, carpeta_salida):
 
 
 if __name__ == '__main__':
-    print(json.dumps(procesar(sys.argv[1], sys.argv[2]), ensure_ascii=False, indent=1))
+    arg = sys.argv[1]
+    if arg.lower().endswith('.json'):
+        with open(arg, encoding='utf-8') as fh:
+            arg = fh.read()
+    print(json.dumps(procesar(arg, sys.argv[2]), ensure_ascii=False, indent=1))
