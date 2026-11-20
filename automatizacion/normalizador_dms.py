@@ -11,6 +11,9 @@ Reglas D-107 (2026-11-20, Pablo):
   3. Direcciones: solo quedan las filas con algun dato cargado ademas del AddressType
      (vacio y 0 no son dato).
 Regla D-108.2 (2026-11-20, Pablo): domicilio con datos sin AddressType (vacio o 0) -> AddressType 1.
+Reglas D-110 (2026-11-20, Pablo): (1) si la hoja Direcciones trae errores de formula (#¡REF!...)
+se arma desde el bloque de direcciones del Formulario (log DIRECCIONES_RECONSTRUIDAS, para avisar
+al comercial); (2) errores de formula en cualquier otra hoja de salida frenan el proceso.
 
 Uso: python3 normalizador_dms.py <entrada.xlsx | datos.json> <carpeta_salida>
 (datos.json = texto que devuelve el Office Script LeerAltaContratoDMS.ts del flujo de T-020)
@@ -348,6 +351,43 @@ def limpiar_direcciones(data):
     return filas
 
 
+ERROR_EXCEL = re.compile(r'^#[\u00a1\u00bf]?[A-Z/0]+[!?]?$')
+HDR_DIRECCIONES = ['Street', 'Number', 'Floor', 'Department', 'City', 'PostalCode', 'State', 'Country',
+                   'Phone', 'MailBox', 'AddressType']
+
+
+def tiene_error_excel(data):
+    """D-110.2: celdas con errores de formula de Excel (#¡REF!, #REF!, #N/A, #¡VALOR!, ...)."""
+    return any(isinstance(x, str) and ERROR_EXCEL.match(x.strip()) for f in data for x in f)
+
+
+def direcciones_desde_formulario(form):
+    """D-110.1: arma la hoja Direcciones con el bloque de direcciones del Formulario
+    (fila con 'Clase de Direcci\u00f3n' en la columna B; columnas C a M). Vacio -> '0', como las formulas."""
+    ini = None
+    for i, r in enumerate(form):
+        if len(r) > 1 and js_str(r[1]).strip() == 'Clase de Direcci\u00f3n':
+            ini = i; break
+    if ini is None:
+        return None
+    filas = [list(HDR_DIRECCIONES)]
+    for r in form[ini + 1:]:
+        etiqueta = js_str(r[1]).strip() if len(r) > 1 else ''
+        if not etiqueta or etiqueta.startswith('*'):
+            break
+        fila = []
+        for c in range(2, 13):
+            v = r[c] if c < len(r) else None
+            if v is None or v == '':
+                fila.append('0')
+            elif isinstance(v, float) and v.is_integer():
+                fila.append(str(int(v)))
+            else:
+                fila.append(str(v))
+        filas.append(fila)
+    return filas
+
+
 def libro_desde_json(texto):
     """Arma un libro en memoria con la salida del Office Script LeerAltaContratoDMS
     (todas las hojas con sus valores; las celdas con formato de fecha vienen como serial de Excel)."""
@@ -432,6 +472,14 @@ def procesar(entrada, carpeta_salida):
                     if str(fila[k]).strip() != v:
                         log.append(f'Contrato.{campo}: "{fila[k]}" -> "{v}" (igual al Formulario)')
                         fila[k] = v
+        if nombre == 'Direcciones' and data and tiene_error_excel(data):  # D-110.1
+            nuevas = direcciones_desde_formulario(form)
+            if not nuevas or tiene_error_excel(nuevas):
+                return {'ok': False, 'errores': ['La hoja "Direcciones" tiene errores de f\u00f3rmula (#\u00a1REF!) y no se pudo armar desde el Formulario'], 'log': log}
+            data = nuevas
+            log.append('DIRECCIONES_RECONSTRUIDAS: la hoja "Direcciones" ten\u00eda errores de f\u00f3rmula (#\u00a1REF!); se arm\u00f3 desde el Formulario')
+        elif nombre != 'Direcciones' and tiene_error_excel(data):  # D-110.2
+            return {'ok': False, 'errores': [f'La hoja "{nombre}" tiene errores de f\u00f3rmula de Excel (#\u00a1REF!, #N/A, ...)'], 'log': log}
         if nombre == 'Direcciones' and data:
             antes = len(data)
             data = limpiar_direcciones(data)  # D-107.3
