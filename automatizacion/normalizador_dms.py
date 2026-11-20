@@ -10,6 +10,7 @@ Reglas D-107 (2026-11-20, Pablo):
   2. Se eliminan siempre los espacios al final de todos los textos de la salida.
   3. Direcciones: solo quedan las filas con algun dato cargado ademas del AddressType
      (vacio y 0 no son dato).
+Regla D-108.2 (2026-11-20, Pablo): domicilio con datos sin AddressType (vacio o 0) -> AddressType 1.
 
 Uso: python3 normalizador_dms.py <entrada.xlsx | datos.json> <carpeta_salida>
 (datos.json = texto que devuelve el Office Script LeerAltaContratoDMS.ts del flujo de T-020)
@@ -337,6 +338,12 @@ def limpiar_direcciones(data):
     filas = [data[0]]
     for f in data[1:]:
         if any(str(x).strip() not in ('', '0') for k, x in enumerate(f) if k != col_tipo):
+            # D-108.2: domicilio con datos pero sin AddressType (vacio o 0) -> 1
+            if col_tipo >= 0:
+                while len(f) <= col_tipo:
+                    f.append('')
+                if str(f[col_tipo]).strip() in ('', '0'):
+                    f[col_tipo] = '1'
             filas.append(f)
     return filas
 
