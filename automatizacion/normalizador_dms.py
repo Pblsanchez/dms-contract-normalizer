@@ -4,6 +4,13 @@ Copia de las reglas de dms-contract-normalizer (js/normalizador-1.js + js/normal
 iguales a masivo/masivo-reglas.js), para que la automatizacion aplique exactamente lo mismo
 que el normalizador diario. Si cambia una regla alla, hay que copiarla aca tambien.
 
+Reglas D-107 (2026-11-20, Pablo):
+  1. Continente <-> SLA tambien con el modelo V9 ("Continente" en la columna B de Niveles de
+     esfuerzo) y la correccion llega a la hoja Contrato (SLA y TipoDeEnvio salen del Formulario).
+  2. Se eliminan siempre los espacios al final de todos los textos de la salida.
+  3. Direcciones: solo quedan las filas con algun dato cargado ademas del AddressType
+     (vacio y 0 no son dato).
+
 Uso: python3 normalizador_dms.py <entrada.xlsx | datos.json> <carpeta_salida>
 (datos.json = texto que devuelve el Office Script LeerAltaContratoDMS.ts del flujo de T-020)
 Salida: JSON con ok, errores, log, archivo, codigoERP, solicitante (6 digitos), razonSocial.
@@ -58,6 +65,8 @@ MAPA_REF = {'Log\u00edstica Solicitada': 'logistica', 'Continente': 'continente'
 CAMPOS_REFERENCIA = ['TipoDeEnvio', 'Log\u00edstica Solicitada', 'Continente', 'SLA', 'Plazo', 'FormularioMobileB2B']
 BOOLEANOS = ['AllowRescue', 'AllowWithdrawPartialValues', 'ObligatoryGauge', 'AllowPartialDelivery',
              'IsCentralizedReturn', 'HasCollectionManagement', 'AllowPrintDocumentationReturn', '\u00bfEs recambio?']
+# D-107.1: campos del Formulario que se copian a la hoja Contrato (por nombre de columna)
+CAMPOS_A_CONTRATO = ['SLA', 'TipoDeEnvio']
 
 
 def js_str(v):
@@ -205,6 +214,16 @@ def validar_contra_referencias(campo, valor, refs):
     return ok, (vn if ok else valor), norm
 
 
+def campo_de_fila(row, i):
+    """Nombre del campo de la fila del Formulario. D-107.1: en el modelo V9 la tabla
+    'Niveles de esfuerzo' (filas 27-30) trae el nombre en la columna B; de ahi solo se toma
+    'Continente' (Plazo y el resto siguen sin validarse, como en el normalizador web)."""
+    campo = js_str(row[0]).strip()
+    if not campo and 26 <= i <= 29 and len(row) > 1 and js_str(row[1]).strip() == 'Continente':
+        return 'Continente'
+    return campo
+
+
 def validar_formulario(form, refs, log):
     errores = []
     filas = list(range(2, 24)) + list(range(26, 30))
@@ -222,7 +241,7 @@ def validar_formulario(form, refs, log):
         row = form[i]
         while len(row) < 3:
             row.append(None)
-        campo = js_str(row[0]).strip()
+        campo = campo_de_fila(row, i)
         valor = js_str(row[2]).strip()
         if not campo:
             continue
@@ -290,6 +309,38 @@ def validar_formulario(form, refs, log):
     return errores
 
 
+def valores_formulario(form, campos):
+    """Valor final (ya validado y corregido) de cada campo del Formulario, por nombre en la columna A."""
+    out = {}
+    for r in form:
+        if r and js_str(r[0]).strip() in campos and len(r) > 2:
+            out[js_str(r[0]).strip()] = js_str(r[2]).strip()
+    return out
+
+
+def recortar_espacios_finales(data):
+    """D-107.2: quita los espacios al final de todos los textos. Devuelve cuantas celdas cambiaron."""
+    n = 0
+    for fila in data:
+        for k, x in enumerate(fila):
+            if isinstance(x, str) and x != x.rstrip():
+                fila[k] = x.rstrip(); n += 1
+    return n
+
+
+def limpiar_direcciones(data):
+    """D-107.3: quedan solo las filas con algun dato ademas del AddressType (vacio y 0 no son dato)."""
+    if not data:
+        return data
+    enc = [str(x).strip() for x in data[0]]
+    col_tipo = enc.index('AddressType') if 'AddressType' in enc else -1
+    filas = [data[0]]
+    for f in data[1:]:
+        if any(str(x).strip() not in ('', '0') for k, x in enumerate(f) if k != col_tipo):
+            filas.append(f)
+    return filas
+
+
 def libro_desde_json(texto):
     """Arma un libro en memoria con la salida del Office Script LeerAltaContratoDMS
     (todas las hojas con sus valores; las celdas con formato de fecha vienen como serial de Excel)."""
@@ -346,12 +397,14 @@ def procesar(entrada, carpeta_salida):
         log.append(f'CodigoSolicitanteERP: "{sol_raw}" -> "{sol}"')
     if cn_raw != client:
         log.append(f'ClientName limpiado: "{cn_raw}" -> "{client}"')
+    finales = valores_formulario(form, CAMPOS_A_CONTRATO)
     # normalizeWorkbook: todas las hojas como texto (raw:false), sin Formulario, Referencias al final
     salida = openpyxl.Workbook()
     salida.remove(salida.active)
     orden = [s for s in wb_f.sheetnames if s not in ('Formulario', 'Referencias')]
     if 'Referencias' in wb_f.sheetnames:
         orden.append('Referencias')
+    recortes = 0
     for nombre in orden:
         data = hoja_a_filas(wb_f[nombre], crudo=False)
         if nombre == 'Contrato' and len(data) > 1:
@@ -362,14 +415,27 @@ def procesar(entrada, carpeta_salida):
                 fila[12] = client
             if len(fila) > 24:
                 fila[24] = 'false'
+            enc = [str(x).strip() for x in data[0]]
+            for campo in CAMPOS_A_CONTRATO:  # D-107.1
+                v = finales.get(campo, '')
+                if v and campo in enc:
+                    k = enc.index(campo)
+                    while len(fila) <= k:
+                        fila.append('')
+                    if str(fila[k]).strip() != v:
+                        log.append(f'Contrato.{campo}: "{fila[k]}" -> "{v}" (igual al Formulario)')
+                        fila[k] = v
         if nombre == 'Direcciones' and data:
             antes = len(data)
-            data = [data[0]] + [f for f in data[1:] if any(str(x).strip() not in ('', '0') for x in f)]
+            data = limpiar_direcciones(data)  # D-107.3
             if len(data) != antes:
                 log.append(f'Se eliminaron {antes - len(data)} filas vac\u00edas en "Direcciones"')
+        recortes += recortar_espacios_finales(data)  # D-107.2
         ws = salida.create_sheet(nombre)
         for f in data:
             ws.append([(x if x != '' else None) for x in f])
+    if recortes:
+        log.append(f'Se quitaron espacios al final en {recortes} celdas')
     nombre_salida = f'Alta de contrato DMS {codigo_erp} {sol}' + (f' {client}' if client else '') + '.xlsx'
     os.makedirs(carpeta_salida, exist_ok=True)
     ruta = os.path.join(carpeta_salida, nombre_salida)
