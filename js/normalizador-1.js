@@ -195,7 +195,7 @@
                 ['', '', '', ''],
                 ['', '📋 NIVELES DE ESFUERZO', '', ''],
                 ['Logística Solicitada', 'Entrega, Logística inversa, Punto a punto, Retiro, Cambio', '', 'Seleccionar de la lista'],
-                ['Continente', 'Contenedor, Bulto, Pallets, Bultos Bigger, Sobre, Bodega, etc.', '', 'Seleccionar de la lista'],
+                ['Continente', 'Contenedor, Bulto/Paquete, Pallet, Bultos Bigger, Sobre, Bodega, etc.', '', 'Seleccionar de la lista'],
                 ['Plazo', 'SLA 1 - Estándar B2B, SLA 2 - Acordado con cliente, SLA 3 - Urgente, SLA 4 - Logistica Asegurada V2, SLA PALLETS, SLA BIGGER', '', 'Seleccionar de la lista'],
                 ['Formulario Mobile B2B', 'Formulario B2B 1 al 13', '', 'Seleccionar de la lista'],
                 ['', '', '', ''],

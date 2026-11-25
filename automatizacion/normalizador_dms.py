@@ -11,6 +11,9 @@ Reglas D-107 (2026-11-20, Pablo):
   3. Direcciones: solo quedan las filas con algun dato cargado ademas del AddressType
      (vacio y 0 no son dato).
 Regla D-108.2 (2026-11-20, Pablo): domicilio con datos sin AddressType (vacio o 0) -> AddressType 1.
+Regla E3 de T-029 (2026-11-25): el Continente es "Pallet" (asi figura en Referencias, codigo 4);
+"pallet"/"pallets" se normalizan a "Pallet" y la regla Continente <-> SLA usa Pallet <-> SLA PALLETS.
+La correccion SLA -> Continente encuentra la fila aunque el nombre este en la columna B (modelo V9/V10).
 Reglas D-110 (2026-11-20, Pablo): (1) si la hoja Direcciones trae errores de formula (#¡REF!...)
 se arma desde el bloque de direcciones del Formulario (log DIRECCIONES_RECONSTRUIDAS, para avisar
 al comercial); (2) errores de formula en cualquier otra hoja de salida frenan el proceso.
@@ -57,7 +60,7 @@ DICCIONARIOS = {
         'slapallets': 'SLA PALLETS', 'sla bigger': 'SLA BIGGER', 'sla biger': 'SLA BIGGER',
         'slabigger': 'SLA BIGGER'},
     'Continente': {
-        'pallet': 'Pallets', 'pallets': 'Pallets', 'bigger': 'Bultos Bigger',
+        'pallet': 'Pallet', 'pallets': 'Pallet', 'bigger': 'Bultos Bigger',
         'bultos bigger': 'Bultos Bigger', 'bulto bigger': 'Bultos Bigger',
         'bultos biger': 'Bultos Bigger', 'bulto biger': 'Bultos Bigger'},
     'HasDeliveryNote': {
@@ -234,8 +237,8 @@ def validar_formulario(form, refs, log):
     rs = limpiar_texto_envolvente(js_str(celda(form, 13, 2)).strip()) or 'No especificada'
 
     def buscar(nombre):
-        for r in form:
-            if r and js_str(r[0]).strip() == nombre:
+        for k, r in enumerate(form):  # T-029 E3: tambien con el nombre en la columna B
+            if r and campo_de_fila(r, k) == nombre:
                 return r
         return None
 
@@ -297,7 +300,7 @@ def validar_formulario(form, refs, log):
             if r is not None and js_str(r[2]).strip() != 'Log\u00edstica Asegurada':
                 log.append('TipoDeEnvio auto-corregido a "Log\u00edstica Asegurada"'); r[2] = 'Log\u00edstica Asegurada'
         # Cruzadas Continente <-> SLA
-        c2s = {'Pallets': 'SLA PALLETS', 'Bultos Bigger': 'SLA BIGGER'}
+        c2s = {'Pallet': 'SLA PALLETS', 'Bultos Bigger': 'SLA BIGGER'}
         s2c = {v: k for k, v in c2s.items()}
         if campo == 'Continente' and valor in c2s:
             r = buscar('SLA')

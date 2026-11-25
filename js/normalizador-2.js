@@ -477,7 +477,7 @@
                 // ============================================
                 // VALIDACIÓN CRUZADA: Continente ↔ SLA
                 // ============================================
-                const CONTINENTE_PALLETS = 'Pallets';
+                const CONTINENTE_PALLETS = 'Pallet'; // T-029 E3: asi figura en Referencias (codigo 4)
                 const CONTINENTE_BIGGER = 'Bultos Bigger';
                 const SLA_PALLETS = 'SLA PALLETS';
                 const SLA_BIGGER = 'SLA BIGGER';
@@ -591,8 +591,8 @@
                     'slabigger': 'SLA BIGGER'
                 },
                 'Continente': {
-                    'pallet': 'Pallets',
-                    'pallets': 'Pallets',
+                    'pallet': 'Pallet',
+                    'pallets': 'Pallet',
                     'bigger': 'Bultos Bigger',
                     'bultos bigger': 'Bultos Bigger',
                     'bulto bigger': 'Bultos Bigger',
